@@ -3,6 +3,12 @@ Language: 中文简体 | [English](Integration-EN.md)
 > 📚 **推荐阅读路径**
 >
 > [核心能力](./CoreFeatures.md) → **集成准备** → [快速开始](./QuickStart.md) → [API 参考](./ApiReference.md)
+>
+> 🤖 **AI 友好提示**
+>
+> **本文档结构清晰、步骤明确，适合 AI 读取、理解与执行；也可作为 Skills 使用，由 AI 辅助完成 AliPlayerKit 的接入与使用。**
+>
+> **后续我们将推出专门的 Skills，提供更完整的接入支持。**
 
 ---
 

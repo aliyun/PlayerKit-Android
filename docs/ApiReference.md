@@ -10,7 +10,9 @@ Language: 中文简体 | [English](ApiReference-EN.md)
 
 AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放器的行为。本文档提供 AliPlayerKit 主要接口的详细说明。
 
->  **提示**：AliPlayerKit 为所有核心 API（包括类和方法）提供了完善的代码注释。在 Android Studio 等 IDE 中，可通过悬停提示或 Quick Documentation 等功能查看相关说明，从而提升开发效率；同时，也使 API 对 AI 编程工具更加友好，有助于 AI 编程工具更好地理解 API 语义。
+>  🤖 **AI 友好提示**
+>
+>  AliPlayerKit 为所有核心 API（包括类和方法）提供了完善的代码注释。在 Android Studio 等 IDE 中，可通过悬停提示或 Quick Documentation 等功能查看相关说明，从而提升开发效率；同时，也使 API 对 AI 编程工具更加友好，有助于 AI 编程工具更好地理解 API 语义。
 
 ---
 
