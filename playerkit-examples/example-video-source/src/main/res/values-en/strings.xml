@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="video_source_example_title">Video Source Example</string>
+    <string name="video_source_example_description">Demonstrates how to use different types of video sources for playback:\n• URL: Play videos via direct URL\n• VidAuth: Play videos via VID and PlayAuth\n• VidSts: Play videos via VID and STS token\n\nAfter selecting a video source type, if the configuration is incomplete, you will be guided to the settings page to configure it.</string>
+
+    <string name="video_source_example_btn_url_source">URL Video Source</string>
+    <string name="video_source_example_btn_vid_auth_source">VidAuth Video Source</string>
+    <string name="video_source_example_btn_vid_sts_source">VidSts Video Source</string>
+    <string name="video_source_example_config_title">Video Source Configuration</string>
+    <string name="video_source_example_config_message">Video source configuration is incomplete. Please go to the settings page to configure</string>
+    <string name="video_source_example_config_go_scan">Go to Settings</string>
+</resources>
+

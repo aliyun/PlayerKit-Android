@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Live scene tips -->
+    <string name="setting_live_url_not_set_title">Live URL</string>
+    <string name="setting_live_url_not_set_message">Live URL not set, please scan QR code to configure</string>
+    <string name="setting_live_url_go_scan">Go to Scan</string>
+
+</resources>

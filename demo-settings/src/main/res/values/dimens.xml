@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 通用设置项组件尺寸（布局、文字、图标） -->
+    <dimen name="setting_padding_horizontal">16dp</dimen>
+    <dimen name="setting_padding_vertical">14dp</dimen>
+    <dimen name="setting_header_padding">12dp</dimen>
+    <dimen name="setting_title_size">16dp</dimen>
+    <dimen name="setting_subtitle_size">13dp</dimen>
+    <dimen name="setting_icon_size">20dp</dimen>
+    <dimen name="setting_item_spacing">8dp</dimen>
+
+    <!-- 链接设置项组件尺寸（链接、输入框、分割线、按钮） -->
+    <dimen name="setting_link_name_size">14dp</dimen>
+    <dimen name="setting_item_padding_vertical">12dp</dimen>
+    <dimen name="setting_input_padding_vertical">10dp</dimen>
+    <dimen name="setting_icon_padding">4dp</dimen>
+    <dimen name="setting_divider_height">0.5dp</dimen>
+    <dimen name="setting_button_text_size">16dp</dimen>
+    <dimen name="setting_button_corner_radius">8dp</dimen>
+</resources>

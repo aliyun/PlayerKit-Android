@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 分组标题 -->
+    <string name="setting_header_general">通用</string>
+    <string name="setting_header_log">日志</string>
+    <string name="setting_header_tools">工具</string>
+    <string name="setting_header_version">版本</string>
+    <string name="setting_header_others">其它</string>
+
+    <!-- 设置项标题 -->
+    <string name="setting_link_setting">链接设置</string>
+    <string name="setting_device_id">设备 UUID</string>
+    <string name="setting_sdk_version">SDK 版本号</string>
+    <string name="setting_playerkit_version">PlayerKit 版本号</string>
+    <string name="setting_playerkit_build_info">构建信息</string>
+    <string name="setting_toast_copied">已复制到剪贴板</string>
+
+    <!-- 播放器视图类型设置 -->
+    <string name="setting_view_type_title">播放 View 类型</string>
+    <string name="setting_view_type_display_view">AliDisplayView（推荐）</string>
+    <string name="setting_view_type_surface_view">SurfaceView</string>
+    <string name="setting_view_type_texture_view">TextureView</string>
+
+    <!-- Debug 模式设置 -->
+    <string name="setting_debug_mode_title">调试模式</string>
+
+    <!-- 禁止截屏设置 -->
+    <string name="setting_disable_screenshot_title">禁止截屏</string>
+
+    <!-- 日志相关设置 -->
+    <string name="setting_log_panel_title">显示日志面板</string>
+    <string name="setting_log_level_title">日志等级</string>
+
+    <!-- 工具相关设置 -->
+    <string name="setting_mobile_ops">掌上运维</string>
+
+    <!-- 其它设置 -->
+    <string name="setting_reset_default">恢复默认配置</string>
+    <string name="setting_clear_cache">清除缓存</string>
+    <string name="setting_toast_reset_default">已恢复默认配置，将退出应用</string>
+    <string name="setting_toast_clear_cache">缓存已清除</string>
+
+    <!-- 链接配置项 -->
+    <string name="setting_link_video_url">视频 Direct URL 地址</string>
+    <string name="setting_link_video_vid">视频 ID (Vid)</string>
+    <string name="setting_link_video_play_auth">Vid 播放凭证 (PlayAuth)</string>
+    <string name="setting_link_video_live_url">直播地址</string>
+    <string name="setting_link_video_vid_sts_vid">VidSts 视频 ID (Vid)</string>
+    <string name="setting_link_video_vid_sts_access_key_id">VidSts 访问密钥 ID (AccessKeyId)</string>
+    <string name="setting_link_video_vid_sts_access_key_secret">VidSts 访问密钥密文 (AccessKeySecret)</string>
+    <string name="setting_link_video_vid_sts_security_token">VidSts 安全令牌 (SecurityToken)</string>
+    <string name="setting_link_video_vid_sts_region">VidSts 区域信息 (Region，可选)</string>
+
+    <!-- 链接配置提示 -->
+    <string name="setting_link_save">保存配置</string>
+    <string name="setting_link_toast_save_success">配置已保存</string>
+    <string name="setting_link_toast_camera_permission">需要相机权限才能扫码</string>
+    <string name="setting_link_item_name_placeholder">配置项名称</string>
+    <string name="setting_link_item_input_hint">请输入链接</string>
+    <string name="setting_link_item_scan">扫码</string>
+</resources>
+

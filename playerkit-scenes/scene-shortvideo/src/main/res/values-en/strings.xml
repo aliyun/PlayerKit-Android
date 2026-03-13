@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Micro-Drama Solution Hint -->
+    <string name="short_video_hint"><![CDATA[
+    To enable <strong>short video list playback</strong>, it is recommended to use the <strong>Alibaba Cloud Short Drama Solution</strong> directly.<br/><br/>
+    This solution consists of the <strong>client-side AUI components</strong> and the <strong>server-side VodAppServer</strong>, covering the complete short drama business workflow from content management and distribution to playback. With integrated frontend and backend design, it allows you to quickly build an operable short drama application without developing your own backend services, significantly reducing development cost and time to market.<br/><br/>
+    <strong>Note:</strong> The <strong>feature source code and sample projects</strong> related to short drama are provided only after the purchase of the <strong>Professional Edition License</strong> of the SDK.<br/><br/>
+    For more information about Professional Edition features, licensing, or integration details, please contact the <strong>PDSA pre-sales technical support team</strong> for further assistance.<br/><br/>
+    👉 <a href="https://help.aliyun.com/zh/vod/use-cases/brief-introduction-micro-of-drama/">
+    Learn more about the Alibaba Cloud Short Drama Solution
+    </a>]]></string>
+
+    <string name="copy_success">Copied</string>
+
+</resources>

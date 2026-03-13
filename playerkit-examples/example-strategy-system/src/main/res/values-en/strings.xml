@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Strategy system example: resume playback -->
+    <string name="strategy_system_example_resume_playback">
+        Strategy System Example: Resume playback\nAutomatically saves playback progress and resumes playback when re-entering.
+    </string>
+
+    <!-- Resume play: restored toast -->
+    <string name="resume_play_restored_toast">Resumed from your last watching position</string>
+
+</resources>

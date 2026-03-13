@@ -1,0 +1,54 @@
+apply plugin: 'com.android.library'
+
+android {
+    /// 集成FAQ (Integration FAQ)
+    /// 关于 namespace 声明的注意事项：
+    /// - AGP 版本 ≥ 8.0（如 8.3.2）：必须声明 namespace
+    /// - AGP 版本 < 7.0（如 4.0.1）：需移除 namespace 声明，使用 AndroidManifest.xml 的 package 属性
+    /// - AGP 版本 7.x：namespace 声明可选，建议声明以兼容未来升级
+    ///
+    /// Note: For namespace declaration:
+    /// - AGP ≥ 8.0 (e.g., 8.3.2): namespace declaration is required
+    /// - AGP < 7.0 (e.g., 4.0.1): remove namespace declaration, use package attribute in AndroidManifest.xml
+    /// - AGP 7.x: namespace declaration is optional, recommended for future compatibility
+    namespace = "com.aliyun.playerkit.examples.mobileops"
+
+    compileSdkVersion 33
+    buildToolsVersion "33.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 33
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+dependencies {
+    // 集成FAQ (Integration FAQ)
+    /// <!!!> 如果在您的项目中已经引入了相同的第三方组件库，请调整版本号以确保兼容性，并避免潜在的冲突。
+    /// <!!!> If the same third-party component library is already included in your project, please adjust the version number to ensure compatibility and avoid potential conflicts.
+    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'com.google.android.material:material:1.6.0'
+
+    // 引入 AliPlayerKit 核心模块：提供开箱即用、可配置的播放器 UI 组件，覆盖基础播放与常见交互能力。
+    implementation project(':playerkit')
+
+    // 引入 demo-settings 模块（用于读取链接配置）
+    implementation project(':demo-settings')
+}

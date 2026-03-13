@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event_system_example_title">Event System Example</string>
+    <string name="event_system_example_description">
+    Control AliPlayerKit via the event bus:\n
+    • Send commands to control PlayerKit (e.g. play / pause)\n
+    • Receive events to obtain PlayerKit states (e.g. playback progress)
+    </string>
+
+    <string name="btn_send_toggle">Send Toggle Command (Play / Pause)</string>
+    <string name="toast_toggle_sent">Toggle command sent. Playback state will be switched.</string>
+
+    <string name="info_event_output">Info Event Output (Subscribed)</string>
+    <string name="event_info">Playback info: position %1$s, duration %2$s, buffered position %3$s</string>
+
+    <string name="time_format_seconds">%.1fs</string>
+</resources>
+

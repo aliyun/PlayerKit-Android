@@ -1,0 +1,72 @@
+apply plugin: 'com.android.library'
+
+android {
+    /// 集成FAQ (Integration FAQ)
+    /// 关于 namespace 声明的注意事项：
+    /// - AGP 版本 ≥ 8.0（如 8.3.2）：必须声明 namespace
+    /// - AGP 版本 < 7.0（如 4.0.1）：需移除 namespace 声明，使用 AndroidManifest.xml 的 package 属性
+    /// - AGP 版本 7.x：namespace 声明可选，建议声明以兼容未来升级
+    ///
+    /// Note: For namespace declaration:
+    /// - AGP ≥ 8.0 (e.g., 8.3.2): namespace declaration is required
+    /// - AGP < 7.0 (e.g., 4.0.1): remove namespace declaration, use package attribute in AndroidManifest.xml
+    /// - AGP 7.x: namespace declaration is optional, recommended for future compatibility
+    namespace = "com.aliyun.playerkit"
+
+    compileSdkVersion 33
+    buildToolsVersion "33.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 33
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    // Prevent lint errors from aborting the gradle build
+    // Call requires API level R: java.util.Set#of
+    lintOptions {
+        abortOnError false
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+dependencies {
+    // 集成FAQ (Integration FAQ)
+    /// <!!!> 如果在您的项目中已经引入了相同的第三方组件库，请调整版本号以确保兼容性，并避免潜在的冲突。
+    /// <!!!> If the same third-party component library is already included in your project, please adjust the version number to ensure compatibility and avoid potential conflicts.
+    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'com.google.android.material:material:1.6.0'
+
+    // Glide库，图片加载和缓存的工具
+    // Glide library for loading and caching images
+    implementation 'com.github.bumptech.glide:glide:4.13.0'
+
+    // 您可以参考官网获取播放器 SDK 最新版本：https://help.aliyun.com/zh/vod/developer-reference/sdk-download
+    // You can refer to the official website for SDK updates: https://www.alibabacloud.com/help/en/vod/developer-reference/sdk-download
+    def player_sdk_version = "7.12.0"
+    api "com.aliyun.sdk.android:AliyunPlayer:$player_sdk_version-full"
+
+    // 播放器与Rts低延时直播组件的桥接层（AlivcArtc），版本号需要与播放器一致，需要和 Rts低延时直播组件 一起集成
+    // The bridging layer (AlivcArtc) between the player and RtsSDK, with the same version number as the player, needs to be integrated with RtsSDK.
+    api "com.aliyun.sdk.android:AlivcArtc:$player_sdk_version"
+
+    // Rts低延时直播组件 您可以参考官网 获取 RTS SDK 最新版本：https://help.aliyun.com/zh/live/pull-streams-over-rts-on-android
+    // You can refer to the official website for SDK updates: https://www.alibabacloud.com/help/en/live/pull-streams-over-rts-on-android
+    def rts_sdk_version = "7.12.0"
+    api "com.aliyun.rts.android:RtsSDK:$rts_sdk_version"
+}

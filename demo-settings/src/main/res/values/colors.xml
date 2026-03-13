@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="setting_header_bg">#FFF5F5F5</color>
+    <color name="setting_item_title">#FF111111</color>
+    <color name="setting_item_subtitle">#FF666666</color>
+    <color name="setting_divider">#FFEEEEEE</color>
+    <color name="setting_divider_strong">#FFDDDDDD</color>
+</resources>

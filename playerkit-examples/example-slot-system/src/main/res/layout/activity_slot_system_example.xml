@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <!--  播放器组件视图  -->
+    <com.aliyun.playerkit.AliPlayerView
+        android:id="@+id/v_player_kit"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--  控制面板  -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/slot_control_panel_bg"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!--  标题  -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="@string/slot_system_example_title"
+            android:textColor="@color/slot_text_primary"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <!--  当前状态显示  -->
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/slot_system_example_current_status"
+            android:textColor="@color/slot_text_primary"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <!--  特性说明  -->
+        <TextView
+            android:id="@+id/feature_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/slot_system_example_features"
+            android:textColor="@color/slot_text_secondary"
+            android:textSize="12dp" />
+
+        <!--  Surface 插槽切换按钮区域  -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/slot_system_example_switch_label"
+            android:textColor="@color/slot_text_primary"
+            android:textSize="13dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_surface_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="12dp"
+                android:text="@string/btn_surface_view"
+                android:textSize="11dp" />
+
+            <Button
+                android:id="@+id/btn_texture_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="12dp"
+                android:text="@string/btn_texture_view"
+                android:textSize="11dp" />
+
+            <Button
+                android:id="@+id/btn_empty_slot"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="12dp"
+                android:text="@string/btn_empty_slot"
+                android:textSize="11dp" />
+        </LinearLayout>
+
+        <!--  说明文字  -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="2dp"
+            android:text="@string/slot_system_example_tip"
+            android:textColor="@color/slot_text_hint"
+            android:textSize="11dp" />
+    </LinearLayout>
+
+</FrameLayout>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical">
+
+    <!-- 上：介绍区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/preload_example_title"
+            android:textColor="@android:color/black"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/preload_example_description"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="13dp" />
+
+    </LinearLayout>
+
+    <!-- 中：播放器视图区域 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- 播放器视图 -->
+        <com.aliyun.playerkit.AliPlayerView
+            android:id="@+id/v_player_kit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- 首帧时间显示（在播放器上方，仅在播放器 attach 时显示） -->
+        <TextView
+            android:id="@+id/tv_first_frame_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:fontFamily="monospace"
+            android:padding="8dp"
+            android:textColor="@android:color/white"
+            android:textSize="12dp"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!-- 下：控制区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 预加载控制区域 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/preload_switch_title"
+                android:textColor="@android:color/black"
+                android:textSize="14dp" />
+
+            <Switch
+                android:id="@+id/switch_preload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+        </LinearLayout>
+
+        <!-- 控制按钮区域 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_play_pause"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="@string/btn_play" />
+
+            <Button
+                android:id="@+id/btn_clear"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/btn_clear" />
+
+        </LinearLayout>
+
+        <!-- 预加载状态显示 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/preload_status_title"
+            android:textColor="@android:color/black"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:id="@+id/sv_preload_status"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/black"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/tv_preload_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:padding="12dp"
+                android:textColor="@android:color/white"
+                android:textSize="12dp" />
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>

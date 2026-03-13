@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="playlist_demo_hint">Playlist playback demo: Videos will start from the first one and automatically play the next in order</string>
+    <string name="playlist_video_title">Playlist Playback - Video %1$d</string>
+</resources>
+

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="strategy_system_example_title">播放器生命周期策略演示</string>
+    <string name="strategy_system_example_description">演示如何通过 AliPlayerController 自定义传入播放器生命周期策略，以实现播放器实例的精细化管理和资源复用。如果不传则使用默认策略。</string>
+
+    <string name="strategy_select_hint">播放器生命周期策略：</string>
+    <string name="strategy_default">默认策略 (Default)</string>
+    <string name="strategy_reuse_pool">资源复用池 (ReusePool)</string>
+    <string name="strategy_id_scoped">ID 绑定作用域 (IdScoped)</string>
+    <string name="strategy_singleton">全局单例 (Singleton)</string>
+
+    <string name="video_source_title">视频源切换：</string>
+    <string name="video_1">视频 1</string>
+    <string name="video_2">视频 2</string>
+    <string name="video_3">视频 3</string>
+
+    <string name="log_title">策略执行日志：</string>
+
+    <string name="strategy_status_new">新创建</string>
+    <string name="strategy_status_reused">池内复用</string>
+    <string name="strategy_status_hit">ID 命中</string>
+
+    <string name="strategy_status_ready">就绪</string>
+    <string name="strategy_status_idle">空闲</string>
+</resources>

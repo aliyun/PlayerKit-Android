@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">AliPlayerKit</string>
+
+    <!-- Common Messages -->
+    <string name="schema_not_supported">Feature not implemented yet: %s</string>
+
+    <!-- Long Video Page -->
+    <string name="long_video_page_title">Long Video</string>
+    <string name="long_video_page_schema">playerkit://scenes/longvideo</string>
+
+    <!-- Live Page -->
+    <string name="live_page_title">Live Stream</string>
+    <string name="live_page_schema">playerkit://scenes/live</string>
+
+    <!-- Playlist Page -->
+    <string name="playlist_page_title">Playlist</string>
+    <string name="playlist_page_schema">playerkit://scenes/playlist</string>
+
+    <!-- Short Video Playback Page -->
+    <string name="short_video_page_title">Short Video Playback</string>
+    <string name="short_video_page_schema">playerkit://scenes/shortvideo</string>
+
+    <!-- Video Source Example Page -->
+    <string name="video_source_example_page_title">Video Source Example</string>
+    <string name="video_source_example_page_schema">playerkit://examples/videosource</string>
+
+    <!--  Slot System Demonstration  -->
+    <string name="slot_system_example_page_title">Slot System Example</string>
+    <string name="slot_system_example_page_schema">playerkit://examples/slotsystem</string>
+
+    <!--  Strategy System Example  -->
+    <string name="strategy_system_example_page_title">Strategy System Example</string>
+    <string name="strategy_system_example_page_schema">playerkit://examples/strategysystem</string>
+
+    <!-- Log System Example Page -->
+    <string name="log_system_example_page_title">Logging System Example</string>
+    <string name="log_system_example_page_schema">playerkit://examples/logsystem</string>
+
+    <!-- Event System Example Page -->
+    <string name="event_system_example_page_title">Event System Example</string>
+    <string name="event_system_example_page_schema">playerkit://examples/eventsystem</string>
+
+    <!-- Player Lifecycle Strategy Example Page -->
+    <string name="lifecycle_strategy_example_page_title">Player Lifecycle Strategy Example</string>
+    <string name="lifecycle_strategy_example_page_schema">playerkit://examples/lifecyclestrategy</string>
+
+    <!-- Preload Example Page -->
+    <string name="preload_example_page_title">Preload Example</string>
+    <string name="preload_example_example_schema">playerkit://examples/preload</string>
+
+    <!-- Settings Page -->
+    <string name="settings_page_title">Settings</string>
+    <string name="settings_page_schema">playerkit://settings</string>
+
+    <!-- Link Page -->
+    <string name="setting_link_page_schema">playerkit://link</string>
+
+</resources>

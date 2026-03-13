@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="playlist_demo_hint">列表播放演示：从第一个视频开始，播放完后将自动依次播放后续视频</string>
+    <string name="playlist_video_title">列表播放 - 视频 %1$d</string>
+</resources>
+

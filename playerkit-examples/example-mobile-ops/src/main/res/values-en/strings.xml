@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mobile_ops_title">Mobile Operations</string>
+    <string name="mobile_ops_description">Operations tool for analyzing client-side logs.\nSelect a video source type to start playback. Logs during playback will be automatically injected into the log panel.\n• URL: Play video via direct URL\n• VidAuth: Play video via VID and PlayAuth\n• VidSts: Play video via VID and STS token\n\nAfter selecting a video source type, if the configuration is incomplete, you will be guided to the settings page to configure.</string>
+
+    <string name="mobile_ops_btn_url_source">URL Video Source</string>
+    <string name="mobile_ops_btn_vid_auth_source">VidAuth Video Source</string>
+    <string name="mobile_ops_btn_vid_sts_source">VidSts Video Source</string>
+    <string name="mobile_ops_config_title">Video Source Configuration</string>
+    <string name="mobile_ops_config_message">Video source configuration is incomplete. Please go to the settings page to configure</string>
+    <string name="mobile_ops_config_go_scan">Go to Settings</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 按钮透明度（使用整数表示，实际值为 100 表示 1.0，70 表示 0.7） -->
+    <integer name="slot_button_alpha_selected">100</integer>
+    <integer name="slot_button_alpha_unselected">70</integer>
+</resources>

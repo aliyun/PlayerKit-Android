@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="player_brightness">亮度</string>
+    <string name="player_volume">音量</string>
+    <string name="player_playback_speed_active">倍速播放中</string>
+    <string name="player_volume_percent_format">%1$d%%</string>
+    <string name="player_brightness_percent_format">%1$d%%</string>
+
+    <string name="play_state_error_code_label">错误代码</string>
+    <string name="play_state_error_message_label">错误信息</string>
+    <string name="play_state_error_message_default">发生了一个意外错误。</string>
+    <string name="play_state_error_details_format">%1$s: %2$d\n%3$s: %4$s</string>
+
+    <!-- 设置菜单 -->
+    <string name="setting_menu_title">设置</string>
+    <string name="setting_item_speed">倍速</string>
+    <string name="setting_item_quality">清晰度</string>
+    <string name="setting_item_loop">循环播放</string>
+    <string name="setting_item_mute">静音播放</string>
+    <string name="setting_item_mirror">镜像模式</string>
+    <string name="setting_item_scale">渲染填充</string>
+    <string name="setting_item_rotate">旋转模式</string>
+
+    <!-- 日志面板插槽 -->
+    <string name="log_panel_title_show">调试日志面板（点击显示）</string>
+    <string name="log_panel_title_hide">调试日志面板（点击关闭）</string>
+    <string name="log_panel_clear">清除</string>
+    <string name="log_panel_copy_no_logs">暂无可复制的日志</string>
+    <string name="log_panel_copy_success">日志已复制到剪贴板</string>
+    <string name="log_panel_copy_failed">复制失败：系统剪贴板不可用</string>
+    <string name="log_panel_fullscreen">全屏</string>
+    <string name="log_panel_exit_fullscreen">退出全屏</string>
+    <string name="log_panel_clipboard_label">AliPlayerKit Logs</string>
+
+    <!--  策略  -->
+    <string name="strategy_tip_first_frame_cost">
+        首帧耗时: %1$dms (准备:%2$dms, 渲染:%3$dms)
+    </string>
+
+    <!-- 卡顿检测提示 -->
+    <string name="strategy_tip_stutter_detected">
+        卡顿检测：单次耗时 %1$dms
+    </string>
+
+    <!-- 播放会话分析日志 -->
+    <string name="strategy_tip_stutter_session_analysis">
+        会话分析：停留=%1$dms，播放=%2$dms，卡顿=%3$dms（%4$d 次）
+    </string>
+
+    <!-- 流量保护策略：当前使用移动网络播放提示 -->
+    <string name="strategy_tip_mobile_network_playing">当前为移动网络，正在使用流量播放</string>
+
+    <!-- 横屏提示插槽 -->
+    <string name="landscape_hint_fullscreen">全屏观看</string>
+
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/setting_padding_horizontal"
+    android:paddingTop="@dimen/setting_item_padding_vertical"
+    android:paddingRight="@dimen/setting_padding_horizontal"
+    android:paddingBottom="@dimen/setting_item_padding_vertical">
+
+    <!-- 链接名称标题 -->
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/setting_link_item_name_placeholder"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="@dimen/setting_link_name_size"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/setting_item_spacing"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- 链接输入框（Outlined 风格，带清除按钮） -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_link"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:endIconMode="clear_text"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/setting_link_item_input_hint"
+                android:paddingTop="@dimen/setting_input_padding_vertical"
+                android:paddingBottom="@dimen/setting_input_padding_vertical"
+                android:textSize="@dimen/setting_subtitle_size" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- 扫描按钮（打开相机扫描二维码等） -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_scan"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/setting_item_spacing"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/setting_link_item_scan"
+            android:textColor="?attr/colorPrimary"
+            app:icon="@android:drawable/ic_menu_camera"
+            app:iconPadding="@dimen/setting_icon_padding" />
+
+    </LinearLayout>
+
+    <!-- 底部分割线 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/setting_divider_height"
+        android:layout_marginTop="@dimen/setting_item_padding_vertical"
+        android:background="@color/setting_divider_strong" />
+
+</LinearLayout>

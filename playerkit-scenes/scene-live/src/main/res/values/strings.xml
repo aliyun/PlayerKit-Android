@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 直播场景提示 -->
+    <string name="setting_live_url_not_set_title">直播地址</string>
+    <string name="setting_live_url_not_set_message">未设置直播地址，请先扫码配置</string>
+    <string name="setting_live_url_go_scan">去扫码</string>
+
+</resources>
+

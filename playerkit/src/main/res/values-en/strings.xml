@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="player_brightness">Brightness</string>
+    <string name="player_volume">Volume</string>
+    <string name="player_playback_speed_active">Playback Speed Active</string>
+    <string name="player_volume_percent_format">%1$d%%</string>
+    <string name="player_brightness_percent_format">%1$d%%</string>
+
+    <string name="play_state_error_code_label">Error Code</string>
+    <string name="play_state_error_message_label">Error Message</string>
+    <string name="play_state_error_message_default">An unexpected error occurred.</string>
+    <string name="play_state_error_details_format">%1$s: %2$d\n%3$s: %4$s</string>
+
+    <!-- Settings Menu -->
+    <string name="setting_menu_title">Settings</string>
+    <string name="setting_item_speed">Playback Speed</string>
+    <string name="setting_item_quality">Video Quality</string>
+    <string name="setting_item_loop">Loop Playback</string>
+    <string name="setting_item_mute">Mute Playback</string>
+    <string name="setting_item_mirror">Mirror Mode</string>
+    <string name="setting_item_scale">Scale Mode</string>
+    <string name="setting_item_rotate">Rotate Mode</string>
+
+    <!-- Log panel slot -->
+    <string name="log_panel_title_show">Debug Log Panel (Tap to Show)</string>
+    <string name="log_panel_title_hide">Debug Log Panel (Tap to Close)</string>
+    <string name="log_panel_clear">Clear</string>
+    <string name="log_panel_copy_no_logs">No logs available to copy</string>
+    <string name="log_panel_copy_success">Logs copied to clipboard</string>
+    <string name="log_panel_copy_failed">Copy failed: System clipboard unavailable</string>
+    <string name="log_panel_fullscreen">Fullscreen</string>
+    <string name="log_panel_exit_fullscreen">Exit Fullscreen</string>
+    <string name="log_panel_clipboard_label">AliPlayerKit Logs</string>
+
+    <!--  Strategy  -->
+    <string name="strategy_tip_first_frame_cost">
+        First frame cost: %1$dms (prepare: %2$dms, render: %3$dms)
+    </string>
+
+    <!-- Stutter detection -->
+    <string name="strategy_tip_stutter_detected">
+        Stutter detected: single duration %1$dms
+    </string>
+
+    <!-- Session analysis -->
+    <string name="strategy_tip_stutter_session_analysis">
+        Session analysis: stay=%1$dms, play=%2$dms, stutter=%3$dms (%4$d times)
+    </string>
+
+    <!-- Traffic protection strategy: playing on mobile data hint -->
+    <string name="strategy_tip_mobile_network_playing">You are on mobile data. Playing using cellular data.</string>
+
+    <!-- Landscape Hint Slot -->
+    <string name="landscape_hint_fullscreen">Fullscreen View</string>
+
+</resources>

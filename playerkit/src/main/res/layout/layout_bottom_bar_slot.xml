@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="#80000000"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <!--  播放按钮  -->
+    <ImageView
+        android:id="@+id/iv_play_pause"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_play_white" />
+
+    <!--  刷新按钮（可选：直播场景）  -->
+    <ImageView
+        android:id="@+id/iv_replay"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_replay_white"
+        android:visibility="gone" />
+
+    <!--  播放进度条  -->
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:maxHeight="4dp"
+        android:minHeight="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:progressDrawable="@android:drawable/progress_horizontal"
+        android:splitTrack="false"
+        android:thumbOffset="8dp" />
+
+    <!--  播放进度/播放时长  -->
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="#FFFFFF"
+        android:textSize="12dp" />
+
+    <!--  全屏按钮  -->
+    <ImageView
+        android:id="@+id/iv_fullscreen"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_fullscreen_white" />
+
+</LinearLayout>

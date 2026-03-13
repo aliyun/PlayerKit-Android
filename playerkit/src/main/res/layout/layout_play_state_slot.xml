@@ -1,0 +1,22 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#BF000000"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!--  错误展示  -->
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_center_display_bg"
+        android:gravity="center"
+        android:lineSpacingExtra="6dp"
+        android:padding="20dp"
+        android:textColor="#FFFFFF"
+        android:textSize="15dp"
+        android:visibility="gone" />
+
+</FrameLayout>
