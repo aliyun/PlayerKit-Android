@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="log_system_example_title">日志系统使用示例</string>
+    <string name="log_system_example_description">演示如何接入日志监听器，将日志保存到文件。遇到问题时，可将日志文件提供给技术支持团队分析。</string>
+
+    <string name="integration_guide">接入指南</string>
+    <string name="integration_guide_simple">仅需 2 步即可接入：\n1. 创建 FileLogListener 实例\n2. 调用 LogHub.addListener() 注册监听器\n\n参考 FileLogListener.java 实现文件写入逻辑（TODO 标记处）</string>
+    <string name="btn_register_file_listener">注册文件日志监听器</string>
+    <string name="file_listener_registered_log">文件日志监听器已注册，日志将保存到文件</string>
+
+    <string name="test_log_output">测试日志输出</string>
+    <string name="btn_test_info">测试 INFO</string>
+    <string name="btn_test_warn">测试 WARN</string>
+    <string name="btn_test_error">测试 ERROR</string>
+    <string name="test_log_info">这是一条 INFO 级别的日志</string>
+    <string name="test_log_warn">这是一条 WARN 级别的日志</string>
+    <string name="test_log_error">这是一条 ERROR 级别的日志</string>
+
+    <string name="log_output">日志输出</string>
+</resources>

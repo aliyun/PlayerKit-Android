@@ -1,0 +1,91 @@
+apply plugin: 'com.android.application'
+
+ext.MTL_buildId = getEnvValue("MUPP_BUILD_ID", 'localbuild')
+
+//@keria:cannot make method static
+String getEnvValue(key, defValue) {
+    def val = System.getProperty(key)
+    if (null != val) {
+        return val
+    }
+    val = System.getenv(key)
+    if (null != val) {
+        return val
+    }
+    return defValue
+}
+
+android {
+    compileSdkVersion 33
+    buildToolsVersion "33.0.2"
+
+    aaptOptions {
+        ignoreAssetsPattern "!.svn:!.git"
+    }
+
+    defaultConfig {
+        applicationId "com.aliyun.playerkit.example"
+        minSdkVersion 21
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("$rootDir/release.keystore")
+            storePassword "123456"
+            keyAlias "animoji"
+            keyPassword "123456"
+        }
+    }
+
+    buildTypes {
+        configureEach {
+            buildConfigField "String", "MTL_BUILD_ID", "\"${MTL_buildId}\""
+        }
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
+            outputFileName = "AliPlayerKit-${variant.buildType.name}-${MTL_buildId}.apk"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'com.google.android.material:material:1.6.0'
+
+    // AliPlayerKit 核心模块：提供开箱即用、可配置的播放器 UI 组件，覆盖基础播放与常见交互能力。
+    // 具体说明见 docs/ 目录下的文档
+    implementation project(':playerkit')
+
+    // AliPlayerKit 播放场景模块：基于 AliPlayerKit 核心组件，提供开箱即用的标准播放场景方案
+    // 少量代码即可搭建短剧、长视频、直播等典型场景，详见各模块 README.md
+    implementation project(':playerkit-scenes:scene-longvideo')
+    implementation project(':playerkit-scenes:scene-live')
+    implementation project(':playerkit-scenes:scene-playlist')
+    implementation project(':playerkit-scenes:scene-shortvideo')
+
+    // AliPlayerKit 使用示例模块：演示 AliPlayerKit 各子系统/能力怎么用
+    // 适合需要深入理解架构、进行定制开发或能力扩展的开发者参考使用
+    implementation project(':playerkit-examples:example-event-system')
+    implementation project(':playerkit-examples:example-lifecycle-strategy')
+    implementation project(':playerkit-examples:example-log-system')
+    implementation project(':playerkit-examples:example-mobile-ops')
+    implementation project(':playerkit-examples:example-preload')
+    implementation project(':playerkit-examples:example-slot-system')
+    implementation project(':playerkit-examples:example-strategy-system')
+    implementation project(':playerkit-examples:example-video-source')
+
+    // Demo 设置模块
+    implementation project(':demo-settings')
+}

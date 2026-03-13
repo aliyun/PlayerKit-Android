@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="48dp"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/setting_padding_horizontal"
+    android:paddingTop="@dimen/setting_padding_vertical"
+    android:paddingEnd="@dimen/setting_padding_horizontal"
+    android:paddingBottom="@dimen/setting_padding_vertical">
+
+    <!--  设置项标题  -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/setting_item_title"
+        android:textSize="@dimen/setting_title_size"
+        tools:text="设置项" />
+
+    <!--  设置值展示  -->
+    <TextView
+        android:id="@+id/tvSelected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:textColor="@color/setting_item_subtitle"
+        android:textSize="@dimen/setting_subtitle_size"
+        tools:text="设置值" />
+
+    <!--  设置项箭头  -->
+    <ImageView
+        android:id="@+id/arrowView"
+        android:layout_width="@dimen/setting_icon_size"
+        android:layout_height="@dimen/setting_icon_size"
+        android:src="@drawable/ic_setting_arrow_right"
+        app:tint="@color/setting_item_subtitle" />
+
+</LinearLayout>

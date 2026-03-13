@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 日志面板默认高度 -->
+    <dimen name="log_panel_default_height">240dp</dimen>
+</resources>

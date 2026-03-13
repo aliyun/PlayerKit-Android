@@ -1,0 +1,60 @@
+<resources>
+    <!-- 应用名称 -->
+    <string name="app_name">AliPlayerKit</string>
+
+    <!-- 通用提示信息 -->
+    <string name="schema_not_supported">功能暂未实现: %s</string>
+
+    <!--  页面配置  -->
+    <!-- 中长视频页面 -->
+    <string name="long_video_page_title">中长视频</string>
+    <string name="long_video_page_schema">playerkit://scenes/longvideo</string>
+
+    <!-- 直播页面 -->
+    <string name="live_page_title">直播</string>
+    <string name="live_page_schema">playerkit://scenes/live</string>
+
+    <!-- 列表播放页面 -->
+    <string name="playlist_page_title">列表播放</string>
+    <string name="playlist_page_schema">playerkit://scenes/playlist</string>
+
+    <!-- 短视频列表播放页面 -->
+    <string name="short_video_page_title">短视频列表播放</string>
+    <string name="short_video_page_schema">playerkit://scenes/shortvideo</string>
+
+    <!-- 视频源使用示例页面 -->
+    <string name="video_source_example_page_title">视频源使用示例</string>
+    <string name="video_source_example_page_schema">playerkit://examples/videosource</string>
+
+    <!--  插槽系统使用示例  -->
+    <string name="slot_system_example_page_title">插槽系统使用示例</string>
+    <string name="slot_system_example_page_schema">playerkit://examples/slotsystem</string>
+
+    <!--  策略系统使用示例  -->
+    <string name="strategy_system_example_page_title">策略系统使用示例</string>
+    <string name="strategy_system_example_page_schema">playerkit://examples/strategysystem</string>
+
+    <!-- 日志系统使用示例页面 -->
+    <string name="log_system_example_page_title">日志系统使用示例</string>
+    <string name="log_system_example_page_schema">playerkit://examples/logsystem</string>
+
+    <!-- 事件系统使用示例页面 -->
+    <string name="event_system_example_page_title">事件系统使用示例</string>
+    <string name="event_system_example_page_schema">playerkit://examples/eventsystem</string>
+
+    <!-- 播放器生命周期策略使用示例页面 -->
+    <string name="lifecycle_strategy_example_page_title">播放器生命周期策略使用示例</string>
+    <string name="lifecycle_strategy_example_page_schema">playerkit://examples/lifecyclestrategy</string>
+
+    <!-- 预加载使用示例页面 -->
+    <string name="preload_example_page_title">预加载使用示例</string>
+    <string name="preload_example_example_schema">playerkit://examples/preload</string>
+
+    <!-- 设置页面 -->
+    <string name="settings_page_title">设置</string>
+    <string name="settings_page_schema">playerkit://settings</string>
+
+    <!-- 链接页面 -->
+    <string name="setting_link_page_schema">playerkit://link</string>
+
+</resources>

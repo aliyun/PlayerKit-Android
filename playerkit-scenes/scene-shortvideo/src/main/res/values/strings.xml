@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 微短剧解决方案提示 -->
+    <string name="short_video_hint"><![CDATA[
+    如需实现 <strong>短视频列表播放</strong> 能力，建议直接采用 <strong>阿里云微短剧解决方案</strong>。<br/><br/>
+    该方案由 <strong>客户端 AUI 组件</strong> 与 <strong>服务端 VodAppServer</strong> 配套组成，覆盖从内容管理、分发到播放的完整短剧业务链路。通过前后端一体化设计，无需自行搭建后台服务，即可快速构建具备运营能力的短剧应用，有效缩短上线周期并降低研发成本。<br/><br/>
+    <strong>说明：</strong>微短剧相关 <strong>功能源码及示例工程</strong> 仅在完成 <strong>专业版 License</strong> 的 SDK 采购后方可提供。<br/><br/>
+    如需了解专业版功能范围、授权方式或接入流程，可联系 <strong>PDSA 售前技术支持团队</strong> 获取进一步协助。<br/><br/>
+    👉 <a href="https://help.aliyun.com/zh/vod/use-cases/brief-introduction-micro-of-drama/">
+    查看阿里云微短剧解决方案介绍
+    </a>]]></string>
+
+    <string name="copy_success">已复制</string>
+
+</resources>

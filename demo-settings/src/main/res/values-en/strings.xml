@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Section headers -->
+    <string name="setting_header_general">General</string>
+    <string name="setting_header_log">Logs</string>
+    <string name="setting_header_tools">Tools</string>
+    <string name="setting_header_version">Versions</string>
+    <string name="setting_header_others">Others</string>
+
+    <!-- Setting item titles -->
+    <string name="setting_link_setting">Link Settings</string>
+    <string name="setting_device_id">Device UUID</string>
+    <string name="setting_sdk_version">SDK Version</string>
+    <string name="setting_playerkit_version">PlayerKit Version</string>
+    <string name="setting_playerkit_build_info">Build Info</string>
+    <string name="setting_toast_copied">Copied to clipboard</string>
+
+    <!-- Player view type settings -->
+    <string name="setting_view_type_title">Player View Type</string>
+    <string name="setting_view_type_display_view">AliDisplayView (Recommended)</string>
+    <string name="setting_view_type_surface_view">SurfaceView</string>
+    <string name="setting_view_type_texture_view">TextureView</string>
+
+    <!-- Debug mode settings -->
+    <string name="setting_debug_mode_title">Debug Mode</string>
+
+    <!-- Disable screenshot settings -->
+    <string name="setting_disable_screenshot_title">Disable Screenshot</string>
+
+    <!-- Log-related settings -->
+    <string name="setting_log_panel_title">Show Log Panel</string>
+    <string name="setting_log_level_title">Log Level</string>
+
+    <!-- Tool-related settings -->
+    <string name="setting_mobile_ops">Mobile Operations</string>
+
+    <!-- Other configuration items -->
+    <string name="setting_reset_default">Reset to Default</string>
+    <string name="setting_clear_cache">Clear Cache</string>
+    <string name="setting_toast_reset_default">Default settings have been restored. The app will exit.</string>
+    <string name="setting_toast_clear_cache">Cache cleared</string>
+
+    <!-- Link configuration items -->
+    <string name="setting_link_video_url">Video Direct URL</string>
+    <string name="setting_link_video_vid">Video ID (Vid)</string>
+    <string name="setting_link_video_play_auth">Vid PlayAuth</string>
+    <string name="setting_link_video_live_url">Live URL</string>
+    <string name="setting_link_video_vid_sts_vid">VidSts Video ID (Vid)</string>
+    <string name="setting_link_video_vid_sts_access_key_id">VidSts Access Key ID (AccessKeyId)</string>
+    <string name="setting_link_video_vid_sts_access_key_secret">VidSts Access Key Secret (AccessKeySecret)</string>
+    <string name="setting_link_video_vid_sts_security_token">VidSts Security Token (SecurityToken)</string>
+    <string name="setting_link_video_vid_sts_region">VidSts Region (Region, Optional)</string>
+
+    <!-- Link configuration tips -->
+    <string name="setting_link_save">Save Configuration</string>
+    <string name="setting_link_toast_save_success">Configuration saved</string>
+    <string name="setting_link_toast_camera_permission">Camera permission required for scanning</string>
+    <string name="setting_link_item_name_placeholder">Item Name</string>
+    <string name="setting_link_item_input_hint">Please enter link</string>
+    <string name="setting_link_item_scan">Scan</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 策略系统使用示例：记忆播放 -->
+    <string name="strategy_system_example_resume_playback">
+        策略系统使用示例：记忆播放\n自动保存播放进度，退出后再次进入可继续播放
+    </string>
+
+    <!-- 记忆播放：恢复到上次观看位置的提示 -->
+    <string name="resume_play_restored_toast">已为您恢复到上次观看位置</string>
+
+</resources>

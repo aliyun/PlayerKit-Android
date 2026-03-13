@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Surface Slot System Demo -->
+    <string name="slot_system_example_title">Surface Slot Dynamic Plug-in and Removal Demo</string>
+    <string name="slot_system_example_current_status">Current Surface Slot: %1$s</string>
+    <string name="slot_system_example_features">Features: %1$s</string>
+    <string name="slot_system_example_switch_label">Switch Surface Slot:</string>
+    <string name="slot_system_example_tip">Tip: Click buttons to dynamically switch different Surface slots without rebuilding the player</string>
+
+    <!-- Button Text -->
+    <string name="btn_surface_view">SurfaceView</string>
+    <string name="btn_texture_view">TextureView</string>
+    <string name="btn_empty_slot">Empty Slot</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_already_current">Already %1$s</string>
+    <string name="toast_switched_to">Switched to %1$s</string>
+    <string name="toast_slot_host_layout_not_initialized">SlotHostLayout not initialized</string>
+
+    <!-- Slot Type Names -->
+    <string name="slot_type_surface_view">SurfaceViewSlot</string>
+    <string name="slot_type_texture_view">TextureViewSlot</string>
+    <string name="slot_type_empty">Empty Slot</string>
+
+    <!-- Slot Type Tags -->
+    <string name="slot_tag_traditional">Traditional</string>
+    <string name="slot_tag_animation">Animation Support</string>
+    <string name="slot_tag_remove_surface">Remove Surface</string>
+
+    <!-- Slot Features -->
+    <string name="slot_features_surface_view">Independent rendering thread | Suitable for independent rendering layer | No animation support</string>
+    <string name="slot_features_texture_view">Animation and transformation support | Suitable for animation scenarios | Slightly lower performance</string>
+    <string name="slot_features_empty">Audio-only playback | Background playback | Custom scenarios</string>
+</resources>

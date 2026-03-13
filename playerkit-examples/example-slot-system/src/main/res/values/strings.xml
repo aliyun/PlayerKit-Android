@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Surface 插槽系统使用示例 -->
+    <string name="slot_system_example_title">Surface 插槽动态插拔演示</string>
+    <string name="slot_system_example_current_status">当前 Surface 插槽：%1$s</string>
+    <string name="slot_system_example_features">特性：%1$s</string>
+    <string name="slot_system_example_switch_label">切换 Surface 插槽：</string>
+    <string name="slot_system_example_tip">提示：点击按钮可动态切换不同的 Surface 插槽，无需重建播放器</string>
+
+    <!-- 按钮文字 -->
+    <string name="btn_surface_view">SurfaceView</string>
+    <string name="btn_texture_view">TextureView</string>
+    <string name="btn_empty_slot">空插槽</string>
+
+    <!-- Toast 消息 -->
+    <string name="toast_already_current">当前已是 %1$s</string>
+    <string name="toast_switched_to">已切换到 %1$s</string>
+    <string name="toast_slot_host_layout_not_initialized">SlotHostLayout 未初始化</string>
+
+    <!-- 插槽类型名称 -->
+    <string name="slot_type_surface_view">SurfaceViewSlot</string>
+    <string name="slot_type_texture_view">TextureViewSlot</string>
+    <string name="slot_type_empty">空插槽</string>
+
+    <!-- 插槽类型标签 -->
+    <string name="slot_tag_traditional">传统实现</string>
+    <string name="slot_tag_animation">支持动画</string>
+    <string name="slot_tag_remove_surface">移除 Surface</string>
+
+    <!-- 插槽特性 -->
+    <string name="slot_features_surface_view">独立渲染线程 | 适合独立渲染层 | 不支持动画</string>
+    <string name="slot_features_texture_view">支持动画变换 | 适合动画场景 | 性能略低</string>
+    <string name="slot_features_empty">纯音频播放 | 后台播放 | 自定义场景</string>
+
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 按钮状态颜色 -->
+    <color name="slot_button_selected">#FF2196F3</color>
+    <color name="slot_button_unselected">#FF424242</color>
+
+    <!-- 控制面板背景 -->
+    <color name="slot_control_panel_bg">#E6000000</color>
+
+    <!-- 文字颜色 -->
+    <color name="slot_text_primary">#FFFFFFFF</color>
+    <color name="slot_text_secondary">#CCFFFFFF</color>
+    <color name="slot_text_hint">#99FFFFFF</color>
+</resources>

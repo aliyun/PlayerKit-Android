@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="log_system_example_title">Log System Example</string>
+    <string name="log_system_example_description">Demonstrates how to integrate log listeners to save logs to files. When encountering issues, log files can be provided to the technical support team for analysis.</string>
+
+    <string name="integration_guide">Integration Guide</string>
+    <string name="integration_guide_simple">Only 2 steps to integrate:\n1. Create FileLogListener instance\n2. Call LogHub.addListener() to register listener\n\nRefer to FileLogListener.java to implement file writing logic (marked with TODO)</string>
+    <string name="btn_register_file_listener">Register File Log Listener</string>
+    <string name="file_listener_registered_log">File log listener registered, logs will be saved to file</string>
+
+    <string name="test_log_output">Test Log Output</string>
+    <string name="btn_test_info">Test INFO</string>
+    <string name="btn_test_warn">Test WARN</string>
+    <string name="btn_test_error">Test ERROR</string>
+    <string name="test_log_info">This is an INFO level log</string>
+    <string name="test_log_warn">This is a WARN level log</string>
+    <string name="test_log_error">This is an ERROR level log</string>
+
+    <string name="log_output">Log Output</string>
+</resources>

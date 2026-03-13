@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preload_example_title">预加载使用示例</string>
+    <string name="preload_example_description">演示预加载 API 的使用：\n• 通过预加载提前缓存视频数据，提升首帧速度\n• 对比开启/关闭预加载的首帧耗时差异\n• 注意：关闭预加载时需清除缓存才能看到效果</string>
+
+    <string name="preload_switch_title">预加载开关</string>
+
+    <string name="btn_play">播放</string>
+    <string name="btn_clear">清除缓存</string>
+
+    <string name="preload_status_title">预加载状态</string>
+
+    <string name="tip_cache_cleared_on_entry">缓存已清除</string>
+
+    <string name="status_preloader_initialized">预加载器已初始化</string>
+    <string name="status_preload_started">开始预加载：taskId=%1$s</string>
+    <string name="status_preload_completed">预加载完成：taskId=%1$s</string>
+    <string name="status_preload_error">预加载错误：taskId=%1$s, code=%2$d, message=%3$s</string>
+    <string name="status_preload_canceled">预加载已取消：taskId=%1$s</string>
+    <string name="status_preload_canceling">正在取消预加载：taskId=%1$s</string>
+    <string name="status_preload_closed">预加载已关闭</string>
+
+    <string name="status_cache_cleared">缓存已清除</string>
+    <string name="status_cache_cleared_and_reload">缓存已清除，重新开始预加载</string>
+    <string name="status_player_attached_with_preload">播放器已 attach（已预加载）</string>
+    <string name="status_player_attached_without_preload">播放器已 attach（未预加载）</string>
+    <string name="status_player_detached">播放器已 detach</string>
+
+    <string name="first_frame_time_format">首帧耗时：总耗时 %1$d ms\n准备耗时：%2$d ms\n渲染耗时：%3$d ms\n时间：%4$s</string>
+
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preload_example_title">Preload Example</string>
+    <string name="preload_example_description">
+    Demonstrates how to use preload API:\n
+    • Preload video data in advance to improve first frame speed\n
+    • Compare first frame time with/without preload\n
+    • Note: Clear cache when disabling preload to see the effect
+    </string>
+
+    <string name="preload_switch_title">Preload Switch</string>
+
+    <string name="btn_play">Play</string>
+    <string name="btn_clear">Clear Cache</string>
+
+    <string name="preload_status_title">Preload Status</string>
+
+    <string name="tip_cache_cleared_on_entry">Cache cleared</string>
+
+    <string name="status_preloader_initialized">Preloader initialized</string>
+    <string name="status_preload_started">Preload started: taskId=%1$s</string>
+    <string name="status_preload_completed">Preload completed: taskId=%1$s</string>
+    <string name="status_preload_error">Preload error: taskId=%1$s, code=%2$d, message=%3$s</string>
+    <string name="status_preload_canceled">Preload canceled: taskId=%1$s</string>
+    <string name="status_preload_canceling">Canceling preload: taskId=%1$s</string>
+    <string name="status_preload_closed">Preload closed</string>
+
+    <string name="status_cache_cleared">Cache cleared</string>
+    <string name="status_cache_cleared_and_reload">Cache cleared, restarting preload</string>
+    <string name="status_player_attached_with_preload">Player attached (preloaded)</string>
+    <string name="status_player_attached_without_preload">Player attached (not preloaded)</string>
+    <string name="status_player_detached">Player detached</string>
+
+    <string name="first_frame_time_format">First frame: total %1$d ms\nPrepare: %2$d ms\nRender: %3$d ms\nTime: %4$s</string>
+
+</resources>

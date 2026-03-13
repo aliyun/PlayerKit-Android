@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mobile_ops_title">掌上运维</string>
+    <string name="mobile_ops_description">用于分析端侧日志的运维工具。\n选择视频源类型后开始播放，播放过程中的日志将自动注入到日志面板。\n• URL：通过直接 URL 播放视频\n• VidAuth：通过 VID 和 PlayAuth 播放视频\n• VidSts：通过 VID 和 STS 令牌播放视频\n\n选择视频源类型后，如果配置不完整，将引导您前往设置页面进行配置。</string>
+
+    <string name="mobile_ops_btn_url_source">URL 视频源</string>
+    <string name="mobile_ops_btn_vid_auth_source">VidAuth 视频源</string>
+    <string name="mobile_ops_btn_vid_sts_source">VidSts 视频源</string>
+    <string name="mobile_ops_config_title">视频源配置</string>
+    <string name="mobile_ops_config_message">视频源配置不完整，请前往设置页面进行配置</string>
+    <string name="mobile_ops_config_go_scan">前往配置</string>
+</resources>

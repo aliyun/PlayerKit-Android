@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="strategy_system_example_title">Player Lifecycle Strategy Demo</string>
+    <string name="strategy_system_example_description">
+        Demonstrates how to customize and provide a player lifecycle strategy via AliPlayerController
+        to achieve fine-grained management and reuse of player instances. If not provided, the default
+        strategy will be used.
+    </string>
+
+    <string name="strategy_select_hint">Player Lifecycle Strategy:</string>
+    <string name="strategy_default">Default Strategy</string>
+    <string name="strategy_reuse_pool">Resource Pool (ReusePool)</string>
+    <string name="strategy_id_scoped">ID Scoped Pool (IdScoped)</string>
+    <string name="strategy_singleton">Global Singleton (Singleton)</string>
+
+    <string name="video_source_title">Video Switching:</string>
+    <string name="video_1">Video 1</string>
+    <string name="video_2">Video 2</string>
+    <string name="video_3">Video 3</string>
+
+    <string name="log_title">Strategy Execution Logs:</string>
+
+    <string name="strategy_status_new">New Instance</string>
+    <string name="strategy_status_reused">Reused from Pool</string>
+    <string name="strategy_status_hit">ID Context Hit</string>
+
+    <string name="strategy_status_ready">READY</string>
+    <string name="strategy_status_idle">IDLE</string>
+</resources>

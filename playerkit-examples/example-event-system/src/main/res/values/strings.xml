@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event_system_example_title">事件系统使用示例</string>
+    <string name="event_system_example_description">通过事件总线控制 AliPlayerKit：\n• 发送命令控制播放器组件（如播放/暂停）\n• 接收事件获取播放器组件状态（如播放进度）</string>
+
+    <string name="btn_send_toggle">发送 Toggle 命令（播放 / 暂停切换）</string>
+    <string name="toast_toggle_sent">已发送 Toggle 命令，播放状态将切换</string>
+
+    <string name="info_event_output">Info 事件输出（已订阅）</string>
+    <string name="event_info">播放信息：当前位置 %1$s，总时长 %2$s，缓冲位置 %3$s</string>
+
+    <string name="time_format_seconds">%.1f秒</string>
+</resources>
+

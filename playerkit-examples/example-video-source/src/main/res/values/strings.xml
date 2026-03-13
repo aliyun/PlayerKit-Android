@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="video_source_example_title">视频源使用示例</string>
+    <string name="video_source_example_description">演示如何使用不同类型的视频源进行播放：\n• URL：通过直接 URL 播放视频\n• VidAuth：通过 VID 和 PlayAuth 播放视频\n• VidSts：通过 VID 和 STS 令牌播放视频\n\n选择视频源类型后，如果配置不完整，将引导您前往设置页面进行配置。</string>
+
+    <string name="video_source_example_btn_url_source">URL 视频源</string>
+    <string name="video_source_example_btn_vid_auth_source">VidAuth 视频源</string>
+    <string name="video_source_example_btn_vid_sts_source">VidSts 视频源</string>
+    <string name="video_source_example_config_title">视频源配置</string>
+    <string name="video_source_example_config_message">视频源配置不完整，请前往设置页面进行配置</string>
+    <string name="video_source_example_config_go_scan">前往配置</string>
+</resources>
+
