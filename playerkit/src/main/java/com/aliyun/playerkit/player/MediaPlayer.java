@@ -59,13 +59,19 @@ import java.util.List;
  */
 public class MediaPlayer implements IMediaPlayer {
 
+    private static final String TAG = "MediaPlayer";
+
     // 加载 RTS 低延迟直播组件动态库
     // 必须在使用播放器前完成加载
     static {
-        System.loadLibrary("RtsSDK");
+        try {
+            System.loadLibrary("RtsSDK");
+        } catch (UnsatisfiedLinkError e) {
+            LogHub.e(TAG, "RtsSDK load failed: " + e.getMessage());
+        } catch (SecurityException e) {
+            LogHub.e(TAG, "RtsSDK load denied: " + e.getMessage());
+        }
     }
-
-    private static final String TAG = "MediaPlayer";
 
     /**
      * RTS 流地址前缀
