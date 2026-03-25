@@ -120,7 +120,7 @@ public class SettingSelectorItemView<T> extends LinearLayout implements ISetting
         }
 
         final String[] displayOptions = buildDisplayOptions(item, options);
-        new AlertDialog.Builder(getContext(), R.style.Theme_AppCompat_Dialog_Alert)
+        new AlertDialog.Builder(getContext())
                 .setTitle(item.title)
                 .setItems(displayOptions, (dialog, which) -> applySelection(item, options, which))
                 .show();

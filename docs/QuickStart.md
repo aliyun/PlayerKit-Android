@@ -100,6 +100,20 @@ class MyApplication : Application() {
 
 ### **步骤 2：绑定控制器并播放**
 
+> **重要配置**：如果您的应用支持全屏播放切换，需要在所在 Activity 的 `AndroidManifest.xml` 清单文件中添加 `android:configChanges` 属性，以避免屏幕旋转时 Activity 重建导致播放状态丢失：
+>
+> ```xml
+> <application>
+>     <activity
+>         android:name=".VideoPlayerActivity"
+>         android:configChanges="orientation|screenSize"
+>         ...>
+>     </activity>
+> </application>
+> ```
+>
+> **说明**：未添加此配置可能导致全屏切换时播放器状态异常、画面闪烁或播放中断等问题。
+
 在 Activity/Fragment 中创建控制器、配置数据、绑定视图：
 
 * **Java**：
