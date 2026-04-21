@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.aliyun.player.AliPlayerFactory;
+import com.aliyun.player.BuildConfig;
 import com.aliyun.playerkit.global.GlobalInitializer;
 import com.aliyun.playerkit.logging.logger.DefaultPlayerLogger;
 import com.aliyun.playerkit.logging.logger.IPlayerLogger;
@@ -263,6 +264,33 @@ public final class AliPlayerKit {
      */
     public static boolean isInitialized() {
         return initialized;
+    }
+
+    /**
+     * 确保 setExtraData 已被调用（保险机制）
+     * <p>
+     * 在以下位置会被调用：
+     * 1. ContentProvider 自动初始化（应用启动时）
+     * 2. AliPlayerController 构造函数（播放器创建时）
+     * </p>
+     * <p>
+     * 如果已通过 ContentProvider 或 AliPlayerKit.init() 设置过，此方法不会重复设置。
+     * </p>
+     *
+     * @param context 应用上下文
+     */
+    static void ensureExtraData(@NonNull Context context) {
+        try {
+            // 如果已经初始化（通过 AliPlayerKit.init()），则无需重复设置
+            if (initialized) {
+                return;
+            }
+
+            // 调用 GlobalInitializer 仅设置 extraData
+            GlobalInitializer.setExtraDataOnly(context);
+        } catch (Exception e) {
+            LogHub.w(TAG, "Failed to ensure extra data", e);
+        }
     }
 
     /**

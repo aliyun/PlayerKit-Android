@@ -17,4 +17,16 @@
     <!--  Used for device vibration  -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <application>
+        <!-- PlayerKit 自动初始化 Provider -->
+        <!-- 通过 ContentProvider 机制实现无侵入式自动初始化 -->
+        <!-- 应用启动时会自动调用，无需用户手动调用 AliPlayerKit.init() -->
+        <provider
+            android:name=".global.PlayerKitInitializer"
+            android:authorities="${applicationId}.playerkit.initializer"
+            android:exported="false"
+            android:initOrder="1000"
+            android:multiprocess="true" />
+    </application>
+
 </manifest>

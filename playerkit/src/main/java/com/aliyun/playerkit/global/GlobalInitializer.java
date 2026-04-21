@@ -220,6 +220,26 @@ public class GlobalInitializer {
     // ==================== 私有辅助方法 ====================
 
     /**
+     * 仅设置业务来源信息（用于自动初始化）
+     * <p>
+     * 此方法由 ContentProvider 自动调用，不执行完整的初始化流程。
+     * 如果用户已调用 AliPlayerKit.init()，此方法不会重复设置。
+     * </p>
+     *
+     * @param context 应用上下文
+     */
+    public static void setExtraDataOnly(@NonNull Context context) {
+        try {
+            // 检查是否已经设置过（避免重复设置）
+            // 注意：这里不做线程安全检查，因为 setExtraData 本身是幂等的
+            setExtraData();
+            LogHub.i(TAG, "setExtraDataOnly completed");
+        } catch (Exception e) {
+            LogHub.e(TAG, "Failed to set extra data only", e);
+        }
+    }
+
+    /**
      * 设置业务来源信息
      */
     private static void setExtraData() {

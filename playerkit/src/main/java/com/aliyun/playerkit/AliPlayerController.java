@@ -157,6 +157,10 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
         }
         this.context = context;
 
+        // 保险机制：确保 setExtraData 被调用
+        // 即使客户没有调用 AliPlayerKit.init()，也能通过 ContentProvider 或这里补调
+        AliPlayerKit.ensureExtraData(context);
+
         this.lifecycleStrategy = lifecycleStrategy;
         this.playerFactory = new DefaultPlayerFactory();
 
