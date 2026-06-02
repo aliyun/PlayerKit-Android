@@ -69,4 +69,28 @@ public final class ControlBarEvents {
             super(playerId);
         }
     }
+
+    /**
+     * 显示倍速选择面板事件
+     * <p>
+     * 触发横屏场景下的倍速选择面板。
+     * </p>
+     */
+    public static final class ShowSpeedPanel extends PlayerEvent {
+        public ShowSpeedPanel(@NonNull String playerId) {
+            super(playerId);
+        }
+    }
+
+    /**
+     * 显示清晰度选择面板事件
+     * <p>
+     * 触发横屏场景下的清晰度选择面板。
+     * </p>
+     */
+    public static final class ShowQualityPanel extends PlayerEvent {
+        public ShowQualityPanel(@NonNull String playerId) {
+            super(playerId);
+        }
+    }
 }

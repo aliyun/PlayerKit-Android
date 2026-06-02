@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/universal_slider_view_width"
+    android:layout_height="@dimen/universal_slider_view_height"
+    android:background="@drawable/bg_universal_slider"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/universal_slider_padding"
+    android:paddingEnd="@dimen/universal_slider_padding">
+
+    <ImageView
+        android:id="@+id/iv_control"
+        android:layout_width="@dimen/universal_slider_icon_size"
+        android:layout_height="@dimen/universal_slider_icon_size"
+        android:scaleType="center"
+        android:src="@drawable/ic_volume" />
+
+    <SeekBar
+        android:id="@+id/pb_control"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:max="100"
+        android:maxHeight="@dimen/video_slider_track_height"
+        android:minHeight="@dimen/video_slider_track_height"
+        android:paddingStart="@dimen/video_slider_track_padding_normal"
+        android:paddingEnd="@dimen/video_slider_track_padding_normal"
+        android:enabled="false"
+        android:progressDrawable="@drawable/bg_video_slider"
+        android:splitTrack="false"
+        android:thumb="@null" />
+
+    <TextView
+        android:id="@+id/tv_control"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:minWidth="@dimen/universal_slider_text_min_width"
+        android:text="@string/universal_slider_default_progress"
+        android:textColor="@color/common_text_white"
+        android:textSize="@dimen/common_text_14" />
+
+</LinearLayout>
+
+

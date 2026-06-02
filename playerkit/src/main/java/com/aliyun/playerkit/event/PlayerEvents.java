@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.data.TrackQuality;
 import com.aliyun.playerkit.player.IMediaPlayer;
+import com.aliyun.player.bean.ErrorInfo;
 
 import java.util.List;
 
@@ -123,9 +124,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "FirstFrameRendered{" +
-                    "playerId='" + playerId + '\'' +
-                    '}';
+            return "FirstFrameRendered{" + "playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -214,10 +213,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "SetSpeedCompleted{" +
-                    "speed=" + speed +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "SetSpeedCompleted{" + "speed=" + speed + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -284,13 +280,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "SnapshotCompleted{" +
-                    "result=" + result +
-                    ", snapshotPath='" + snapshotPath + '\'' +
-                    ", width=" + width +
-                    ", height=" + height +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "SnapshotCompleted{" + "result=" + result + ", snapshotPath='" + snapshotPath + '\'' + ", width=" + width + ", height=" + height + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -329,10 +319,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "SetLoopCompleted{" +
-                    "loop=" + loop +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "SetLoopCompleted{" + "loop=" + loop + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -371,10 +358,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "SetMuteCompleted{" +
-                    "mute=" + mute +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "SetMuteCompleted{" + "mute=" + mute + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -413,10 +397,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "SetScaleTypeCompleted{" +
-                    "scaleType=" + scaleType +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "SetScaleTypeCompleted{" + "scaleType=" + scaleType + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -454,10 +435,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "SetMirrorTypeCompleted{" +
-                    "mirrorType=" + mirrorType +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "SetMirrorTypeCompleted{" + "mirrorType=" + mirrorType + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -495,10 +473,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "SetRotationCompleted{" +
-                    "rotation=" + rotation +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "SetRotationCompleted{" + "rotation=" + rotation + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -537,10 +512,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "TrackQualityListUpdated{" +
-                    "trackQualityList=" + trackQualityList +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "TrackQualityListUpdated{" + "trackQualityList=" + trackQualityList + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -578,12 +550,68 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "TrackSelected{" +
-                    "trackIndex=" + trackIndex +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "TrackSelected{" + "trackIndex=" + trackIndex + ", playerId='" + playerId + '\'' + '}';
         }
     }
+
+    /**
+     * 清晰度切换完成事件
+     * <p>
+     * 当清晰度切换成功时触发。
+     * </p>
+     * <p>
+     * Track Switch Completed Event
+     * <p>
+     * Triggered when track switching completes successfully.
+     * </p>
+     */
+    public static final class TrackSwitchCompleted extends PlayerEvent {
+
+        public final TrackQuality quality;
+
+        public TrackSwitchCompleted(@NonNull String playerId, @NonNull TrackQuality quality) {
+            super(playerId);
+            this.quality = quality;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "TrackSwitchCompleted{" + "quality=" + quality + ", playerId='" + playerId + '\'' + '}';
+        }
+    }
+
+    /**
+     * 清晰度切换失败事件
+     * <p>
+     * 当清晰度切换失败时触发。
+     * </p>
+     * <p>
+     * Track Switch Failed Event
+     * <p>
+     * Triggered when track switching fails.
+     * </p>
+     */
+    public static final class TrackSwitchFailed extends PlayerEvent {
+
+        public final TrackQuality quality;
+
+        @Nullable
+        public final ErrorInfo errorInfo;
+
+        public TrackSwitchFailed(@NonNull String playerId, @NonNull TrackQuality quality, @Nullable ErrorInfo errorInfo) {
+            super(playerId);
+            this.quality = quality;
+            this.errorInfo = errorInfo;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "TrackSwitchFailed{" + "quality=" + quality + ", errorInfo=" + errorInfo + ", playerId='" + playerId + '\'' + '}';
+        }
+    }
+
 
     /**
      * 开始加载事件
@@ -605,9 +633,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "LoadingBegin{" +
-                    "playerId='" + playerId + '\'' +
-                    '}';
+            return "LoadingBegin{" + "playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -643,11 +669,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "LoadingProgress{" +
-                    "percent=" + percent +
-                    ", netSpeed=" + netSpeed +
-                    ", playerId='" + playerId + '\'' +
-                    '}';
+            return "LoadingProgress{" + "percent=" + percent + ", netSpeed=" + netSpeed + ", playerId='" + playerId + '\'' + '}';
         }
     }
 
@@ -671,9 +693,7 @@ public final class PlayerEvents {
         @NonNull
         @Override
         public String toString() {
-            return "LoadingEnd{" +
-                    "playerId='" + playerId + '\'' +
-                    '}';
+            return "LoadingEnd{" + "playerId='" + playerId + '\'' + '}';
         }
     }
 }

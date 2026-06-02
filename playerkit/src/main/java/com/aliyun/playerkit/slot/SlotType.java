@@ -29,7 +29,7 @@ public enum SlotType {
      * Core view for displaying player video content.
      * </p>
      */
-    PLAYER_SURFACE,
+    PLAYER_SURFACE(10),
 
     /**
      * 全屏管理插槽
@@ -84,7 +84,7 @@ public enum SlotType {
      * </ul>
      * </p>
      */
-    FULLSCREEN,
+    FULLSCREEN(15),
 
     /**
      * 手势控制插槽
@@ -97,7 +97,7 @@ public enum SlotType {
      * Used for handling player gesture controls (tap, double-tap, long-press, drag, etc.).
      * </p>
      */
-    GESTURE_CONTROL,
+    GESTURE_CONTROL(20),
 
     /**
      * 横屏观看提示插槽
@@ -110,7 +110,7 @@ public enum SlotType {
      * Prompts the user to view in fullscreen when a landscape video is detected in a portrait display area.
      * </p>
      */
-    LANDSCAPE_HINT,
+    LANDSCAPE_HINT(30),
 
     /**
      * 封面图插槽
@@ -123,7 +123,7 @@ public enum SlotType {
      * Used to display video cover image, overlaying on top of Surface.
      * </p>
      */
-    COVER,
+    COVER(40),
 
     /**
      * 中心显示插槽
@@ -136,7 +136,7 @@ public enum SlotType {
      * Used to display status information in the center area (such as speed, brightness, volume, etc.).
      * </p>
      */
-    CENTER_DISPLAY,
+    CENTER_DISPLAY(50),
 
     /**
      * 播放状态插槽
@@ -149,7 +149,7 @@ public enum SlotType {
      * Used to display playback status (such as error tips, loading, etc.).
      * </p>
      */
-    PLAY_STATE,
+    PLAY_STATE(60),
 
     /**
      * 日志面板插槽
@@ -162,7 +162,7 @@ public enum SlotType {
      * Used to display player log information, facilitating debugging and problem troubleshooting.
      * </p>
      */
-    LOG_PANEL,
+    LOG_PANEL(70),
 
     /**
      * 顶部控制栏插槽
@@ -175,7 +175,7 @@ public enum SlotType {
      * Displays back button, title, settings, etc.
      * </p>
      */
-    TOP_BAR,
+    TOP_BAR(80),
 
     /**
      * 底部控制栏插槽
@@ -188,7 +188,7 @@ public enum SlotType {
      * Displays playback controls, seek bar, fullscreen toggle, etc.
      * </p>
      */
-    BOTTOM_BAR,
+    BOTTOM_BAR(90),
 
     /**
      * 设置菜单插槽
@@ -202,6 +202,60 @@ public enum SlotType {
      * Used to display the setting menu (such as speed, quality, mirror, rotation, etc.).
      * </p>
      */
-    SETTING_MENU,
+    SETTING_MENU(100),
 
+    /**
+     * 选项面板插槽
+     * <p>
+     * 用于在横屏场景下显示倍速、清晰度等选项的独立选择面板。
+     * </p>
+     * <p>
+     * Option Panel Slot
+     * <p>
+     * Used to display an independent selection panel for speed, quality, etc. in landscape mode.
+     * </p>
+     */
+    OPTION_PANEL(110);
+
+    // ==================== 层级顺序 ====================
+
+    /**
+     * 插槽的层级顺序值
+     * <p>
+     * 值越小层级越低（越靠底层），值越大层级越高（越靠顶层）。
+     * 内置插槽的顺序值以 10 为间距递增，为自定义插槽预留插入空间。
+     * </p>
+     * <p>
+     * The layer order value of the slot
+     * <p>
+     * Lower values mean lower layers (closer to the bottom), higher values mean higher layers (closer to the top).
+     * Built-in slot order values increment by 10, reserving insertion space for custom slots.
+     * </p>
+     */
+    private final int order;
+
+    SlotType(int order) {
+        this.order = order;
+    }
+
+    /**
+     * 获取插槽的层级顺序值
+     * <p>
+     * 值越小层级越低（越靠底层），值越大层级越高（越靠顶层）。
+     * 内置插槽的顺序值以 10 为间距递增，为自定义插槽预留插入空间。
+     * 例如：可以创建 order=25 的自定义插槽，它将自动位于 GESTURE_CONTROL(20) 和 LANDSCAPE_HINT(30) 之间。
+     * </p>
+     * <p>
+     * Get the layer order value of the slot
+     * <p>
+     * Lower values mean lower layers (closer to the bottom), higher values mean higher layers (closer to the top).
+     * Built-in slot order values increment by 10, reserving insertion space for custom slots.
+     * For example: a custom slot with order=25 will automatically be placed between GESTURE_CONTROL(20) and LANDSCAPE_HINT(30).
+     * </p>
+     *
+     * @return 层级顺序值 / Layer order value
+     */
+    public int getOrder() {
+        return order;
+    }
 }

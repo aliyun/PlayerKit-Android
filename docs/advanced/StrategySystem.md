@@ -1,5 +1,3 @@
-Language: 中文简体 | [English](StrategySystem-EN.md)
-
 # **策略系统 (Strategy System)**
 
 **策略系统 (Strategy System)** 是 AliPlayerKit 的核心架构设计。它通过事件驱动的策略机制，将播放器监控、分析和优化逻辑封装为独立的策略组件，实现播放器业务逻辑的解耦、复用与灵活扩展。
@@ -153,7 +151,8 @@ AliPlayerModel model = new AliPlayerModel.Builder()
         .build();
 
 // 3. 绑定到视图
-playerView.attach(controller, model);
+controller.configure(model);
+playerView.attach(controller);
 ```
 
 默认注册的策略包括：
@@ -180,7 +179,8 @@ strategyManager.register(new StutterDetectStrategy());
 AliPlayerModel model = new AliPlayerModel.Builder()
         .videoSource(videoSource)
         .build();
-playerView.attach(controller, model);
+controller.configure(model);
+playerView.attach(controller);
 ```
 
 ### **4.3 策略三：完全自定义策略**
@@ -202,7 +202,8 @@ strategyManager.register(new MyAnalyticsStrategy());
 AliPlayerModel model = new AliPlayerModel.Builder()
         .videoSource(videoSource)
         .build();
-playerView.attach(controller, model);
+controller.configure(model);
+playerView.attach(controller);
 ```
 
 ---

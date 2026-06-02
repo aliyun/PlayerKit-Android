@@ -1,15 +1,13 @@
 package com.aliyun.playerkit.strategy.strategies;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.aliyun.playerkit.AliPlayerKit;
 import com.aliyun.playerkit.R;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
+import com.aliyun.playerkit.locale.PlayerLocale;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.strategy.BaseStrategy;
 import com.aliyun.playerkit.strategy.StrategyContext;
@@ -255,9 +253,8 @@ public class StutterDetectStrategy extends BaseStrategy {
             mTotalStutterDuration += duration;
 
             // 卡顿提示
-            Context context = AliPlayerKit.getContext();
             try {
-                String message = context.getString(R.string.strategy_tip_stutter_detected, duration);
+                String message = PlayerLocale.get(R.string.strategy_tip_stutter_detected, duration);
                 LogHub.i(TAG, message);
 
                 // Toast 提示 (Debug Only)
@@ -299,8 +296,7 @@ public class StutterDetectStrategy extends BaseStrategy {
         long stayDuration = now - mSessionStartTime;
 
         // 统计会话（这里的 mValidPlayDuration 已经是不含暂停、不含卡顿的有效播放时长）
-        Context context = AliPlayerKit.getContext();
-        String message = context.getString(R.string.strategy_tip_stutter_session_analysis, stayDuration, mValidPlayDuration, mTotalStutterDuration, mStutterCount);
+        String message = PlayerLocale.get(R.string.strategy_tip_stutter_session_analysis, stayDuration, mValidPlayDuration, mTotalStutterDuration, mStutterCount);
         LogHub.i(TAG, message);
 
         // Toast 提示 (Debug Only)

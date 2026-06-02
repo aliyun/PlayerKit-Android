@@ -63,6 +63,9 @@ public class LifecycleStrategyExampleActivity extends AppCompatActivity {
     // 播放器组件视图
     private AliPlayerView mPlayerView;
 
+    // 当前播放器控制器
+    private AliPlayerController mCurrentController;
+
     // 当前使用的播放器生命周期策略
     private IPlayerLifecycleStrategy mLifecycleStrategy;
 
@@ -253,11 +256,12 @@ public class LifecycleStrategyExampleActivity extends AppCompatActivity {
         if (index < 0 || index >= mVideoSources.size()) return;
         VideoSource source = mVideoSources.get(index);
 
-        // 处理视图层面的重置 (View 内部会调用旧控制器的 destroy)
-        mPlayerView.detach();
+        // 销毁旧控制器
+        if (mCurrentController != null) {
+            mCurrentController.destroy();
+        }
 
         // 核心步骤：不再复用控制器实例，而是根据当前策略创建一个新的控制器
-        // 既然旧的控制器已被 destroy，如果要继续播放新视频且保持 View 绑定，必须使用新的控制器实例
         AliPlayerController controller;
         if (mLifecycleStrategy != null) {
             controller = new AliPlayerController(this, mLifecycleStrategy);
@@ -270,17 +274,20 @@ public class LifecycleStrategyExampleActivity extends AppCompatActivity {
                 .videoSource(source)
                 .build();
 
-        // 核心 API: 绑定视图、控制器和数据模型
-        mPlayerView.attach(controller, model);
+        // 核心 API: 配置数据并绑定控制器到视图
+        controller.configure(model);
+        mPlayerView.attach(controller);
+        mCurrentController = controller;
     }
 
     /**
      * 内部清理逻辑
      */
     private void cleanup() {
-        // 解绑播放器组件，停止渲染
-        if (mPlayerView != null) {
-            mPlayerView.detach();
+        // 销毁当前控制器，释放资源
+        if (mCurrentController != null) {
+            mCurrentController.destroy();
+            mCurrentController = null;
         }
         // 销毁策略环境，清理策略内部持有的播放器实例
         if (mLifecycleStrategy != null) {

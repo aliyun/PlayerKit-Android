@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_landscape_container"
+    android:layout_width="@dimen/setting_landscape_panel_width"
+    android:layout_height="match_parent"
+    android:layout_gravity="end"
+    android:background="@color/setting_panel_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/setting_landscape_panel_padding_horizontal"
+    android:paddingTop="@dimen/setting_landscape_panel_padding_top"
+    android:paddingEnd="@dimen/setting_landscape_panel_padding_horizontal"
+    android:paddingBottom="@dimen/setting_landscape_panel_padding_bottom">
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rc_landscape_setting_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never" />
+</LinearLayout>

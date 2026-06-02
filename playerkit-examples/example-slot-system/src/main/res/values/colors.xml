@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 按钮状态颜色 -->
-    <color name="slot_button_selected">#FF2196F3</color>
-    <color name="slot_button_unselected">#FF424242</color>
+    <!-- 正文文字颜色 -->
+    <color name="slot_text_body">#FF555555</color>
 
-    <!-- 控制面板背景 -->
-    <color name="slot_control_panel_bg">#E6000000</color>
+    <!-- 分隔线 -->
+    <color name="slot_divider">#FFE0E0E0</color>
 
-    <!-- 文字颜色 -->
-    <color name="slot_text_primary">#FFFFFFFF</color>
-    <color name="slot_text_secondary">#CCFFFFFF</color>
-    <color name="slot_text_hint">#99FFFFFF</color>
+    <!-- 场景描述背景 -->
+    <color name="slot_desc_bg">#FFF5F5F5</color>
 </resources>

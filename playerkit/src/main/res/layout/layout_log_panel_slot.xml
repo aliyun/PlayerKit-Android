@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
-    android:background="#CC000000"
+    android:background="@color/log_panel_background"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical">
@@ -13,13 +13,13 @@
     <LinearLayout
         android:id="@+id/ll_header"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="@dimen/log_panel_header_height"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="@dimen/log_panel_header_padding_horizontal"
+        android:paddingTop="@dimen/log_panel_header_padding_vertical"
+        android:paddingEnd="@dimen/log_panel_header_padding_horizontal"
+        android:paddingBottom="@dimen/log_panel_header_padding_vertical">
 
         <TextView
             android:id="@+id/tv_title"
@@ -28,8 +28,8 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="#FFFFFF"
-            android:textSize="12dp" />
+            android:textColor="@color/common_text_white"
+            android:textSize="@dimen/log_panel_title_text_size" />
 
         <TextView
             android:id="@+id/tv_clear"
@@ -38,11 +38,11 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
+            android:paddingHorizontal="@dimen/log_panel_btn_padding_horizontal"
+            android:paddingVertical="@dimen/log_panel_btn_padding_vertical"
             android:text="@string/log_panel_clear"
-            android:textColor="#FFFFFF"
-            android:textSize="11dp" />
+            android:textColor="@color/common_text_white"
+            android:textSize="@dimen/log_panel_btn_text_size" />
 
         <TextView
             android:id="@+id/tv_fullscreen"
@@ -51,19 +51,19 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
+            android:paddingHorizontal="@dimen/log_panel_btn_padding_horizontal"
+            android:paddingVertical="@dimen/log_panel_btn_padding_vertical"
             android:text="@string/log_panel_fullscreen"
-            android:textColor="#FFFFFF"
-            android:textSize="11dp" />
+            android:textColor="@color/common_text_white"
+            android:textSize="@dimen/log_panel_btn_text_size" />
 
     </LinearLayout>
 
     <!-- 分割线 -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#40FFFFFF" />
+        android:layout_height="@dimen/log_panel_divider_height"
+        android:background="@color/log_panel_divider" />
 
     <!-- 内容区：滚动日志 -->
     <ScrollView
@@ -77,9 +77,9 @@
             android:id="@+id/tv_logs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:textColor="#EEEEEE"
-            android:textSize="10dp"
+            android:padding="@dimen/log_panel_content_padding"
+            android:textColor="@color/log_panel_text_color"
+            android:textSize="@dimen/log_panel_log_text_size"
             android:typeface="monospace" />
     </ScrollView>
 </LinearLayout>

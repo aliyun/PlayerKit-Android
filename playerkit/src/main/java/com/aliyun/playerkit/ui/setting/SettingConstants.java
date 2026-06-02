@@ -1,9 +1,8 @@
 package com.aliyun.playerkit.ui.setting;
 
-import android.content.Context;
-
 import com.aliyun.playerkit.R;
 import com.aliyun.playerkit.data.TrackQuality;
+import com.aliyun.playerkit.locale.PlayerLocale;
 import com.aliyun.playerkit.player.IMediaPlayer;
 import com.aliyun.playerkit.slot.IPlayerControl;
 import com.aliyun.playerkit.utils.FormatUtil;
@@ -30,6 +29,9 @@ import java.util.List;
  * @date 2025/12/25
  */
 public final class SettingConstants {
+    public static final int GROUP_PLAYBACK = 0; // 播放相关：倍速、清晰度
+    public static final int GROUP_AUDIO = 1; // 音频相关：循环、静音
+    public static final int GROUP_DISPLAY = 2; // 显示相关：镜像、缩放、旋转
 
     /**
      * 私有构造函数，防止实例化
@@ -300,56 +302,62 @@ public final class SettingConstants {
      * Creates items with predefined keys/options/defaults and wires user actions to {@link IPlayerControl}.
      * </p>
      *
-     * @param context Android context used to resolve string resources.
      * @param control Player control interface used to apply user settings.
      * @return A list of default {@link SettingItem} for the settings menu.
      */
-    public static List<SettingItem<?>> createDefaultItems(Context context, IPlayerControl control) {
+    public static List<SettingItem<?>> createDefaultItems(IPlayerControl control) {
         List<SettingItem<?>> items = new ArrayList<>();
 
         // 1. 倍速
-        SettingItem<Float> speedItem = new SettingItem<>(KEY_SPEED, context.getString(R.string.setting_item_speed), SettingItemType.SELECTOR, DEFAULT_SPEED);
+        SettingItem<Float> speedItem = new SettingItem<>(KEY_SPEED, PlayerLocale.get(R.string.setting_item_speed), SettingItemType.SELECTOR, DEFAULT_SPEED);
         speedItem.options = SettingOptions.of(SPEED_OPTIONS);
         speedItem.formatter = value -> value + "x";
         speedItem.listener = (item, newValue) -> control.setSpeed(newValue);
+        speedItem.group = GROUP_PLAYBACK;
         items.add(speedItem);
 
         // 2. 清晰度
         // 默认值为 null，因为初始状态下还没有获取到可用的清晰度选项；options 将在运行时动态设置
-        SettingItem<TrackQuality> qualityItem = new SettingItem<>(KEY_QUALITY, context.getString(R.string.setting_item_quality), SettingItemType.SELECTOR, null);
+        SettingItem<TrackQuality> qualityItem = new SettingItem<>(KEY_QUALITY, PlayerLocale.get(R.string.setting_item_quality), SettingItemType.SELECTOR, null);
         qualityItem.formatter = TrackUtil::findNearestResolution;
         qualityItem.listener = (SettingItem<TrackQuality> item, TrackQuality newValue) -> control.selectTrack(newValue);
+        qualityItem.group = GROUP_PLAYBACK;
         items.add(qualityItem);
 
         // 3. 循环播放
-        SettingItem<Boolean> loopItem = new SettingItem<>(KEY_LOOP, context.getString(R.string.setting_item_loop), SettingItemType.SWITCHER, DEFAULT_LOOP);
+        SettingItem<Boolean> loopItem = new SettingItem<>(KEY_LOOP, PlayerLocale.get(R.string.setting_item_loop), SettingItemType.SWITCHER, DEFAULT_LOOP);
         loopItem.listener = (item, newValue) -> control.setLoop(newValue);
+        loopItem.group = GROUP_AUDIO;
         items.add(loopItem);
 
         // 4. 静音播放
-        SettingItem<Boolean> muteItem = new SettingItem<>(KEY_MUTE, context.getString(R.string.setting_item_mute), SettingItemType.SWITCHER, DEFAULT_MUTE);
+        SettingItem<Boolean> muteItem = new SettingItem<>(KEY_MUTE, PlayerLocale.get(R.string.setting_item_mute), SettingItemType.SWITCHER, DEFAULT_MUTE);
         muteItem.listener = (item, newValue) -> control.setMute(newValue);
+        muteItem.group = GROUP_AUDIO;
         items.add(muteItem);
 
         // 5. 镜像模式
-        SettingItem<Integer> mirrorItem = new SettingItem<>(KEY_MIRROR, context.getString(R.string.setting_item_mirror), SettingItemType.SELECTOR, DEFAULT_MIRROR);
+        SettingItem<Integer> mirrorItem = new SettingItem<>(KEY_MIRROR, PlayerLocale.get(R.string.setting_item_mirror), SettingItemType.SELECTOR, DEFAULT_MIRROR);
         mirrorItem.options = SettingOptions.of(MIRROR_OPTIONS);
         mirrorItem.formatter = FormatUtil::formatMirrorType;
         mirrorItem.listener = (item, newValue) -> control.setMirrorType(newValue);
+        mirrorItem.group = GROUP_DISPLAY;
         items.add(mirrorItem);
 
         // 6. 渲染填充
-        SettingItem<Integer> scaleItem = new SettingItem<>(KEY_SCALE, context.getString(R.string.setting_item_scale), SettingItemType.SELECTOR, DEFAULT_SCALE);
+        SettingItem<Integer> scaleItem = new SettingItem<>(KEY_SCALE, PlayerLocale.get(R.string.setting_item_scale), SettingItemType.SELECTOR, DEFAULT_SCALE);
         scaleItem.options = SettingOptions.of(SCALE_OPTIONS);
         scaleItem.formatter = FormatUtil::formatScaleType;
         scaleItem.listener = (item, newValue) -> control.setScaleType(newValue);
+        scaleItem.group = GROUP_DISPLAY;
         items.add(scaleItem);
 
         // 7. 旋转模式
-        SettingItem<Integer> rotateItem = new SettingItem<>(KEY_ROTATE, context.getString(R.string.setting_item_rotate), SettingItemType.SELECTOR, DEFAULT_ROTATE);
+        SettingItem<Integer> rotateItem = new SettingItem<>(KEY_ROTATE, PlayerLocale.get(R.string.setting_item_rotate), SettingItemType.SELECTOR, DEFAULT_ROTATE);
         rotateItem.options = SettingOptions.of(ROTATE_OPTIONS);
         rotateItem.formatter = FormatUtil::formatRotation;
         rotateItem.listener = (item, newValue) -> control.setRotation(newValue);
+        rotateItem.group = GROUP_DISPLAY;
         items.add(rotateItem);
 
         return items;

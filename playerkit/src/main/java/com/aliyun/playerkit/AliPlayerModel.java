@@ -3,6 +3,7 @@ package com.aliyun.playerkit;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.aliyun.playerkit.config.OnPlayerConfigCallback;
 import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.data.VideoSource;
 
@@ -102,6 +103,15 @@ public class AliPlayerModel {
     private final boolean allowedScreenSleep;
 
     /**
+     * 实例级播放器自定义配置回调
+     * <p>
+     * Instance-level player custom configuration callback
+     * </p>
+     */
+    @Nullable
+    private final OnPlayerConfigCallback onPlayerConfig;
+
+    /**
      * 私有构造函数，通过 Builder 创建实例
      * <p>
      * Private constructor, create instance through Builder
@@ -119,6 +129,7 @@ public class AliPlayerModel {
         this.startTime = builder.startTime;
         this.isHardWareDecode = builder.isHardWareDecode;
         this.allowedScreenSleep = builder.allowedScreenSleep;
+        this.onPlayerConfig = builder.onPlayerConfig;
     }
 
     /**
@@ -240,6 +251,19 @@ public class AliPlayerModel {
     }
 
     /**
+     * 获取实例级播放器自定义配置回调。
+     * <p>
+     * Get instance-level player custom configuration callback.
+     * </p>
+     *
+     * @return 配置回调，可能为 null
+     */
+    @Nullable
+    public OnPlayerConfigCallback getOnPlayerConfig() {
+        return onPlayerConfig;
+    }
+
+    /**
      * 播放器数据构建器
      * <p>
      * 采用 Builder 模式，方便创建 {@link AliPlayerModel} 实例。
@@ -299,6 +323,11 @@ public class AliPlayerModel {
          * 是否允许屏幕休眠，默认为 false
          */
         private boolean allowedScreenSleep = false;
+
+        /**
+         * 实例级播放器自定义配置回调
+         */
+        private OnPlayerConfigCallback onPlayerConfig;
 
         /**
          * 设置视频资源对象
@@ -485,6 +514,21 @@ public class AliPlayerModel {
         }
 
         /**
+         * 设置实例级播放器自定义配置回调。
+         *
+         * <p>回调在每次 {@code configure()} 时、{@code prepare()} 前调用，
+         * 可通过播放器实例访问任意底层 SDK 配置能力。</p>
+         *
+         * @param callback 播放器配置回调
+         * @return 构建器实例，支持链式调用
+         */
+        @NonNull
+        public Builder onPlayerConfig(@Nullable OnPlayerConfigCallback callback) {
+            this.onPlayerConfig = callback;
+            return this;
+        }
+
+        /**
          * 构建 {@link AliPlayerModel} 实例
          * <p>
          * Build {@link AliPlayerModel} instance
@@ -536,6 +580,7 @@ public class AliPlayerModel {
                 ", startTime=" + startTime +
                 ", isHardWareDecode=" + isHardWareDecode +
                 ", allowedScreenSleep=" + allowedScreenSleep +
+                ", onPlayerConfig=" + onPlayerConfig +
                 '}';
     }
 }

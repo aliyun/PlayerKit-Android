@@ -24,9 +24,8 @@ import com.aliyun.playerkit.example.settings.storage.SPManager;
 import com.aliyun.playerkit.logging.logger.LoggerCallback;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.logging.LogLevel;
-import com.aliyun.playerkit.slot.SlotRegistry;
+import com.aliyun.playerkit.slot.SlotManager;
 import com.aliyun.playerkit.slot.SlotType;
-import com.aliyun.playerkit.ui.DefaultSlotRegistryFactory;
 import com.aliyun.playerkit.ui.slots.LogPanelSlot;
 import com.aliyun.playerkit.utils.StringUtil;
 
@@ -56,6 +55,9 @@ public class MobileOpsActivity extends AppCompatActivity {
 
     // 播放器组件视图
     private AliPlayerView mPlayerView;
+
+    // 播放器控制器
+    private AliPlayerController mPlayerController;
 
     private LinearLayout mLlSourceSelection;
     private Button mBtnUrlSource;
@@ -229,11 +231,11 @@ public class MobileOpsActivity extends AppCompatActivity {
      */
     private void playVideo(VideoSource videoSource) {
         // 创建播放控制器
-        AliPlayerController playerController = new AliPlayerController(this);
+        mPlayerController = new AliPlayerController(this);
 
-        // 创建自定义插槽注册表，重新定制日志面板插槽
-        SlotRegistry registry = DefaultSlotRegistryFactory.create();
-        registry.register(SlotType.LOG_PANEL, parent -> new MobileOpsLogPanelSlot(parent.getContext()));
+        // 通过 SlotManager 重新定制日志面板插槽
+        SlotManager slotManager = mPlayerView.getSlotManager();
+        slotManager.register(SlotType.LOG_PANEL, parent -> new MobileOpsLogPanelSlot(parent.getContext()));
 
         // 构建播放数据
         AliPlayerModel playerModel = new AliPlayerModel.Builder()
@@ -241,8 +243,9 @@ public class MobileOpsActivity extends AppCompatActivity {
                 .videoTitle("Mobile Ops Demo")
                 .build();
 
-        // 绑定控制器、数据和自定义注册表到视图
-        mPlayerView.attach(playerController, playerModel, registry);
+        // 配置数据并绑定控制器到视图
+        mPlayerController.configure(playerModel);
+        mPlayerView.attach(mPlayerController);
 
         // 隐藏选择区域，显示播放器
         mLlSourceSelection.setVisibility(View.GONE);
@@ -260,9 +263,9 @@ public class MobileOpsActivity extends AppCompatActivity {
         AliPlayerKit.getLogger().setLogCallback(null);
         LogHub.i(TAG, "onDestroy", "Logger callback removed");
 
-        // 解绑播放器组件，释放资源
-        if (mPlayerView != null) {
-            mPlayerView.detach();
+        // 销毁播放器控制器，释放资源
+        if (mPlayerController != null) {
+            mPlayerController.destroy();
         }
     }
 

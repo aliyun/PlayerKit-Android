@@ -1,22 +1,33 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#BF000000"
-    android:clickable="true"
-    android:focusable="true">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--  错误展示  -->
-    <TextView
-        android:id="@+id/tv_message"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@drawable/shape_center_display_bg"
+        android:background="@drawable/bg_play_state"
         android:gravity="center"
-        android:lineSpacingExtra="6dp"
-        android:padding="20dp"
-        android:textColor="#FFFFFF"
-        android:textSize="15dp"
-        android:visibility="gone" />
+        android:orientation="vertical"
+        android:padding="@dimen/play_state_padding">
 
-</FrameLayout>
+        <ImageView
+            android:id="@+id/iv_message_type"
+            android:layout_width="@dimen/common_icon_size"
+            android:layout_height="@dimen/common_icon_size"
+            android:layout_marginBottom="@dimen/play_state_item_margin" />
+
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lineSpacingExtra="@dimen/play_state_line_spacing"
+            android:maxWidth="@dimen/play_state_max_width"
+            android:maxHeight="@dimen/play_state_max_height"
+            android:minWidth="@dimen/play_state_min_width"
+            android:minHeight="@dimen/play_state_min_height"
+            android:textColor="@color/common_text_white"
+            android:textSize="@dimen/common_text_14" />
+
+    </LinearLayout>
+
+</merge>

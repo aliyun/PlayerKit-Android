@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ==================== 通用颜色 ==================== -->
+    <!-- 通用白色文字 -->
+    <color name="common_text_white">#FFFFFF</color>
+    <!-- 全透明（用于透明背景） -->
+    <color name="common_transparent">#00000000</color>
+
+    <!-- ==================== 顶部栏颜色 ==================== -->
+    <!-- 顶部栏字体阴影颜色（40% 透明度黑色） -->
+    <color name="top_bar_tv_shadow">#66000000</color>
+    <!-- 顶部栏字体颜色（白色） -->
+    <color name="top_bar_tv_color">#FFFFFFFF</color>
+
+    <!-- ==================== 视频进度条颜色 ==================== -->
+    <!-- 进度条背景轨道色（30% 透明度白色） -->
+    <color name="video_slider_background">#4DFFFFFF</color>
+    <!-- 进度条已播放轨道颜色（纯白色） -->
+    <color name="video_slider_track">#FFFFFF</color>
+    <!-- 进度条缓冲轨道颜色（50% 透明度白色） -->
+    <color name="video_slider_track_second">#80FFFFFF</color>
+
+    <!-- ==================== 通用滑块控件颜色（音量/亮度） ==================== -->
+    <!-- 滑块控件背景色（深灰色半透明） -->
+    <color name="universal_slider_background">#CC1C1D22</color>
+
+    <!-- ==================== 设置面板颜色 ==================== -->
+    <!-- 面板背景色（深黑色半透明） -->
+    <color name="setting_panel_bg">#E61C1D22</color>
+    <!-- 面板项背景色（10% 透明度白色） -->
+    <color name="setting_panel_item_bg">#1AFFFFFF</color>
+    <!-- 设置项分隔线颜色（20% 透明度白色） -->
+    <color name="setting_divider">#33FFFFFF</color>
+
+    <!-- ==================== 设置面板文本颜色 ==================== -->
+    <!-- 标题颜色（白色） -->
+    <color name="setting_title_color">#FFFFFFFF</color>
+    <!-- 选项选中时的文本颜色（白色） -->
+    <color name="setting_option_selected_color">#FFFFFFFF</color>
+    <!-- 选项未选中时的文本颜色（60% 透明度白色） -->
+    <color name="setting_option_normal_color">#99FFFFFF</color>
+
+    <!-- ==================== 全屏观看按钮控件颜色 ==================== -->
+    <!-- 全屏观看按钮背景色 -->
+    <color name="fullscreen_button_background">#ff202020</color>
+    <!-- 全屏观看按钮边框颜色 -->
+    <color name="fullscreen_button_border">#ff333333</color>
+
+    <!-- ==================== 设置选择器颜色 ==================== -->
+    <!-- 设置项副标题/图标颜色（灰色） -->
+    <color name="setting_subtitle_color">#AAAAAA</color>
+
+    <!-- ==================== 日志面板颜色 ==================== -->
+    <!-- 日志面板背景色（80% 透明度黑色） -->
+    <color name="log_panel_background">#CC000000</color>
+    <!-- 日志面板分隔线颜色（25% 透明度白色） -->
+    <color name="log_panel_divider">#40FFFFFF</color>
+    <!-- 日志文本颜色（浅灰色） -->
+    <color name="log_panel_text_color">#EEEEEE</color>
+
+    <!-- ==================== 播放状态卡片颜色 ==================== -->
+    <!-- 播放状态卡片背景色（80%透明深灰色） -->
+    <color name="play_state_background">#cc1C1D22</color>
+</resources>

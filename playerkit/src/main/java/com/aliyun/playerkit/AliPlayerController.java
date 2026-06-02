@@ -12,8 +12,10 @@ import androidx.lifecycle.LifecycleOwner;
 import com.aliyun.player.videoview.AliDisplayView;
 import com.aliyun.playerkit.core.IPlayerController;
 import com.aliyun.playerkit.core.IPlayerStateStore;
+import com.aliyun.playerkit.config.OnPlayerConfigCallback;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.data.TrackQuality;
+import com.aliyun.playerkit.manager.GlobalManager;
 import com.aliyun.playerkit.player.DefaultPlayerFactory;
 import com.aliyun.playerkit.player.IMediaPlayer;
 import com.aliyun.playerkit.player.IPlayerFactory;
@@ -112,6 +114,12 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
     private boolean wasPlayingBeforePause = false;
 
     /**
+     * 销毁回调（包级可见，由 AliPlayerView 注册）
+     */
+    @Nullable
+    private Runnable onDestroyCallback;
+
+    /**
      * 策略管理器
      * <p>
      * 管理所有策略的生命周期，包括注册、启动、停止、重置等。
@@ -157,10 +165,14 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
         }
         this.context = context;
 
-        this.lifecycleStrategy = lifecycleStrategy;
+        // 初始化全局设置
+        GlobalManager.initialize(context.getApplicationContext());
+
+        // 初始化播放器工厂
         this.playerFactory = new DefaultPlayerFactory();
 
         // 初始化生命周期策略（只初始化一次，策略内部应保持幂等）
+        this.lifecycleStrategy = lifecycleStrategy;
         this.lifecycleStrategy.init(playerFactory);
 
         LogHub.i(TAG, "Controller created with lifecycle strategy: " + lifecycleStrategy.getClass().getSimpleName());
@@ -237,6 +249,12 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
 
         // 5. 配置视频源
         player.setDataSource(model);
+
+        // 6. 调用用户自定义播放器配置回调（prepare 前）
+        OnPlayerConfigCallback onPlayerConfig = model.getOnPlayerConfig();
+        if (onPlayerConfig != null) {
+            onPlayerConfig.onPlayerConfig(player);
+        }
     }
 
     /**
@@ -269,6 +287,12 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
     @Override
     public void destroy() {
         LogHub.i(TAG, "Destroy controller");
+
+        // 先通知绑定的 View 解绑（在资源释放之前，确保插槽能正常执行 onDetach 回调）
+        if (onDestroyCallback != null) {
+            onDestroyCallback.run();
+            onDestroyCallback = null;
+        }
 
         // 释放播放器资源
         if (player != null) {
@@ -411,6 +435,17 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
 
         player.surfaceChanged();
         LogHub.i(TAG, "Surface changed notified to player instance");
+    }
+
+    /**
+     * 设置销毁回调。
+     * <p>
+     * 包级可见，仅供 AliPlayerView 在 attach/detach 时注册/清除。
+     * Controller 销毁时会先触发此回调，通知绑定方执行清理。
+     * </p>
+     */
+    void setOnDestroyCallback(@Nullable Runnable callback) {
+        this.onDestroyCallback = callback;
     }
 
     // ==================== 私有方法 ====================

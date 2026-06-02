@@ -10,11 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.aliyun.playerkit.slot.ISlotManager;
 import com.aliyun.playerkit.slot.SlotHostLayout;
-import com.aliyun.playerkit.slot.SlotRegistry;
+import com.aliyun.playerkit.slot.SlotManager;
 import com.aliyun.playerkit.slot.SlotType;
-import com.aliyun.playerkit.ui.DefaultSlotRegistryFactory;
+import com.aliyun.playerkit.ui.DefaultSlotFactory;
 import com.aliyun.playerkit.ui.slots.FullscreenSlot;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.utils.ContextUtil;
@@ -104,45 +103,34 @@ public class AliPlayerView extends FrameLayout {
     // ==================== 控制器绑定 ====================
 
     /**
-     * 绑定控制器（使用默认插槽注册表）
-     *
-     * @param controller 播放控制器
-     * @param model      播放数据
-     */
-    public void attach(@NonNull AliPlayerController controller, @NonNull AliPlayerModel model) {
-        attach(controller, model, null);
-    }
-
-    /**
-     * 绑定控制器（可自定义插槽注册表）
+     * 绑定 Controller 到视图。
      * <p>
-     * 将播放控制器、数据和插槽注册表绑定到视图。
-     * 绑定后会自动初始化播放器并配置数据。
+     * Controller 必须已通过 {@link AliPlayerController#configure(AliPlayerModel)} 配置过播放数据。
+     * 插槽配置通过 {@link #getSlotManager()} 在 attach 前/后进行。
      * </p>
      *
-     * @param controller 播放控制器，不能为 null（由外部创建和管理）
-     * @param model      播放器数据配置，不能为 null
-     * @param registry   插槽注册表，如果为空则使用默认实现
-     * @throws IllegalStateException 如果已经绑定过控制器
+     * @param controller 已配置的播放控制器
+     * @throws IllegalStateException 如果 controller 未 configure
      */
-    public void attach(@NonNull AliPlayerController controller, @NonNull AliPlayerModel model, @Nullable SlotRegistry registry) {
+    public void attach(@NonNull AliPlayerController controller) {
+        AliPlayerModel model = controller.getModel();
+        if (model == null) {
+            throw new IllegalStateException("Controller must be configured before attaching. Call controller.configure(model) first.");
+        }
+
         if (isAttached) {
-            LogHub.w(TAG, "Controller already attached, detach first");
-            throw new IllegalStateException("Controller already attached. Call detach() first.");
+            LogHub.i(TAG, "Already attached, auto-detaching before re-attach");
+            detach();
         }
 
         this.controller = controller;
-        SlotRegistry actualRegistry = registry != null ? registry : DefaultSlotRegistryFactory.create();
 
         try {
-            // 配置播放数据
-            controller.configure(model);
-
             // 注册默认插槽配置
-            DefaultSlotRegistryFactory.registerDefaultConfigs(slotHostLayout);
+            DefaultSlotFactory.registerDefaultConfigs(slotHostLayout);
 
             // 绑定插槽系统
-            slotHostLayout.bind(controller, model.getSceneType(), actualRegistry);
+            slotHostLayout.bind(controller, model.getSceneType());
 
             // 设置屏幕常亮（根据数据配置，在数据绑定前设置）
             updateKeepScreenOnState(model);
@@ -154,6 +142,15 @@ public class AliPlayerView extends FrameLayout {
             slotHostLayout.bindData(model);
 
             isAttached = true;
+
+            // 注册 destroy 回调：Controller 销毁时自动 detach View
+            controller.setOnDestroyCallback(() -> {
+                if (isAttached) {
+                    LogHub.i(TAG, "Controller destroyed, auto-detaching view");
+                    detach();
+                }
+            });
+
             LogHub.i(TAG, "Controller attached successfully");
 
             // 自动绑定生命周期
@@ -266,8 +263,8 @@ public class AliPlayerView extends FrameLayout {
     /**
      * 解绑控制器
      * <p>
-     * 释放所有资源，包括播放器实例、插槽视图等。
-     * 建议在 Activity/Fragment 的 onDestroy/onDestroyView 中调用。
+     * 仅解绑 UI（插槽系统 unbind、屏幕常亮恢复），不销毁 Controller。
+     * 如需释放播放器资源，请调用 {@link AliPlayerController#destroy()}。
      * </p>
      */
     public void detach() {
@@ -285,9 +282,9 @@ public class AliPlayerView extends FrameLayout {
         // 解绑插槽系统
         slotHostLayout.unbind();
 
-        // 销毁控制器
+        // 清除 destroy 回调（避免 detach 后仍被回调）
         if (controller != null) {
-            controller.destroy();
+            controller.setOnDestroyCallback(null);
         }
 
         // 清理引用
@@ -408,27 +405,11 @@ public class AliPlayerView extends FrameLayout {
      * 如果当前处于全屏状态，则退出全屏并返回 true（表示已处理）。
      * 否则返回 false（表示未处理，由 Activity 自行处理）。
      * </p>
-     * <p>
-     * 使用示例：
-     * <pre>
-     * {@code
-     * @Override
-     * public void onBackPressed() {
-     *     if (playerKit != null && playerKit.onBackPressed()) {
-     *         // 已处理返回键（退出全屏），不需要执行默认行为
-     *         return;
-     *     }
-     *     // 未处理，执行默认行为（关闭 Activity）
-     *     super.onBackPressed();
-     * }
-     * }
-     * </pre>
-     * </p>
      *
      * @return true 如果已处理返回键（退出全屏），false 否则
      */
     public boolean onBackPressed() {
-        View fullscreenSlotView = slotHostLayout.getSlotView(SlotType.FULLSCREEN);
+        View fullscreenSlotView = slotHostLayout.getSlotManager().getSlotView(SlotType.FULLSCREEN);
         if (fullscreenSlotView instanceof FullscreenSlot) {
             return ((FullscreenSlot) fullscreenSlotView).onBackPressed();
         }
@@ -438,53 +419,21 @@ public class AliPlayerView extends FrameLayout {
     /**
      * 获取插槽管理器
      * <p>
-     * 返回插槽管理接口，用于动态管理插槽系统。
-     * 通过此接口，可以在运行时动态切换插槽、访问插槽视图、管理数据绑定等，而无需重建整个播放器组件。
-     * </p>
-     * <p>
-     * <b>架构设计说明</b>：
-     * <ul>
-     *     <li><b>接口隔离原则</b>：ISlotManager 接口专注于插槽管理能力，与 SlotHost 接口（依赖访问）职责分离</li>
-     *     <li><b>依赖倒置原则</b>：外部代码依赖 ISlotManager 接口，而非具体实现类，提高可维护性和可扩展性</li>
-     *     <li><b>封装性</b>：不暴露 SlotHostLayout 的具体实现细节，保持内部实现的灵活性</li>
-     * </ul>
-     * </p>
-     * <p>
-     * <b>使用场景</b>：
-     * <ul>
-     *     <li>动态切换插槽：修改 SlotRegistry 后调用 {@link ISlotManager#rebuildSlots()}</li>
-     *     <li>访问插槽视图：通过 {@link ISlotManager#getSlotView(SlotType)} 获取特定插槽</li>
-     *     <li>数据生命周期管理：通过 {@link ISlotManager#bindData(AliPlayerModel)} 和 {@link ISlotManager#unbindData()} 管理数据绑定</li>
-     *     <li>场景切换：通过 {@link ISlotManager#updateSceneType(int)} 切换播放场景</li>
-     * </ul>
-     * </p>
-     * <p>
-     * <b>注意事项</b>：
-     * <ul>
-     *     <li>建议在 {@link #attach(AliPlayerController, AliPlayerModel, SlotRegistry)} 之后调用</li>
-     *     <li>虽然 SlotHostLayout 在构造时已创建，但只有在 attach 之后才真正初始化</li>
-     *     <li>在 detach 之后，ISlotManager 仍然可用，但插槽可能已被清理</li>
-     * </ul>
+     * 返回插槽管理器，用于动态管理插槽系统。
+     * 通过此对象，可以在运行时动态注册/注销插槽、配置可见性、访问插槽视图等。
      * </p>
      * <p>
      * Get Slot Manager
      * <p>
-     * Returns the slot management interface for dynamically managing the slot system.
-     * Through this interface, slots can be dynamically switched at runtime, slot views can be accessed, data binding can be managed, etc., without rebuilding the entire player component.
-     * </p>
-     * <p>
-     * <b>Architecture Design Notes</b>:
-     * <ul>
-     *     <li><b>Interface Segregation Principle</b>: ISlotManager interface focuses on slot management capabilities, separated from SlotHost interface (dependency access) responsibilities</li>
-     *     <li><b>Dependency Inversion Principle</b>: External code depends on ISlotManager interface rather than concrete implementation classes, improving maintainability and extensibility</li>
-     *     <li><b>Encapsulation</b>: Does not expose SlotHostLayout's concrete implementation details, maintaining flexibility of internal implementation</li>
-     * </ul>
+     * Returns the slot manager for dynamically managing the slot system.
+     * Through this object, slots can be registered/unregistered at runtime,
+     * visibility can be configured, and slot views can be accessed.
      * </p>
      *
-     * @return 插槽管理器接口，不会为 null
+     * @return 插槽管理器，不会为 null
      */
     @NonNull
-    public ISlotManager getSlotManager() {
-        return slotHostLayout;
+    public SlotManager getSlotManager() {
+        return slotHostLayout.getSlotManager();
     }
 }

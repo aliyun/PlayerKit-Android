@@ -1,5 +1,3 @@
-Language: 中文简体 | [English](EventSystem-EN.md)
-
 # **事件系统 (Event System)**
 
 **事件系统 (Event System)** 是 AliPlayerKit 的通信架构。它通过发布-订阅模式，实现了播放器组件间的完全解耦，使 UI 组件与业务逻辑可以独立开发、测试和维护，同时支持多播放器实例的事件隔离。

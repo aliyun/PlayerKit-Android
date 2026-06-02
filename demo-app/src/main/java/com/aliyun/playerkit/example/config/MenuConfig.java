@@ -82,6 +82,11 @@ public final class MenuConfig {
         String preloadSchema = context.getString(R.string.preload_example_example_schema);
         items.add(new MenuItem(R.drawable.ic_preload_example, preloadTitle, preloadSchema));
 
+        // 多语言使用示例页面
+        String localeTitle = context.getString(R.string.locale_example_page_title);
+        String localeSchema = context.getString(R.string.locale_example_page_schema);
+        items.add(new MenuItem(R.drawable.ic_locale_example, localeTitle, localeSchema));
+
         // 设置页面
         String settingsTitle = context.getString(R.string.settings_page_title);
         String settingsSchema = context.getString(R.string.settings_page_schema);

@@ -1,35 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Surface 插槽系统使用示例 -->
-    <string name="slot_system_example_title">Surface 插槽动态插拔演示</string>
-    <string name="slot_system_example_current_status">当前 Surface 插槽：%1$s</string>
-    <string name="slot_system_example_features">特性：%1$s</string>
-    <string name="slot_system_example_switch_label">切换 Surface 插槽：</string>
-    <string name="slot_system_example_tip">提示：点击按钮可动态切换不同的 Surface 插槽，无需重建播放器</string>
+    <!-- 页面标题与描述 -->
+    <string name="slot_demo_title">插槽系统功能演示：</string>
+    <string name="slot_demo_description">• 插槽化设计：播放器界面拆分为多个可组合区域\n• 灵活自定义：顶部栏、底部栏等插槽支持完全自定义\n• 细粒度控制：支持按需隐藏默认插槽中的 UI 元素</string>
+    <string name="slot_demo_video_title">插槽系统演示视频</string>
+    <string name="slot_demo_select_scene">选择演示场景：</string>
+    <string name="slot_demo_current_mode_label">当前模式：</string>
+    <string name="slot_demo_current_mode">%1$s</string>
 
-    <!-- 按钮文字 -->
-    <string name="btn_surface_view">SurfaceView</string>
-    <string name="btn_texture_view">TextureView</string>
-    <string name="btn_empty_slot">空插槽</string>
+    <!-- 场景名称 -->
+    <string name="scene_default_name">默认</string>
+    <string name="scene_simplified_name">精简 UI</string>
+    <string name="scene_gesture_name">手势受限</string>
+    <string name="scene_fine_grained_name">细粒度控制</string>
 
-    <!-- Toast 消息 -->
-    <string name="toast_already_current">当前已是 %1$s</string>
-    <string name="toast_switched_to">已切换到 %1$s</string>
-    <string name="toast_slot_host_layout_not_initialized">SlotHostLayout 未初始化</string>
-
-    <!-- 插槽类型名称 -->
-    <string name="slot_type_surface_view">SurfaceViewSlot</string>
-    <string name="slot_type_texture_view">TextureViewSlot</string>
-    <string name="slot_type_empty">空插槽</string>
-
-    <!-- 插槽类型标签 -->
-    <string name="slot_tag_traditional">传统实现</string>
-    <string name="slot_tag_animation">支持动画</string>
-    <string name="slot_tag_remove_surface">移除 Surface</string>
-
-    <!-- 插槽特性 -->
-    <string name="slot_features_surface_view">独立渲染线程 | 适合独立渲染层 | 不支持动画</string>
-    <string name="slot_features_texture_view">支持动画变换 | 适合动画场景 | 性能略低</string>
-    <string name="slot_features_empty">纯音频播放 | 后台播放 | 自定义场景</string>
-
+    <!-- 场景描述 -->
+    <string name="scene_default_desc">所有元素正常显示，所有手势已启用。\n\n这是默认的播放器 UI，包含完整的顶部栏、底部栏、设置菜单和手势交互。</string>
+    <string name="scene_simplified_desc">已隐藏 UI 元素：\n• 顶部栏：下载按钮、截图按钮\n• 底部栏：进度条\n\n通过 hiddenSlotElements 声明式配置，精准隐藏不需要的 UI 元素，其他元素保持不变。</string>
+    <string name="scene_gesture_desc">已禁用手势：\n• 双击（切换播放状态）\n• 左侧垂直拖动（调整亮度）\n• 右侧垂直拖动（调整音量）\n\n通过 hiddenSlotElements 配置手势控制插槽，可以精准禁用指定的手势交互。</string>
+    <string name="scene_fine_grained_desc">已隐藏 UI 元素：\n• 顶部栏：下载按钮、截图按钮\n• 底部栏：进度条\n• 设置菜单：倍速、静音\n\n已禁用手势：\n• 双击、左侧垂直拖动、右侧垂直拖动\n\n综合展示细粒度控制能力，同时控制 UI 元素和手势交互。</string>
 </resources>

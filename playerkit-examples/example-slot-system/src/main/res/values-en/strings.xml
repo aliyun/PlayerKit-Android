@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Surface Slot System Demo -->
-    <string name="slot_system_example_title">Surface Slot Dynamic Plug-in and Removal Demo</string>
-    <string name="slot_system_example_current_status">Current Surface Slot: %1$s</string>
-    <string name="slot_system_example_features">Features: %1$s</string>
-    <string name="slot_system_example_switch_label">Switch Surface Slot:</string>
-    <string name="slot_system_example_tip">Tip: Click buttons to dynamically switch different Surface slots without rebuilding the player</string>
+    <!-- Page title and description -->
+    <string name="slot_demo_title">Slot System Demo:</string>
+    <string name="slot_demo_description">• Slotted design: Player interface is divided into composable areas\n• Flexible customization: Top bar, bottom bar and other slots support full customization\n• Fine-grained control: Hide specific UI elements within default slots on demand</string>
+    <string name="slot_demo_video_title">Slot System Demo Video</string>
+    <string name="slot_demo_select_scene">Select Demo Scene:</string>
+    <string name="slot_demo_current_mode_label">Current Mode:</string>
+    <string name="slot_demo_current_mode">%1$s</string>
 
-    <!-- Button Text -->
-    <string name="btn_surface_view">SurfaceView</string>
-    <string name="btn_texture_view">TextureView</string>
-    <string name="btn_empty_slot">Empty Slot</string>
+    <!-- Scene names -->
+    <string name="scene_default_name">Default</string>
+    <string name="scene_simplified_name">Simplified UI</string>
+    <string name="scene_gesture_name">Gesture Restricted</string>
+    <string name="scene_fine_grained_name">Fine-Grained</string>
 
-    <!-- Toast Messages -->
-    <string name="toast_already_current">Already %1$s</string>
-    <string name="toast_switched_to">Switched to %1$s</string>
-    <string name="toast_slot_host_layout_not_initialized">SlotHostLayout not initialized</string>
-
-    <!-- Slot Type Names -->
-    <string name="slot_type_surface_view">SurfaceViewSlot</string>
-    <string name="slot_type_texture_view">TextureViewSlot</string>
-    <string name="slot_type_empty">Empty Slot</string>
-
-    <!-- Slot Type Tags -->
-    <string name="slot_tag_traditional">Traditional</string>
-    <string name="slot_tag_animation">Animation Support</string>
-    <string name="slot_tag_remove_surface">Remove Surface</string>
-
-    <!-- Slot Features -->
-    <string name="slot_features_surface_view">Independent rendering thread | Suitable for independent rendering layer | No animation support</string>
-    <string name="slot_features_texture_view">Animation and transformation support | Suitable for animation scenarios | Slightly lower performance</string>
-    <string name="slot_features_empty">Audio-only playback | Background playback | Custom scenarios</string>
+    <!-- Scene descriptions -->
+    <string name="scene_default_desc">All elements displayed normally, all gestures enabled.\n\nThis is the default player UI with complete top bar, bottom bar, settings menu, and gesture interactions.</string>
+    <string name="scene_simplified_desc">Hidden UI elements:\n• Top bar: Download button, Snapshot button\n• Bottom bar: Progress bar\n\nUse hiddenSlotElements declarative configuration to precisely hide unwanted UI elements while keeping others intact.</string>
+    <string name="scene_gesture_desc">Disabled gestures:\n• Double tap (toggle play state)\n• Left vertical drag (adjust brightness)\n• Right vertical drag (adjust volume)\n\nConfigure the gesture control slot via hiddenSlotElements to precisely disable specific gesture interactions.</string>
+    <string name="scene_fine_grained_desc">Hidden UI elements:\n• Top bar: Download button, Snapshot button\n• Bottom bar: Progress bar\n• Settings menu: Speed, Mute\n\nDisabled gestures:\n• Double tap, Left vertical drag, Right vertical drag\n\nComprehensive demonstration of fine-grained control, managing both UI elements and gesture interactions simultaneously.</string>
 </resources>

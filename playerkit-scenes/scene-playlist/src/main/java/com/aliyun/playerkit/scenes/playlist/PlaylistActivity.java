@@ -193,8 +193,9 @@ public class PlaylistActivity extends AppCompatActivity {
                 .videoTitle(videoTitle)
                 .build();
 
-        // 3. 绑定控制器和数据到视图
-        mPlayerView.attach(mCurrentController, playerModel);
+        // 3. 配置数据并绑定控制器到视图
+        mCurrentController.configure(playerModel);
+        mPlayerView.attach(mCurrentController);
     }
 
     /**
@@ -258,9 +259,9 @@ public class PlaylistActivity extends AppCompatActivity {
             return;
         }
 
-        // 解绑当前控制器
-        if (mPlayerView != null) {
-            mPlayerView.detach();
+        // 销毁当前控制器
+        if (mCurrentController != null) {
+            mCurrentController.destroy();
         }
 
         // 将下一个控制器切换为当前控制器
@@ -279,8 +280,9 @@ public class PlaylistActivity extends AppCompatActivity {
                     .videoTitle(videoTitle)
                     .build();
 
-            // 绑定控制器和数据到视图
-            mPlayerView.attach(mCurrentController, playerModel);
+            // 配置数据并绑定控制器到视图
+            mCurrentController.configure(playerModel);
+            mPlayerView.attach(mCurrentController);
         }
 
         // 预加载下一个控制器（如果还有下一个视频）
@@ -297,9 +299,12 @@ public class PlaylistActivity extends AppCompatActivity {
             mStateChangedListener = null;
         }
 
-        // 解绑播放器组件，释放资源（会销毁当前绑定的控制器）
-        if (mPlayerView != null) {
-            mPlayerView.detach();
+        // 销毁播放器控制器，释放资源
+        if (mCurrentController != null) {
+            mCurrentController.destroy();
+        }
+        if (mNextController != null) {
+            mNextController.destroy();
         }
 
         // 销毁生命周期管理策略，促使策略内部按需销毁播放器实例

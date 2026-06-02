@@ -416,6 +416,29 @@ public interface IMediaPlayer {
     void selectTrack(TrackQuality trackQuality);
 
     /**
+     * 获取底层原生播放器实例。
+     *
+     * <p>通过此方法可访问底层播放器 SDK 的完整原生接口，
+     * 适用于在 {@link com.aliyun.playerkit.config.OnPlayerConfigCallback} 回调中
+     * 调用原生配置方法。</p>
+     *
+     * <p>使用示例：</p>
+     * <pre>
+     * .onPlayerConfig(player -> {
+     *     AliPlayer aliPlayer = player.getInternalPlayer();
+     *     PlayerConfig config = aliPlayer.getConfig();
+     *     config.mMaxBufferDuration = 50000;
+     *     aliPlayer.setConfig(config);
+     * })
+     * </pre>
+     *
+     * @param <T> 底层播放器实例类型
+     * @return 底层播放器实例
+     */
+    @NonNull
+    <T> T getInternalPlayer();
+
+    /**
      * 获取播放器唯一标识
      * <p>
      * 返回播放器的唯一标识符，用于区分不同的播放器实例。

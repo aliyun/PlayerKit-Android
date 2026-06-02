@@ -1,302 +1,306 @@
 package com.aliyun.playerkit.examples.slotsystem;
 
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import com.aliyun.playerkit.AliPlayerView;
 import com.aliyun.playerkit.AliPlayerController;
 import com.aliyun.playerkit.AliPlayerModel;
+import com.aliyun.playerkit.AliPlayerView;
 import com.aliyun.playerkit.data.VideoSource;
 import com.aliyun.playerkit.data.VideoSourceFactory;
 import com.aliyun.playerkit.scenes.common.SceneConstants;
-import com.aliyun.playerkit.slot.ISlotManager;
-import com.aliyun.playerkit.slot.SlotRegistry;
-import com.aliyun.playerkit.slot.SlotType;
-import com.aliyun.playerkit.ui.slots.SurfaceViewSlot;
-import com.aliyun.playerkit.ui.slots.TextureViewSlot;
-import com.aliyun.playerkit.utils.ToastUtils;
+import com.aliyun.playerkit.slot.CustomSlotType;
+import com.aliyun.playerkit.slot.SlotManager;
+
+import com.google.android.material.chip.ChipGroup;
 
 /**
  * 插槽系统使用示例 Activity
  * <p>
- * 演示 PlayerKit 插槽系统的 Surface 插槽动态切换功能。
- * </p>
- * <p>
- * <b>核心功能</b>：
+ * 演示 PlayerKit 插槽系统的两大核心功能：
  * <ul>
- *     <li><b>动态切换 Surface 插槽</b>：运行时无缝切换 SurfaceViewSlot/TextureViewSlot/空插槽</li>
- *     <li><b>插槽特性展示</b>：清晰展示每种插槽的特点、优势和使用场景</li>
- *     <li><b>插槽系统优势</b>：体现模块化、动态化、易扩展的设计理念</li>
+ *     <li><b>细粒度控制</b>：通过 {@link SlotManager#hideElements} 声明式配置，
+ *     按需隐藏默认插槽中的 UI 元素或禁用手势交互</li>
+ *     <li><b>层级控制</b>：通过 {@link CustomSlotType} 在任意内置插槽之间插入自定义组件，
+ *     演示如何定义自定义水印插槽并指定其层级</li>
  * </ul>
  * </p>
  * <p>
- * <b>Surface 插槽类型说明</b>：
+ * <b>演示场景</b>：
  * <ul>
- *     <li><b>SurfaceViewSlot</b>：传统 SurfaceView 实现，独立渲染线程，适合需要独立渲染层的场景</li>
- *     <li><b>TextureViewSlot</b>：基于 TextureView，支持动画和变换，适合需要视图动画的场景</li>
- *     <li><b>空插槽</b>：移除 Surface 插槽，可用于特殊场景（如纯音频播放、后台播放等）</li>
+ *     <li><b>默认</b>：展示完整的默认播放器 UI，所有元素正常显示</li>
+ *     <li><b>精简 UI</b>：隐藏顶部栏/底部栏中的部分元素，展示 UI 元素级别的控制</li>
+ *     <li><b>手势受限</b>：禁用部分手势交互，展示手势级别的控制</li>
+ *     <li><b>细粒度控制</b>：综合控制，同时隐藏 UI 元素和禁用手势</li>
  * </ul>
  * </p>
  * <p>
  * Slot System Example Activity
  * <p>
- * Demonstrates the dynamic switching functionality of Surface slots in the PlayerKit slot system.
- * </p>
- * <p>
- * <b>Core Features</b>:
+ * Demonstrates two core features of the PlayerKit slot system:
  * <ul>
- *     <li><b>Dynamic Surface Slot Switching</b>: Seamlessly switch between SurfaceViewSlot/TextureViewSlot/Empty slot at runtime</li>
- *     <li><b>Slot Feature Display</b>: Clearly shows the characteristics, advantages, and use cases of each slot type</li>
- *     <li><b>Slot System Advantages</b>: Demonstrates modular, dynamic, and easily extensible design principles</li>
- * </ul>
- * </p>
- * <p>
- * <b>Surface Slot Type Explanation</b>:
- * <ul>
- *     <li><b>SurfaceViewSlot</b>：Traditional SurfaceView implementation, independent rendering thread, suitable for layers that need to be rendered independently</li>
- *     <li><b>TextureViewSlot</b>：Based on TextureView, supporting animations and transformations, suitable for scenarios that need view animations</li>
- *     <li><b>EmptySlot</b>：Remove Surface slot, suitable for special scenarios (such as pure audio playback, background playback, etc.)</li>
+ *     <li><b>Fine-grained control</b>: Declaratively hide UI elements or disable gesture
+ *     interactions within default slots via {@link SlotManager#hideElements}</li>
+ *     <li><b>Layer control</b>: Insert custom components between any built-in slots via
+ *     {@link CustomSlotType}, demonstrating how to define a custom watermark slot with specific layer order</li>
  * </ul>
  * </p>
  *
  * @author keria
- * @date 2025/12/11
+ * @date 2026/05/10
  */
 public class SlotSystemExampleActivity extends AppCompatActivity {
 
-    private AliPlayerView playerView;
-    private SlotRegistry slotRegistry;
-    private ISlotManager slotManager;
+    // ============================================================
+    // 层级控制：自定义插槽类型定义
+    // Layer Control: Custom Slot Type Definition
+    // ============================================================
 
-    private TextView mStatusTv;
-    private TextView mFeatureTv;
-    private Button[] mSlotButtons;
-    private SurfaceSlotType mCurrentSlot = SurfaceSlotType.SURFACE_VIEW;
+    /**
+     * 自定义水印插槽类型
+     * <p>
+     * order=25 使其位于 GESTURE_CONTROL(20) 和 LANDSCAPE_HINT(30) 之间。
+     * </p>
+     * <p>
+     * Custom watermark slot type.
+     * order=25 places it between GESTURE_CONTROL(20) and LANDSCAPE_HINT(30).
+     * </p>
+     */
+    private static final CustomSlotType WATERMARK = new CustomSlotType("watermark", 25);
+
+    // ============================================================
+    // 播放器相关
+    // ============================================================
+
+    /**
+     * 播放器组件视图
+     */
+    private AliPlayerView playerView;
+
+    /**
+     * 播放器控制器
+     */
+    private AliPlayerController mController;
+
+    // ============================================================
+    // UI 控件
+    // ============================================================
+
+    /**
+     * 场景选择 ChipGroup
+     */
+    private ChipGroup mChipGroup;
+
+    /**
+     * 场景描述文本
+     */
+    private TextView mDescriptionTv;
+
+    /**
+     * 当前模式文本
+     */
+    private TextView mModeTv;
+
+    // ============================================================
+    // 状态
+    // ============================================================
+
+    /**
+     * 当前演示场景
+     */
+    private SlotExampleScene mCurrentScene = SlotExampleScene.DEFAULT;
+
+    // ============================================================
+    // 生命周期
+    // ============================================================
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 加载布局文件
         setContentView(R.layout.activity_slot_system_example);
 
-        // 初始化视图和事件监听
         initViews();
-        // 初始化播放器组件
         initPlayerKit();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mController != null) {
+            mController.destroy();
+        }
+    }
+
+    // ============================================================
+    // 初始化
+    // ============================================================
 
     /**
      * 初始化视图
      * <p>
-     * 绑定 UI 控件，设置按钮点击事件监听器，并更新初始 UI 状态。
-     * </p>
-     * <p>
-     * Initialize Views
-     * <p>
-     * Bind UI controls, set button click listeners, and update initial UI state.
+     * 绑定 UI 控件，设置 ChipGroup 选择监听器，并更新初始 UI 状态。
      * </p>
      */
     private void initViews() {
-        // 绑定状态显示控件
-        mStatusTv = findViewById(R.id.status_text);
-        mFeatureTv = findViewById(R.id.feature_text);
+        // 绑定控件
+        mChipGroup = findViewById(R.id.chip_group_scenes);
+        mDescriptionTv = findViewById(R.id.tv_scene_description);
+        mModeTv = findViewById(R.id.tv_current_mode);
 
-        // 绑定插槽切换按钮
-        mSlotButtons = new Button[]{findViewById(R.id.btn_surface_view), findViewById(R.id.btn_texture_view), findViewById(R.id.btn_empty_slot)};
+        // 设置 ChipGroup 选择监听
+        mChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) {
+                return;
+            }
+            int checkedId = checkedIds.get(0);
+            SlotExampleScene scene = getSceneFromChipId(checkedId);
+            if (scene != null && scene != mCurrentScene) {
+                switchScene(scene);
+            }
+        });
 
-        // 为每个按钮设置点击事件监听器
-        // 按钮顺序与 SurfaceSlotType 枚举顺序对应
-        SurfaceSlotType[] types = SurfaceSlotType.values();
-        for (int i = 0; i < mSlotButtons.length && i < types.length; i++) {
-            final SurfaceSlotType type = types[i];
-            mSlotButtons[i].setOnClickListener(v -> switchSurfaceSlot(type));
-        }
+        // 设置默认选中
+        mChipGroup.check(R.id.chip_default);
 
-        // 更新 UI 显示初始状态
+        // 更新初始 UI 状态
         updateUI();
     }
 
     /**
      * 初始化播放器组件
      * <p>
-     * 创建播放器实例、配置播放数据、注册插槽，并获取 SlotHostLayout 引用用于后续动态切换。
+     * 创建播放器实例，构建播放数据配置，注册自定义插槽，并绑定到 AliPlayerView。
      * </p>
      * <p>
-     * Initialize Player Kit
-     * <p>
-     * Create player instance, configure playback data, register slots, and get SlotHostLayout reference for dynamic switching.
+     * Initialize player component.
+     * Creates player instance, builds playback data, registers custom slots, and attaches to AliPlayerView.
      * </p>
      */
     private void initPlayerKit() {
-        // 步骤 1：获取播放器组件视图
         playerView = findViewById(R.id.v_player_kit);
 
-        // 步骤 2：创建插槽注册表并注册初始插槽
-        slotRegistry = new SlotRegistry();
-        registerSurfaceSlot(slotRegistry, mCurrentSlot);
+        mController = new AliPlayerController(this);
+        AliPlayerModel model = buildPlayerModel();
 
-        // 步骤 3：创建播放器控制器
-        AliPlayerController controller = new AliPlayerController(this);
+        // 配置数据并绑定控制器到播放器视图
+        // Configure data and attach controller to player view
+        mController.configure(model);
 
-        // 步骤 4：创建视频源
-        VideoSource.UrlSource videoSource = VideoSourceFactory.createUrlSource(SceneConstants.SAMPLE_VIDEO_URL);
+        // 注册自定义插槽并应用隐藏元素配置
+        SlotManager slotManager = playerView.getSlotManager();
+        slotManager.register(WATERMARK, parent -> new WatermarkSlot(parent.getContext()));
+        mCurrentScene.applyHiddenElements(slotManager);
 
-        // 步骤 5：构建播放数据配置
-        AliPlayerModel playerModel = new AliPlayerModel.Builder()
+        playerView.attach(mController);
+    }
+
+    // ============================================================
+    // 播放器数据构建
+    // ============================================================
+
+    /**
+     * 构建播放器数据模型
+     */
+    private AliPlayerModel buildPlayerModel() {
+        VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(
+                SceneConstants.LANDSCAPE_SAMPLE_VID,
+                SceneConstants.LANDSCAPE_SAMPLE_PLAY_AUTH
+        );
+
+        AliPlayerModel.Builder builder = new AliPlayerModel.Builder()
                 .videoSource(videoSource)
-                .build();
+                .videoTitle(getString(R.string.slot_demo_video_title));
 
-        // 步骤 6：绑定控制器、数据和插槽注册表到播放器视图
-        // 这会触发插槽的创建和初始化
-        playerView.attach(controller, playerModel, slotRegistry);
-
-        // 步骤 7：获取插槽管理器，用于后续动态切换插槽
-        slotManager = playerView.getSlotManager();
+        return builder.build();
     }
 
-    /**
-     * 注册 Surface 插槽到注册表
-     * <p>
-     * 根据插槽类型，向 SlotRegistry 注册对应的插槽构建器。
-     * 这是插槽系统动态切换的核心实现：通过修改注册表中的构建器，可以实现运行时切换不同的插槽实现。
-     * </p>
-     * <p>
-     * Register Surface Slot to Registry
-     * <p>
-     * Register the corresponding slot builder to SlotRegistry based on the slot type.
-     * This is the core implementation of dynamic slot switching: by modifying the builder in the registry,
-     * different slot implementations can be switched at runtime.
-     * </p>
-     *
-     * @param registry 插槽注册表，不能为 null
-     * @param type     Surface 插槽类型，不能为 null
-     */
-    private void registerSurfaceSlot(@NonNull SlotRegistry registry, @NonNull SurfaceSlotType type) {
-        switch (type) {
-            case SURFACE_VIEW:
-                // 注册 SurfaceViewSlot 构建器
-                // SurfaceView 使用独立渲染线程，适合需要独立渲染层的场景
-                registry.register(SlotType.PLAYER_SURFACE, parent -> new SurfaceViewSlot(parent.getContext()));
-                break;
-            case TEXTURE_VIEW:
-                // 注册 TextureViewSlot 构建器
-                // TextureView 支持动画和变换，适合需要视图动画的场景
-                registry.register(SlotType.PLAYER_SURFACE, parent -> new TextureViewSlot(parent.getContext()));
-                break;
-            case EMPTY:
-                // 移除 Surface 插槽注册
-                // 适用于纯音频播放、后台播放等不需要视频显示的场景
-                registry.unregister(SlotType.PLAYER_SURFACE);
-                break;
-        }
-    }
+    // ============================================================
+    // 场景切换
+    // ============================================================
 
     /**
-     * 切换 Surface 插槽
+     * 切换演示场景
      * <p>
-     * 这是插槽系统的核心功能：运行时动态切换不同的 Surface 实现。
-     * </p>
-     * <p>
-     * Switch Surface Slot
-     * <p>
-     * This is the core functionality of the slot system: dynamically switch between different Surface implementations at runtime.
+     * 切换场景时需要重建播放器，并通过 SlotManager 应用新的隐藏元素配置。
      * </p>
      *
-     * @param type 目标 Surface 插槽类型，不能为 null
+     * @param scene 目标演示场景
      */
-    private void switchSurfaceSlot(@NonNull SurfaceSlotType type) {
-        // 步骤 1：检查是否已经是目标插槽类型
-        if (mCurrentSlot == type) {
-            ToastUtils.showToast(getString(R.string.toast_already_current, type.getDisplayName(this)));
+    private void switchScene(@NonNull SlotExampleScene scene) {
+        if (playerView == null) {
             return;
         }
 
-        // 步骤 2：检查插槽管理器是否已初始化
-        // 注意：虽然 getSlotManager() 返回 @NonNull，但为了防御性编程，仍保留检查
-        if (slotManager == null || playerView == null) {
-            ToastUtils.showToast(R.string.toast_slot_host_layout_not_initialized);
-            return;
+        mCurrentScene = scene;
+
+        // 销毁旧控制器
+        if (mController != null) {
+            mController.destroy();
         }
 
-        // 步骤 3：重新注册目标插槽类型到 SlotRegistry
-        // 这会覆盖之前的构建器，实现动态切换
-        registerSurfaceSlot(slotRegistry, type);
-        mCurrentSlot = type;
+        // 使用新的场景配置重新构建并 attach
+        mController = new AliPlayerController(this);
+        AliPlayerModel model = buildPlayerModel();
+        mController.configure(model);
 
-        // 步骤 4：调用 rebuildSlots() 重建插槽
-        // rebuildSlots() 会：
-        // - 调用旧插槽的 onDetach() 进行清理（会清除旧的 Surface）
-        // - 根据 SlotRegistry 中的新构建器创建新插槽
-        // - 调用新插槽的 onAttach() 进行初始化（会设置新的 Surface）
-        slotManager.rebuildSlots();
+        // 清空旧配置，注册自定义插槽并应用隐藏元素
+        SlotManager slotManager = playerView.getSlotManager();
+        slotManager.clearAllHiddenElements();
+        slotManager.register(WATERMARK, parent -> new WatermarkSlot(parent.getContext()));
+        mCurrentScene.applyHiddenElements(slotManager);
 
-        // 步骤 5：更新 UI 状态显示
+        playerView.attach(mController);
+
+        // 更新 UI
         updateUI();
-
-        // 步骤 6：显示切换成功提示
-        ToastUtils.showToast(getString(R.string.toast_switched_to, type.getDisplayName(this)));
     }
+
+    // ============================================================
+    // UI 更新
+    // ============================================================
 
     /**
      * 更新 UI 状态
      * <p>
-     * 更新状态文本、特性说明和按钮选中状态，提供清晰的视觉反馈。
-     * </p>
-     * <p>
-     * Update UI State
-     * <p>
-     * Update status text, feature description, and button selected state to provide clear visual feedback.
+     * 根据当前场景更新场景描述和当前模式文本。
      * </p>
      */
     private void updateUI() {
-        // 更新状态文本：显示当前插槽类型
-        mStatusTv.setText(getString(R.string.slot_system_example_current_status, mCurrentSlot.getDisplayName(this)));
+        String description = mCurrentScene.getDescription(this);
+        mDescriptionTv.setText(description);
 
-        // 更新特性说明：显示当前插槽的特性
-        mFeatureTv.setText(getString(R.string.slot_system_example_features, mCurrentSlot.getFeatures(this)));
-
-        // 更新按钮状态：高亮当前选中的按钮
-        SurfaceSlotType[] types = SurfaceSlotType.values();
-        Resources res = getResources();
-        // 从资源文件获取透明度值（整数，需要除以 100 转换为 float）
-        float alphaSelected = res.getInteger(R.integer.slot_button_alpha_selected) / 100f;
-        float alphaUnselected = res.getInteger(R.integer.slot_button_alpha_unselected) / 100f;
-        int colorSelected = ContextCompat.getColor(this, R.color.slot_button_selected);
-        int colorUnselected = ContextCompat.getColor(this, R.color.slot_button_unselected);
-
-        for (int i = 0; i < mSlotButtons.length && i < types.length; i++) {
-            boolean isSelected = types[i] == mCurrentSlot;
-            mSlotButtons[i].setSelected(isSelected);
-            mSlotButtons[i].setAlpha(isSelected ? alphaSelected : alphaUnselected);
-            mSlotButtons[i].setBackgroundColor(isSelected ? colorSelected : colorUnselected);
-        }
+        String name = mCurrentScene.getName(this);
+        mModeTv.setText(getString(R.string.slot_demo_current_mode, name));
     }
 
+    // ============================================================
+    // 辅助方法
+    // ============================================================
+
     /**
-     * Activity 销毁时调用
-     * <p>
-     * 解绑播放器组件，释放资源。插槽系统会自动处理所有插槽的清理工作。
-     * </p>
-     * <p>
-     * Called when Activity is destroyed
-     * <p>
-     * Detach player component and release resources. The slot system will automatically handle cleanup of all slots.
-     * </p>
+     * 根据 Chip ID 获取对应的演示场景
+     *
+     * @param chipId Chip 的资源 ID
+     * @return 对应的 SlotExampleScene，如果没有匹配则返回 null
      */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // 解绑播放器组件，释放资源
-        // 插槽系统会自动处理所有插槽的清理工作
-        if (playerView != null) {
-            playerView.detach();
+    @Nullable
+    private static SlotExampleScene getSceneFromChipId(int chipId) {
+        if (chipId == R.id.chip_default) {
+            return SlotExampleScene.DEFAULT;
         }
+        if (chipId == R.id.chip_simplified) {
+            return SlotExampleScene.SIMPLIFIED_UI;
+        }
+        if (chipId == R.id.chip_gesture_restricted) {
+            return SlotExampleScene.GESTURE_RESTRICTED;
+        }
+        if (chipId == R.id.chip_fine_grained) {
+            return SlotExampleScene.FINE_GRAINED;
+        }
+        return null;
     }
 }

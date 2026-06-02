@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/setting_switch_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/setting_item_height_portrait"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/setting_item_padding_horizontal"
+        android:paddingEnd="@dimen/setting_item_padding_horizontal">
+
+        <TextView
+            android:id="@+id/tv_switcher_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:textColor="@color/setting_title_color"
+            android:textSize="@dimen/common_text_14" />
+
+        <CheckBox
+            android:id="@+id/cb_setting_checkbox"
+            android:layout_width="@dimen/setting_switch_width"
+            android:layout_height="@dimen/setting_switch_height"
+            android:layout_gravity="end|center_vertical"
+            android:background="@drawable/ic_selector_checkbox_setting"
+            android:button="@null" />
+    </FrameLayout>
+
+    <View
+        android:id="@+id/view_divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/setting_divider_height"
+        android:layout_marginStart="@dimen/setting_item_padding_horizontal"
+        android:alpha="0.2"
+        android:background="@color/setting_divider" />
+</LinearLayout>

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.aliyun.playerkit.AliPlayerKit;
 import com.aliyun.playerkit.R;
+import com.aliyun.playerkit.locale.PlayerLocale;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.logging.LogHubListener;
 import com.aliyun.playerkit.logging.LogInfo;
@@ -84,7 +85,7 @@ public class LogPanelSlot extends BaseSlot implements LogHubListener {
     /**
      * 是否展开（显示内容区）
      */
-    private boolean mExpanded = true;
+    private boolean mExpanded = false;
 
     /**
      * 日志行缓存：
@@ -319,7 +320,7 @@ public class LogPanelSlot extends BaseSlot implements LogHubListener {
 
         // 修改按钮文本
         if (mTvFullscreen != null) {
-            mTvFullscreen.setText(mIsFullscreen ? R.string.log_panel_exit_fullscreen : R.string.log_panel_fullscreen);
+            mTvFullscreen.setText(PlayerLocale.get(mIsFullscreen ? R.string.log_panel_exit_fullscreen : R.string.log_panel_fullscreen));
         }
 
         // 更新 UI 状态
@@ -374,7 +375,7 @@ public class LogPanelSlot extends BaseSlot implements LogHubListener {
         }
         if (mTvTitle != null) {
             // 更新标题内容
-            String content = mExpanded ? getContext().getString(R.string.log_panel_title_hide) : getContext().getString(R.string.log_panel_title_show);
+            String content = mExpanded ? PlayerLocale.get(R.string.log_panel_title_hide) : PlayerLocale.get(R.string.log_panel_title_show);
             mTvTitle.setText(content);
         }
     }
@@ -396,7 +397,7 @@ public class LogPanelSlot extends BaseSlot implements LogHubListener {
         String tailedString = StringUtil.tail(mTextCache.toString(), MAX_COPY_CHARS);
 
         Context context = getContext();
-        boolean success = ClipboardUtils.copyText(context, context.getString(R.string.log_panel_clipboard_label), tailedString);
+        boolean success = ClipboardUtils.copyText(context, PlayerLocale.get(R.string.log_panel_clipboard_label), tailedString);
         ToastUtils.showToast(success ? R.string.log_panel_copy_success : R.string.log_panel_copy_failed);
     }
 

@@ -17,15 +17,22 @@ import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEventBus;
 import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.logging.LogHub;
+import com.aliyun.playerkit.ui.DefaultSlotFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * AliPlayerKit 插槽宿主布局
  * <p>
  * 负责管理和布局所有插槽视图（Slot View）的核心容器。
- * 根据插槽注册表（{@link SlotRegistry}）和场景类型（{@link SceneType}）动态构建和显示插槽。
+ * 根据插槽管理器（{@link SlotManager}）和场景类型（{@link SceneType}）动态构建和显示插槽。
  * 实现了 {@link SlotHost} 接口，为插槽提供统一的宿主能力。
  * </p>
  * <p>
@@ -44,14 +51,14 @@ import java.util.Map;
  * AliPlayerKit Slot Host Layout
  * <p>
  * Core container responsible for managing and laying out all slot views.
- * Dynamically builds and displays slots based on slot registry ({@link SlotRegistry}) and scene type ({@link SceneType}).
+ * Dynamically builds and displays slots based on slot manager ({@link SlotManager}) and scene type ({@link SceneType}).
  * Implements the {@link SlotHost} interface, providing unified host capabilities for slots.
  * </p>
  *
  * @author keria
  * @date 2025/11/22
  */
-public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceManager, ISlotManager {
+public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceManager {
 
     private static final String TAG = "SlotHostLayout";
 
@@ -65,6 +72,15 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
     private final Map<SlotType, View> slotViews = new EnumMap<>(SlotType.class);
 
     /**
+     * 自定义插槽视图映射表
+     * <p>
+     * Key: 自定义插槽类型，Value: 对应的视图实例。
+     * </p>
+     */
+    @NonNull
+    private final Map<CustomSlotType, View> customSlotViews = new LinkedHashMap<>();
+
+    /**
      * 当前场景类型
      * <p>
      * 用于决定哪些插槽应该显示。不同场景下会显示不同的插槽组合。
@@ -74,18 +90,18 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
     private int sceneType = SceneType.VOD;
 
     /**
-     * 插槽注册表，用于构建插槽视图
+     * 插槽管理器
      * <p>
-     * 在 {@link #bind(AliPlayerController, int, SlotRegistry)} 时设置。
+     * 在构造函数中创建，负责管理所有插槽的注册、可见性配置和构建。
      * </p>
      */
-    @Nullable
-    private SlotRegistry slotRegistry;
+    @NonNull
+    private final SlotManager slotManager;
 
     /**
      * 绑定的播放控制器
      * <p>
-     * 在 {@link #bind(AliPlayerController, int, SlotRegistry)} 时设置。
+     * 在 {@link #bind(AliPlayerController, int)} 时设置。
      * 通过 {@link SlotHost} 接口的 Surface 设置方法提供给插槽使用，而不是直接暴露。
      * </p>
      */
@@ -144,18 +160,20 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
         // 允许子视图超出父视图边界（用于浮层等场景）
         setClipChildren(false);
         setClipToPadding(false);
+        this.slotManager = new SlotManager(this);
+        DefaultSlotFactory.populateDefaults(slotManager);
     }
 
     // ==================== 公开方法 ====================
 
     /**
-     * 绑定控制器和插槽注册表
+     * 绑定控制器
      * <p>
      * 绑定后会自动重建所有插槽视图。
      * 这是使用插槽系统的第一步，必须在构建插槽之前调用。
      * </p>
      * <p>
-     * Bind controller and slot registry
+     * Bind controller
      * <p>
      * After binding, all slot views will be automatically rebuilt.
      * This is the first step in using the slot system and must be called before building slots.
@@ -163,13 +181,11 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
      *
      * @param controller 播放控制器，不能为 null
      * @param sceneType  场景类型
-     * @param registry   插槽注册表，不能为 null
      */
-    public void bind(@NonNull AliPlayerController controller, @SceneType int sceneType, @NonNull SlotRegistry registry) {
+    public void bind(@NonNull AliPlayerController controller, @SceneType int sceneType) {
         LogHub.i(TAG, "Bind controller, sceneType=" + sceneType);
         this.controller = controller;
         this.sceneType = sceneType;
-        this.slotRegistry = registry;
         rebuildSlots();
     }
 
@@ -195,24 +211,37 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
         // 再清理视图生命周期
         detachAllSlots();
         slotViews.clear();
+        customSlotViews.clear();
         removeAllViews();
 
         controller = null;
-        slotRegistry = null;
         visibilityChecker.clear();
     }
 
     /**
-     * 获取指定类型的插槽视图
+     * 获取插槽管理器
      * <p>
-     * Get slot view of specified type
+     * Get slot manager
+     * </p>
+     *
+     * @return 插槽管理器，不会为 null
+     */
+    @NonNull
+    public SlotManager getSlotManager() {
+        return slotManager;
+    }
+
+    /**
+     * 获取指定类型的插槽视图（包级方法，供 SlotManager 委托调用）
+     * <p>
+     * Get slot view of specified type (package-level, for SlotManager delegation)
+     * </p>
      *
      * @param slotType 插槽类型，不能为 null
      * @return 插槽视图，如果不存在则返回 null
      */
-    @Override
     @Nullable
-    public View getSlotView(@NonNull SlotType slotType) {
+    View getSlotViewInternal(@NonNull SlotType slotType) {
         return slotViews.get(slotType);
     }
 
@@ -244,7 +273,6 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
      *
      * @param sceneType 新的场景类型
      */
-    @Override
     public void updateSceneType(@SceneType int sceneType) {
         if (this.sceneType == sceneType) {
             LogHub.i(TAG, "Scene type unchanged: " + sceneType);
@@ -257,7 +285,7 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
         this.sceneType = sceneType;
     }
 
-    // ==================== ISlotManager 接口实现 ====================
+    // ==================== 插槽构建 ====================
 
     /**
      * 重建所有插槽
@@ -272,16 +300,11 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
      * Will first call {@link ISlot#onDetach()} for old slots, then create new slots and call {@link ISlot#onAttach(SlotHost)}.
      * </p>
      */
-    @Override
     public void rebuildSlots() {
         detachAllSlots();
         removeAllViews();
         slotViews.clear();
-
-        if (slotRegistry == null) {
-            LogHub.w(TAG, "SlotRegistry is null, cannot rebuild slots");
-            return;
-        }
+        customSlotViews.clear();
 
         if (controller == null) {
             LogHub.w(TAG, "Controller is null, cannot rebuild slots");
@@ -290,20 +313,86 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
 
         LogHub.i(TAG, "Rebuild slots, sceneType=" + sceneType);
 
-        // 按照 SlotType 定义的顺序构建插槽
-        for (SlotType type : SlotType.values()) {
-            // 检查该插槽是否应该在当前场景下显示
-            if (visibilityChecker.shouldShow(type, sceneType)) {
-                View slotView = slotRegistry.build(type, this);
+        // 收集所有需要显示的插槽，按 order 排序
+        List<SlotEntry> allSlots = collectSortedSlotEntries(sceneType);
+
+        // 按排序结果依次构建和添加插槽
+        for (SlotEntry entry : allSlots) {
+            if (entry.isBuiltIn()) {
+                View slotView = slotManager.buildSlot(entry.builtInType, this);
                 if (slotView != null) {
-                    attachSlot(type, slotView);
+                    attachSlot(entry.builtInType, slotView);
                 }
             } else {
-                LogHub.i(TAG, "Slot skipped: " + type + " (not visible in scene " + sceneType + ")");
+                View slotView = slotManager.buildCustomSlot(entry.customType, this);
+                if (slotView != null) {
+                    attachCustomSlot(entry.customType, slotView);
+                }
             }
         }
 
-        LogHub.i(TAG, "Rebuild slots completed, total=" + slotViews.size());
+        LogHub.i(TAG, "Rebuild slots completed, total=" + (slotViews.size() + customSlotViews.size()) + " (built-in=" + slotViews.size() + ", custom=" + customSlotViews.size() + ")");
+    }
+
+    /**
+     * 收集并排序所有插槽条目
+     * <p>
+     * 合并内置插槽和自定义插槽，按 order 值从小到大排序。
+     * </p>
+     */
+    @NonNull
+    private List<SlotEntry> collectSortedSlotEntries(@SceneType int sceneType) {
+        List<SlotEntry> allSlots = new ArrayList<>();
+
+        // 收集内置插槽
+        for (SlotType type : SlotType.values()) {
+            // 优先检查 SlotManager 的隐藏配置
+            if (slotManager.isHidden(type)) {
+                continue;
+            }
+            if (visibilityChecker.shouldShow(type, sceneType)) {
+                allSlots.add(new SlotEntry(type.getOrder(), type, null));
+            }
+        }
+
+        // 收集自定义插槽
+        for (CustomSlotType customType : slotManager.getCustomSlotTypes()) {
+            allSlots.add(new SlotEntry(customType.getOrder(), null, customType));
+        }
+
+        // 按 order 排序（稳定排序，相同 order 保持注册顺序）
+        Collections.sort(allSlots, new Comparator<SlotEntry>() {
+            @Override
+            public int compare(SlotEntry a, SlotEntry b) {
+                return Integer.compare(a.order, b.order);
+            }
+        });
+
+        return allSlots;
+    }
+
+    /**
+     * 按层级顺序重排子视图
+     * <p>
+     * 仅重排 View 树中的子视图顺序，不触发插槽生命周期回调，不重建插槽实例。
+     * 用于增量更新后修正 z-order。
+     * </p>
+     * <p>
+     * Reorder child views by layer order
+     * <p>
+     * Only reorders child views in the View tree without triggering slot lifecycle callbacks
+     * or recreating slot instances. Used to fix z-order after incremental updates.
+     * </p>
+     */
+    private void reorderChildren(@SceneType int sceneType) {
+        removeAllViews();
+        List<SlotEntry> sorted = collectSortedSlotEntries(sceneType);
+        for (SlotEntry entry : sorted) {
+            View view = entry.isBuiltIn() ? slotViews.get(entry.builtInType) : customSlotViews.get(entry.customType);
+            if (view != null) {
+                addView(view);
+            }
+        }
     }
 
     /**
@@ -319,12 +408,7 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
      *
      * @param newSceneType 新的场景类型
      */
-    private void updateSlotsIncremental(@SceneType int newSceneType) {
-        if (slotRegistry == null) {
-            LogHub.w(TAG, "SlotRegistry is null, cannot update slots");
-            return;
-        }
-
+    void updateSlotsIncremental(@SceneType int newSceneType) {
         if (controller == null) {
             LogHub.w(TAG, "Controller is null, cannot update slots");
             return;
@@ -334,14 +418,15 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
 
         // 按照 SlotType 定义的顺序处理插槽
         for (SlotType type : SlotType.values()) {
-            boolean shouldShow = visibilityChecker.shouldShow(type, newSceneType);
+            // 优先检查 SlotManager 的隐藏配置
+            boolean shouldShow = !slotManager.isHidden(type) && visibilityChecker.shouldShow(type, newSceneType);
             View existingView = slotViews.get(type);
 
             if (shouldShow) {
                 // 应该显示
                 if (existingView == null) {
                     // 之前未显示，现在需要显示 - 创建新插槽
-                    View slotView = slotRegistry.build(type, this);
+                    View slotView = slotManager.buildSlot(type, this);
                     if (slotView != null) {
                         attachSlot(type, slotView);
                         LogHub.i(TAG, "Slot created: " + type);
@@ -363,7 +448,38 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
             }
         }
 
-        LogHub.i(TAG, "Incremental update completed, total=" + slotViews.size());
+        // 处理自定义插槽（自定义插槽始终显示）
+        // 移除已注销的自定义插槽
+        Iterator<Map.Entry<CustomSlotType, View>> it = customSlotViews.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<CustomSlotType, View> entry = it.next();
+            if (!slotManager.isRegistered(entry.getKey())) {
+                View view = entry.getValue();
+                if (view instanceof ISlot) {
+                    ((ISlot) view).onDetach();
+                }
+                removeView(view);
+                it.remove();
+                LogHub.i(TAG, "Custom slot removed: " + entry.getKey().getKey());
+            }
+        }
+
+        for (CustomSlotType customType : slotManager.getCustomSlotTypes()) {
+            View existingCustomView = customSlotViews.get(customType);
+            if (existingCustomView == null) {
+                // 新增的自定义插槽
+                View slotView = slotManager.buildCustomSlot(customType, this);
+                if (slotView != null) {
+                    attachCustomSlot(customType, slotView);
+                    LogHub.i(TAG, "Custom slot created: " + customType.getKey());
+                }
+            }
+        }
+
+        // 保证层级顺序正确
+        reorderChildren(newSceneType);
+
+        LogHub.i(TAG, "Incremental update completed, total=" + (slotViews.size() + customSlotViews.size()));
     }
 
     // ==================== SlotHost 接口实现 ====================
@@ -553,23 +669,14 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
      *
      * @param model 播放数据，不能为 null
      */
-    @Override
     public void bindData(@NonNull AliPlayerModel model) {
         this.model = model;
-        LogHub.i(TAG, "Bind model, notifying " + slotViews.size() + " slots");
+        LogHub.i(TAG, "Bind model, notifying " + (slotViews.size() + customSlotViews.size()) + " slots");
 
-        // 通知所有已附加的 Slot
-        for (Map.Entry<SlotType, View> entry : slotViews.entrySet()) {
-            View slotView = entry.getValue();
-            if (slotView instanceof ISlot) {
-                try {
-                    ((ISlot) slotView).onBindData(model);
-                    LogHub.i(TAG, "Data bound to slot: " + entry.getKey());
-                } catch (Exception e) {
-                    LogHub.e(TAG, "Error binding model to slot: " + entry.getKey(), e);
-                }
-            }
-        }
+        forEachSlot((slot, label) -> {
+            slot.onBindData(model);
+            LogHub.i(TAG, "Data bound to slot: " + label);
+        });
     }
 
     /**
@@ -585,32 +692,62 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
      * Each Slot's {@link ISlot#onUnbindData()} method will be called.
      * </p>
      */
-    @Override
     public void unbindData() {
         if (model == null) {
             LogHub.w(TAG, "Data is already null, skip clearing");
             return;
         }
 
-        LogHub.i(TAG, "Unbind data, notifying " + slotViews.size() + " slots");
+        LogHub.i(TAG, "Unbind data, notifying " + (slotViews.size() + customSlotViews.size()) + " slots");
 
-        // 通知所有已附加的 Slot
-        for (Map.Entry<SlotType, View> entry : slotViews.entrySet()) {
-            View slotView = entry.getValue();
-            if (slotView instanceof ISlot) {
-                try {
-                    ((ISlot) slotView).onUnbindData();
-                    LogHub.i(TAG, "Data unbound from slot: " + entry.getKey());
-                } catch (Exception e) {
-                    LogHub.e(TAG, "Error unbinding data from slot: " + entry.getKey(), e);
-                }
-            }
-        }
+        forEachSlot((slot, label) -> {
+            slot.onUnbindData();
+            LogHub.i(TAG, "Data unbound from slot: " + label);
+        });
 
         this.model = null;
     }
 
     // ==================== 私有方法 ====================
+
+    /**
+     * 插槽操作接口
+     * <p>
+     * Slot action interface for unified slot iteration
+     * </p>
+     */
+    private interface SlotAction {
+        void execute(@NonNull ISlot slot, @NonNull String label) throws Exception;
+    }
+
+    /**
+     * 遍历所有插槽视图执行操作（内置 + 自定义）
+     * <p>
+     * Iterate all slot views (built-in + custom) and execute the action
+     * </p>
+     */
+    private void forEachSlot(@NonNull SlotAction action) {
+        for (Map.Entry<SlotType, View> entry : slotViews.entrySet()) {
+            View view = entry.getValue();
+            if (view instanceof ISlot) {
+                try {
+                    action.execute((ISlot) view, entry.getKey().name());
+                } catch (Exception e) {
+                    LogHub.e(TAG, "Slot action error: " + entry.getKey(), e);
+                }
+            }
+        }
+        for (Map.Entry<CustomSlotType, View> entry : customSlotViews.entrySet()) {
+            View view = entry.getValue();
+            if (view instanceof ISlot) {
+                try {
+                    action.execute((ISlot) view, entry.getKey().getKey());
+                } catch (Exception e) {
+                    LogHub.e(TAG, "Slot action error: " + entry.getKey().getKey(), e);
+                }
+            }
+        }
+    }
 
     /**
      * 附加插槽到宿主
@@ -635,12 +772,39 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
             try {
                 ((ISlot) slotView).onAttach(this);
                 LogHub.i(TAG, "Slot attached: " + slotType);
+                // onAttach 成功后，框架触发元素注册
+                if (slotView instanceof BaseSlot) {
+                    ((BaseSlot) slotView).dispatchRegisterElements(slotType);
+                }
             } catch (Exception e) {
                 LogHub.e(TAG, "Error attaching slot: " + slotType, e);
             }
         }
 
         LogHub.i(TAG, "Slot added: " + slotType);
+    }
+
+    /**
+     * 附加自定义插槽到宿主
+     * <p>
+     * Attach custom slot to host
+     * </p>
+     */
+    private void attachCustomSlot(@NonNull CustomSlotType customType, @NonNull View slotView) {
+        customSlotViews.put(customType, slotView);
+        addView(slotView);
+
+        // 如果插槽实现了 ISlot 接口，调用 onAttach
+        if (slotView instanceof ISlot) {
+            try {
+                ((ISlot) slotView).onAttach(this);
+                LogHub.i(TAG, "Custom slot attached: " + customType.getKey());
+            } catch (Exception e) {
+                LogHub.e(TAG, "Error attaching custom slot: " + customType.getKey(), e);
+            }
+        }
+
+        LogHub.i(TAG, "Custom slot added: " + customType.getKey() + " (order=" + customType.getOrder() + ")");
     }
 
     /**
@@ -655,15 +819,7 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
      * </p>
      */
     private void detachAllSlots() {
-        for (View slotView : slotViews.values()) {
-            if (slotView instanceof ISlot) {
-                try {
-                    ((ISlot) slotView).onDetach();
-                } catch (Exception e) {
-                    LogHub.e(TAG, "Error detaching slot: " + slotView.getClass().getSimpleName(), e);
-                }
-            }
-        }
+        forEachSlot((slot, label) -> slot.onDetach());
     }
 
     /**
@@ -691,6 +847,32 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
             }
             removeView(slotView);
             LogHub.i(TAG, "Slot detached: " + slotType);
+        }
+    }
+
+    // ==================== 层级排序辅助类 ====================
+
+    /**
+     * 插槽排序条目
+     * <p>
+     * 统一表示内置插槽或自定义插槽，用于合并排序。
+     * </p>
+     */
+    private static class SlotEntry {
+        final int order;
+        @Nullable
+        final SlotType builtInType;
+        @Nullable
+        final CustomSlotType customType;
+
+        SlotEntry(int order, @Nullable SlotType builtInType, @Nullable CustomSlotType customType) {
+            this.order = order;
+            this.builtInType = builtInType;
+            this.customType = customType;
+        }
+
+        boolean isBuiltIn() {
+            return builtInType != null;
         }
     }
 }

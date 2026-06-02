@@ -19,6 +19,7 @@ import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.event.GestureEvents;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.slot.BaseSlot;
+import com.aliyun.playerkit.slot.SlotElements;
 import com.aliyun.playerkit.slot.SlotHost;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.utils.BrightnessUtil;
@@ -342,6 +343,11 @@ public class GestureControlSlot extends BaseSlot {
                 return;
             }
 
+            // 水平拖动（进度拖拽）需要确保元素可见
+            if (!isElementVisible(SlotElements.GestureControl.HORIZONTAL_DRAG)) {
+                return;
+            }
+
             mGestureState = GestureState.HORIZONTAL;
             LogHub.i(TAG, "Start horizontal dragging");
 
@@ -356,6 +362,16 @@ public class GestureControlSlot extends BaseSlot {
             }
 
             boolean isLeftSide = mDragStartX < getWidth() / 2.0f;
+
+            // 垂直拖动（音量/亮度调节）需要确保元素可见
+            if (isLeftSide && !isElementVisible(SlotElements.GestureControl.LEFT_VERTICAL_DRAG)) {
+                return;
+            }
+            // 右侧调整音量需要确保元素可见
+            if (!isLeftSide && !isElementVisible(SlotElements.GestureControl.RIGHT_VERTICAL_DRAG)) {
+                return;
+            }
+
             mGestureState = isLeftSide ? GestureState.VERTICAL_LEFT : GestureState.VERTICAL_RIGHT;
             LogHub.i(TAG, "Start vertical dragging on " + (isLeftSide ? "left" : "right") + " side");
 
@@ -602,6 +618,11 @@ public class GestureControlSlot extends BaseSlot {
             return;
         }
 
+        // 单击需要确保元素可见
+        if (!isElementVisible(SlotElements.GestureControl.SINGLE_TAP)) {
+            return;
+        }
+
         LogHub.i(TAG, "Single tap detected");
         postGestureEvent(new GestureEvents.SingleTapEvent(mPlayerId, e.getX(), e.getY()));
     }
@@ -624,6 +645,11 @@ public class GestureControlSlot extends BaseSlot {
     private void handleDoubleTap(MotionEvent e) {
         // 播放器 ID 为空时，不处理
         if (StringUtil.isEmpty(mPlayerId)) {
+            return;
+        }
+
+        // 双击需要确保元素可见
+        if (!isElementVisible(SlotElements.GestureControl.DOUBLE_TAP)) {
             return;
         }
 
@@ -663,6 +689,11 @@ public class GestureControlSlot extends BaseSlot {
 
         // 特定场景下禁用长按（倍速播放）
         if (mSceneType == SceneType.LIVE || mSceneType == SceneType.RESTRICTED || mSceneType == SceneType.MINIMAL) {
+            return;
+        }
+
+        // 长按需要确保元素可见
+        if (!isElementVisible(SlotElements.GestureControl.LONG_PRESS)) {
             return;
         }
 

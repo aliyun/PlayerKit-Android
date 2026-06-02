@@ -1,5 +1,3 @@
-Language: 中文简体 | [English](LifecycleStrategy-EN.md)
-
 # **播放器生命周期策略 (Player Lifecycle Strategy)**
 
 **播放器生命周期策略 (Player Lifecycle Strategy)** 是 AliPlayerKit 的核心架构设计，**面向高阶技术开发者**，为复杂播放场景提供的一套抽象化策略框架。
@@ -215,7 +213,8 @@ AliPlayerController controller = new AliPlayerController(context);
 AliPlayerModel model = new AliPlayerModel.Builder()
         .videoSource(videoSource)
         .build();
-playerView.attach(controller, model);
+controller.configure(model);
+playerView.attach(controller);
 ```
 
 ### **4.2 使用复用池策略**

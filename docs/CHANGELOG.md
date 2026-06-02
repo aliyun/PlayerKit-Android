@@ -1,5 +1,57 @@
 # Changelog
 
+## [7.14.0] - 2026-06-02
+
+### SDK 升级
+
+- AliyunPlayer: 7.12.0 → 7.14.0
+- AlivcArtc: 7.12.0 → 7.14.0
+
+### 不兼容变更
+
+- **SlotRegistry 迁移至 SlotManager**：移除 `SlotRegistry`、`ISlotManager` 和 `HiddenSlotElements`，引入 `SlotManager` 作为统一插槽管理入口
+  - `AliPlayerView.attach(controller, model)` 签名变更为 `attach(controller)`
+  - 数据配置迁移至 `controller.configure(model)`，必须在 `attach()` 前调用
+  - `detach()` 仅解绑视图，需显式调用 `controller.destroy()` 释放资源
+  - 插槽可见性控制从 builder 模式移至运行时 `SlotManager` 方法
+- **GlobalInitializer 重命名为 GlobalManager**
+- **移除动态语言包支持**：仅保留 Android 标准资源机制 (`values-xx/strings.xml`)
+
+### 新增
+
+- **UI 增强**：全新播放器 UI 设计与还原，可直接使用，无需客户再还原 UI。
+- **双层级自定义配置机制**：引入 `OnGlobalInitCallback` 用于全局 SDK 设置、`OnPlayerConfigCallback` 用于实例级播放器配置；暴露 `getInternalPlayer()` 以访问原生 SDK 接口
+- **国际化支持**：引入 `PlayerLocale` 模块自动适配系统语言；添加 `setLanguage` API 强制指定语言
+- **插槽元素细粒度控制**：引入 Element Registry 架构，支持声明式隐藏 UI 元素或禁用手势；添加 `SlotElements` 常量和 `hideElements()`/`showElements()` 方法
+- **自定义插槽层级控制**：引入 `CustomSlotType` 定义自定义插槽层级，支持显式 order 值
+- **通用滑块组件**：引入 `UniversalSlider` 组件用于音量和亮度控制
+- **横屏模式支持**：基于 `ViewStub` 实现懒加载横屏布局；引入 `FullScreenChanged` 事件
+- **轨道切换事件**：添加 `TrackSwitchCompleted` 和 `TrackSwitchFailed` 事件；`PlayStateSlot` 支持 Error、Loading、Snapshot、Track Switch 状态展示
+- **选项面板**：添加速度和质量选择的选项面板组件
+- **能力识别统一**：重构至 `ScenarioManager`，确保播放优化和诊断的一致 JSON 结构
+
+### 变更
+
+- 调试功能默认禁用，需通过公开 setter 显式启用
+- 日志面板默认折叠
+- 搜索栏使用 `Math.round` 修复精度问题
+- 统一资源命名约定并清理未使用资源
+- 移除 BlurView 依赖
+
+### 修复
+
+- 隐藏方法强制至少一个元素键，确保接口安全性
+- 优化布局更新逻辑，从 `onLayout` 切换到 `onSizeChanged` 避免冗余遍历
+- 优雅处理 RtsSDK 库加载异常
+
+### 文档
+
+- 添加 SceneType 配置指南 (`docs/advanced/SceneType.md`)
+- 添加 Locale 多语言文档 (`docs/advanced/Locale.md`)
+- 添加全套英文文档翻译
+- 添加文档站中英文切换支持（侧边栏与内容联动切换）
+- 更新联系方式并添加 GitHub issue 模板
+
 ## [7.12.0] - 2025-03-11
 
 ### Added

@@ -77,8 +77,9 @@ public class LiveActivity extends AppCompatActivity {
                 .sceneType(SceneType.LIVE)
                 .build();
 
-        // 步骤 4：绑定控制器和数据到视图
-        playerView.attach(playerController, playerModel);
+        // 步骤 4：配置数据并绑定控制器到视图
+        playerController.configure(playerModel);
+        playerView.attach(playerController);
     }
 
     /**
@@ -135,10 +136,10 @@ public class LiveActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        // 解绑播放器组件，释放资源
-        // 注意：Activity 销毁时必须释放播放器组件资源，避免内存泄露
-        if (playerView != null) {
-            playerView.detach();
+        // 销毁播放器控制器，释放资源
+        // 注意：Activity 销毁时必须销毁控制器，避免内存泄露
+        if (playerController != null) {
+            playerController.destroy();
         }
     }
 }

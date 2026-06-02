@@ -16,6 +16,12 @@ import java.lang.annotation.Target;
  * 用于区分不同的视频源获取方式，包括 URL、VidSts、VidAuth 三种类型。
  * </p>
  * <p>
+ * <strong>维护约束</strong>：新增枚举值时，<strong>必须</strong>同步更新
+ * {@code com.aliyun.playerkit.manager.ScenarioManager} 内的协议值映射数组，
+ * 且 int 常量需从 0 开始连续递增。如未同步，ScenarioManager 会降级输出
+ * {@code unknown} 并记录 ERROR 日志。
+ * </p>
+ * <p>
  * AliPlayerKit Playback Source Type Definition
  * <p>
  * Defines the different types of playback sources supported for video playback.

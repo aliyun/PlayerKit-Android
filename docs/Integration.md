@@ -1,5 +1,3 @@
-Language: 中文简体 | [English](Integration-EN.md)
-
 > 📚 **推荐阅读路径**
 >
 > [核心能力](./CoreFeatures.md) → **集成准备** → [快速开始](./QuickStart.md) → [API 参考](./ApiReference.md)

@@ -1,15 +1,13 @@
 package com.aliyun.playerkit.strategy.strategies;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.aliyun.playerkit.AliPlayerKit;
 import com.aliyun.playerkit.R;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
+import com.aliyun.playerkit.locale.PlayerLocale;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.strategy.BaseStrategy;
 import com.aliyun.playerkit.utils.ToastUtils;
@@ -186,8 +184,7 @@ public class FirstFrameStrategy extends BaseStrategy {
         mFirstFrameCompleted = true;
 
         // 日志输出
-        Context context = AliPlayerKit.getContext();
-        String message = context.getString(R.string.strategy_tip_first_frame_cost, totalTime, prepareTime, renderTime);
+        String message = PlayerLocale.get(R.string.strategy_tip_first_frame_cost, totalTime, prepareTime, renderTime);
         LogHub.i(TAG, message);
 
         // Toast 显示（仅 Debug 模式）

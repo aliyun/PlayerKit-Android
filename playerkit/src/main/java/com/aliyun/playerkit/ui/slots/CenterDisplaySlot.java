@@ -3,8 +3,6 @@ package com.aliyun.playerkit.ui.slots;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,8 +12,11 @@ import com.aliyun.playerkit.AliPlayerModel;
 import com.aliyun.playerkit.R;
 import com.aliyun.playerkit.event.GestureEvents;
 import com.aliyun.playerkit.event.PlayerEvent;
+import com.aliyun.playerkit.locale.PlayerLocale;
 import com.aliyun.playerkit.slot.BaseSlot;
+import com.aliyun.playerkit.slot.SlotElements;
 import com.aliyun.playerkit.slot.SlotHost;
+import com.aliyun.playerkit.ui.custom.UniversalSlider;
 import com.aliyun.playerkit.utils.StringUtil;
 
 import java.util.Arrays;
@@ -55,23 +56,7 @@ public class CenterDisplaySlot extends BaseSlot {
      * 包含亮度进度条和百分比文本，在左侧垂直拖动时显示。
      * </p>
      */
-    private LinearLayout mLlBrightness;
-
-    /**
-     * 亮度进度条
-     * <p>
-     * 显示当前亮度百分比。
-     * </p>
-     */
-    private ProgressBar mPbBrightness;
-
-    /**
-     * 亮度百分比文本视图
-     * <p>
-     * 显示亮度百分比数值。
-     * </p>
-     */
-    private TextView mTvBrightnessPercent;
+    private UniversalSlider mBrightnessSlider;
 
     /**
      * 音量控制容器布局
@@ -79,23 +64,7 @@ public class CenterDisplaySlot extends BaseSlot {
      * 包含音量进度条和百分比文本，在右侧垂直拖动时显示。
      * </p>
      */
-    private LinearLayout mLlVolume;
-
-    /**
-     * 音量进度条
-     * <p>
-     * 显示当前音量百分比。
-     * </p>
-     */
-    private ProgressBar mPbVolume;
-
-    /**
-     * 音量百分比文本视图
-     * <p>
-     * 显示音量百分比数值。
-     * </p>
-     */
-    private TextView mTvVolumePercent;
+    private UniversalSlider mVolumeSlider;
 
     // ==================== 数据字段 ====================
 
@@ -135,12 +104,11 @@ public class CenterDisplaySlot extends BaseSlot {
 
         // 初始化 UI 组件
         mTvSpeed = findViewById(R.id.tv_speed);
-        mLlBrightness = findViewById(R.id.ll_brightness);
-        mPbBrightness = findViewById(R.id.pb_brightness);
-        mTvBrightnessPercent = findViewById(R.id.tv_brightness_percent);
-        mLlVolume = findViewById(R.id.ll_volume);
-        mPbVolume = findViewById(R.id.pb_volume);
-        mTvVolumePercent = findViewById(R.id.tv_volume_percent);
+        mBrightnessSlider = findViewById(R.id.slider_brightness);
+        mBrightnessSlider.setSliderType(UniversalSlider.SliderType.BRIGHTNESS);
+
+        mVolumeSlider = findViewById(R.id.slider_volume);
+        mVolumeSlider.setSliderType(UniversalSlider.SliderType.VOLUME);
     }
 
     @Override
@@ -212,8 +180,12 @@ public class CenterDisplaySlot extends BaseSlot {
         if (shouldIgnore(event.playerId)) {
             return;
         }
+        // 如果当前没有显示倍速，则不处理
+        if (!isElementVisible(SlotElements.CenterDisplay.SPEED)) {
+            return;
+        }
         mTvSpeed.setVisibility(View.VISIBLE);
-        mTvSpeed.setText(getContext().getText(R.string.player_playback_speed_active));
+        mTvSpeed.setText(PlayerLocale.get(R.string.player_playback_speed_active));
     }
 
     /**
@@ -243,11 +215,15 @@ public class CenterDisplaySlot extends BaseSlot {
         if (shouldIgnore(event.playerId)) {
             return;
         }
-        mLlBrightness.setVisibility(View.VISIBLE);
+        // 如果当前没有显示亮度，则不处理
+        if (!isElementVisible(SlotElements.CenterDisplay.BRIGHTNESS)) {
+            return;
+        }
+        mBrightnessSlider.setVisibility(View.VISIBLE);
 
         int progress = (int) (event.currentPercent * 100);
-        mPbBrightness.setProgress(progress);
-        mTvBrightnessPercent.setText(getContext().getString(R.string.player_brightness_percent_format, progress));
+
+        mBrightnessSlider.updateSliderValue(progress);
     }
 
     /**
@@ -262,7 +238,7 @@ public class CenterDisplaySlot extends BaseSlot {
         if (shouldIgnore(event.playerId)) {
             return;
         }
-        mLlBrightness.setVisibility(View.GONE);
+        mBrightnessSlider.setVisibility(View.GONE);
     }
 
     /**
@@ -277,11 +253,14 @@ public class CenterDisplaySlot extends BaseSlot {
         if (shouldIgnore(event.playerId)) {
             return;
         }
-        mLlVolume.setVisibility(View.VISIBLE);
+        // 如果当前没有显示音量，则不处理
+        if (!isElementVisible(SlotElements.CenterDisplay.VOLUME)) {
+            return;
+        }
+        mVolumeSlider.setVisibility(View.VISIBLE);
 
         int progress = (int) (event.currentPercent * 100);
-        mPbVolume.setProgress(progress);
-        mTvVolumePercent.setText(getContext().getString(R.string.player_volume_percent_format, progress));
+        mVolumeSlider.updateSliderValue(progress);
     }
 
     /**
@@ -296,7 +275,7 @@ public class CenterDisplaySlot extends BaseSlot {
         if (shouldIgnore(event.playerId)) {
             return;
         }
-        mLlVolume.setVisibility(View.GONE);
+        mVolumeSlider.setVisibility(View.GONE);
     }
 
     // ==================== 工具方法 ====================
@@ -322,7 +301,7 @@ public class CenterDisplaySlot extends BaseSlot {
      */
     private void hideAllDisplays() {
         mTvSpeed.setVisibility(View.GONE);
-        mLlBrightness.setVisibility(View.GONE);
-        mLlVolume.setVisibility(View.GONE);
+        mBrightnessSlider.setVisibility(View.GONE);
+        mVolumeSlider.setVisibility(View.GONE);
     }
 }

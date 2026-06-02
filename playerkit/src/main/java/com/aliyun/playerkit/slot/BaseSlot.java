@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.CallSuper;
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -15,7 +16,10 @@ import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEventBus;
 import com.aliyun.playerkit.logging.LogHub;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * AliPlayerKit 插槽基类
@@ -45,6 +49,42 @@ public abstract class BaseSlot extends FrameLayout implements ISlot, IPlayerCont
      * </p>
      */
     protected final SlotBehavior slotBehavior = new SlotBehavior();
+
+    /**
+     * 元素注册表
+     * <p>
+     * 存储已注册的插槽子元素及其控制句柄。
+     * 框架会在 {@link #onBindData(AliPlayerModel)} 时自动根据隐藏配置控制已注册元素的可见性。
+     * 元素在 {@link #onAttach(SlotHost)} 后通过 {@link #onRegisterElements()} 注册。
+     * </p>
+     * <p>
+     * Element Registry
+     * <p>
+     * Stores registered slot sub-elements and their control handles.
+     * The framework automatically controls the visibility of registered elements based on hidden configuration during {@link #onBindData(AliPlayerModel)}.
+     * Elements are registered via {@link #onRegisterElements()} after {@link #onAttach(SlotHost)}.
+     * </p>
+     */
+    private final Map<String, SlotElementHandle> mElementRegistry = new LinkedHashMap<>();
+
+    /**
+     * 隐藏元素配置缓存
+     * <p>
+     * 在 {@link #onBindData(AliPlayerModel)} 时从 Model 中提取并缓存，
+     * 供 {@link #isElementVisible(String)} 进行运行时查询。
+     * </p>
+     * <p>
+     * Hidden Elements Configuration Cache
+     * <p>
+     * Extracted and cached from the Model during {@link #onBindData(AliPlayerModel)},
+     * used by {@link #isElementVisible(String)} for runtime queries.
+     * </p>
+     */
+    @Nullable
+    private Set<String> mHiddenElements;
+
+    @Nullable
+    private SlotType mSlotType;
 
     public BaseSlot(@NonNull Context context) {
         super(context);
@@ -87,6 +127,113 @@ public abstract class BaseSlot extends FrameLayout implements ISlot, IPlayerCont
         return 0;
     }
 
+    // ==================== 元素注册 ====================
+
+    /**
+     * Called by framework ({@link SlotHostLayout}) after
+     * {@link ISlot#onAttach} returns. Injects the slot type
+     * and triggers element registration.
+     *
+     * @param slotType the slot type assigned by the framework
+     */
+    void dispatchRegisterElements(@NonNull SlotType slotType) {
+        mSlotType = slotType;
+        onRegisterElements();
+    }
+
+    /**
+     * 注册插槽元素（框架回调）
+     * <p>
+     * 子类覆写此方法，声明需要框架管理的插槽子元素。
+     * 此方法由框架在 {@link #onAttach(SlotHost)} 返回后自动调用，
+     * 此时 View 已初始化，子类不应手动调用此方法。
+     * </p>
+     * <p>
+     * 使用示例：
+     * <pre>
+     * {@literal @}Override
+     * protected void onRegisterElements() {
+     *     registerElement(SlotElements.TopBar.BACK, mIvBack);
+     *     registerElement(SlotElements.TopBar.TITLE, mTvTitle);
+     * }
+     * </pre>
+     * </p>
+     * <p>
+     * Register Slot Elements (Framework Callback)
+     * <p>
+     * Subclasses override this method to declare sub-elements managed by the framework.
+     * This method is automatically called by the framework after {@link #onAttach(SlotHost)} returns.
+     * Views are initialized at this point. Subclasses should NOT call this method manually.
+     * </p>
+     */
+    protected void onRegisterElements() {
+        // 子类覆写，声明需要框架管理的元素
+    }
+
+    /**
+     * 注册自定义控制的插槽元素
+     * <p>
+     * 将元素注册到框架的元素注册表中，使用自定义的 {@link SlotElementHandle} 控制逻辑。
+     * 适用于非 View 类型的元素控制（如手势行为）或需要自定义显示/隐藏逻辑的场景。
+     * </p>
+     * <p>
+     * Register custom-controlled slot element
+     * <p>
+     * Registers an element to the framework's element registry with a custom {@link SlotElementHandle} control logic.
+     * Suitable for non-View type element control (e.g., gesture behaviors) or scenarios requiring custom show/hide logic.
+     * </p>
+     *
+     * @param key    元素 key，对应 {@link SlotElements} 中的常量
+     * @param handle 元素控制句柄，不能为 null
+     */
+    protected void registerElement(@NonNull String key, @NonNull SlotElementHandle handle) {
+        mElementRegistry.put(key, handle);
+    }
+
+    /**
+     * 注册一个 View 元素到框架。框架将自动管理该 View 的可见性
+     * （{@link View#VISIBLE} / {@link View#GONE}）。
+     *
+     * <p>如果 view 为 null，则静默跳过注册，不会抛出异常。
+     * 这在 View 可能因布局配置不同而不存在时是安全的。
+     *
+     * @param key  元素标识符，来自 {@link SlotElements}
+     * @param view 要控制可见性的 View，可以为 null
+     */
+    protected void registerElement(@NonNull String key, @Nullable View view) {
+        if (view == null) return;
+        registerElement(key, new SlotElementHandle() {
+            @Override
+            public void setVisible(boolean visible) {
+                view.setVisibility(visible ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
+
+    /**
+     * 查询指定元素是否可见
+     * <p>
+     * 运行时查询方法，适用于行为型元素（如手势、事件驱动的显示逻辑）在决策点判断是否启用。
+     * 如果框架未注入插槽类型或尚未调用 onBindData，默认返回 true（可见）。
+     * </p>
+     * <p>
+     * Query whether the specified element is visible
+     * <p>
+     * Runtime query method, suitable for behavioral elements (e.g., gestures, event-driven display logic)
+     * to determine whether to enable at decision points.
+     * If the slot type is not injected by the framework or onBindData has not been called yet, returns true (visible) by default.
+     * </p>
+     *
+     * @param key 元素 key，对应 {@link SlotElements} 中的常量
+     * @return true 如果元素可见/启用，false 如果元素被隐藏/禁用
+     */
+    protected boolean isElementVisible(@NonNull String key) {
+        if (mHiddenElements == null || mHiddenElements.isEmpty()) {
+            return true;
+        }
+        return !mHiddenElements.contains(key);
+    }
+
     /**
      * 查找子视图
      * <p>
@@ -104,7 +251,7 @@ public abstract class BaseSlot extends FrameLayout implements ISlot, IPlayerCont
      */
     @SuppressWarnings("unchecked")
     @Nullable
-    protected <T extends View> T findViewByIdCompat(int id) {
+    protected <T extends View> T findViewByIdCompat(@IdRes int id) {
         return (T) findViewById(id);
     }
 
@@ -222,6 +369,10 @@ public abstract class BaseSlot extends FrameLayout implements ISlot, IPlayerCont
 
         // 子类在 super 之前清理视图资源
 
+        // 清理元素注册表（确保 re-attach 时重新注册）
+        mElementRegistry.clear();
+        mSlotType = null;
+
         // 断开连接
         slotBehavior.detach();
     }
@@ -275,9 +426,11 @@ public abstract class BaseSlot extends FrameLayout implements ISlot, IPlayerCont
      *
      * @param model 播放数据，不会为 null
      */
+    @CallSuper
     @Override
     public void onBindData(@NonNull AliPlayerModel model) {
-        // 子类可选重写
+        // 框架层：缓存元素隐藏配置并自动应用已注册元素的可见性
+        applyElementRegistry();
     }
 
     /**
@@ -293,9 +446,60 @@ public abstract class BaseSlot extends FrameLayout implements ISlot, IPlayerCont
      * BaseSlot provides empty implementation, subclasses can optionally override to clean up data-related resources.
      * </p>
      */
+    @CallSuper
     @Override
     public void onUnbindData() {
-        // 子类可选重写
+        // 框架层：重置所有已注册元素为可见状态，清空缓存
+        resetElementRegistry();
+    }
+
+    /**
+     * 应用元素注册表的可见性控制
+     * <p>
+     * 从 Model 中提取当前插槽的隐藏元素配置并缓存，
+     * 然后遍历注册表中的所有元素，根据配置设置其可见性。
+     * </p>
+     */
+    private void applyElementRegistry() {
+        SlotType slotType = mSlotType;
+        if (slotType == null) {
+            return;
+        }
+
+        // 从 SlotManager 读取隐藏元素配置
+        Set<String> elements = null;
+        SlotHost host = getHost();
+        if (host instanceof SlotHostLayout) {
+            SlotManager slotManager = ((SlotHostLayout) host).getSlotManager();
+            elements = slotManager.getHiddenElements(slotType);
+        }
+
+        mHiddenElements = elements;
+
+        // 自动应用已注册元素的可见性
+        if (mElementRegistry.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, SlotElementHandle> entry : mElementRegistry.entrySet()) {
+            boolean visible = isElementVisible(entry.getKey());
+            entry.getValue().setVisible(visible);
+        }
+    }
+
+    /**
+     * 重置元素注册表
+     * <p>
+     * 将所有已注册元素恢复为可见状态，清空隐藏配置缓存。
+     * 确保切换视频源时元素状态被正确重置。
+     * </p>
+     */
+    private void resetElementRegistry() {
+        // 重置所有已注册元素为可见
+        for (SlotElementHandle handle : mElementRegistry.values()) {
+            handle.setVisible(true);
+        }
+        // 清空缓存
+        mHiddenElements = null;
     }
 
     /**

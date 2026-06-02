@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/play_state_background" />
+    <corners android:radius="@dimen/play_state_shape_radius" />
+</shape>

@@ -36,6 +36,11 @@ public class StrategySystemExampleActivity extends AppCompatActivity {
      */
     private AliPlayerView playerView;
 
+    /**
+     * 播放器控制器
+     */
+    private AliPlayerController playerController;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +64,7 @@ public class StrategySystemExampleActivity extends AppCompatActivity {
         playerView = findViewById(R.id.v_player_kit);
 
         // 2. 创建播放器控制器
-        AliPlayerController playerController = new AliPlayerController(this);
+        playerController = new AliPlayerController(this);
 
         // 3. 获取策略管理器并注册策略
         StrategyManager strategyManager = playerController.getStrategyManager();
@@ -68,7 +73,10 @@ public class StrategySystemExampleActivity extends AppCompatActivity {
         strategyManager.register(new ResumePlayStrategy());
 
         // 4. 准备播放数据
-        VideoSource videoSource = VideoSourceFactory.createUrlSource(SceneConstants.SAMPLE_VIDEO_URL);
+        VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(
+                SceneConstants.LANDSCAPE_SAMPLE_VID,
+                SceneConstants.LANDSCAPE_SAMPLE_PLAY_AUTH
+        );
         // 在起播前，通过 ResumePlayStrategy 读取续播进度，并通过 startTime 设置起播时间
         long startTime = ResumePlayStrategy.getResumePosition(videoSource);
 
@@ -78,8 +86,11 @@ public class StrategySystemExampleActivity extends AppCompatActivity {
                 .startTime(startTime) // 使用记忆播放位置作为起播时间
                 .build();
 
-        // 5. 绑定控制器和模型到视图，开始播放
-        playerView.attach(playerController, model);
+        // 5. 配置播放器组件数据
+        playerController.configure(model);
+
+        // 6. 将播放控制器附加到播放器视图
+        playerView.attach(playerController);
 
         // 显示提示
         ToastUtils.showToast(getString(R.string.resume_play_restored_toast));
@@ -89,12 +100,12 @@ public class StrategySystemExampleActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        // 解绑播放器组件，释放资源
-        // 注意：Activity 销毁时必须释放播放器组件资源，避免内存泄露
-        // StrategyManager 会在播放器销毁时自动停止所有策略
-        // Detach player view and release resources to avoid memory leaks.
-        if (playerView != null) {
-            playerView.detach();
+        // 销毁播放器控制器，释放资源
+        // 注意：Activity 销毁时必须销毁控制器，避免内存泄露
+        // StrategyManager 会在控制器销毁时自动停止所有策略
+        // Destroy player controller and release resources to avoid memory leaks.
+        if (playerController != null) {
+            playerController.destroy();
         }
     }
 }

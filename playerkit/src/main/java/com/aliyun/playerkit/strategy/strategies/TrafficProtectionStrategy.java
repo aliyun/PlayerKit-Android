@@ -15,6 +15,7 @@ import com.aliyun.playerkit.R;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
+import com.aliyun.playerkit.locale.PlayerLocale;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.strategy.BaseStrategy;
 import com.aliyun.playerkit.strategy.StrategyContext;
@@ -236,7 +237,7 @@ public class TrafficProtectionStrategy extends BaseStrategy {
         }
 
         mMobileHintShown = true;
-        ToastUtils.showToast(mContext.getString(R.string.strategy_tip_mobile_network_playing));
+        ToastUtils.showToast(PlayerLocale.get(R.string.strategy_tip_mobile_network_playing));
     }
 
     /**

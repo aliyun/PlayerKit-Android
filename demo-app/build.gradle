@@ -85,6 +85,7 @@ dependencies {
     implementation project(':playerkit-examples:example-slot-system')
     implementation project(':playerkit-examples:example-strategy-system')
     implementation project(':playerkit-examples:example-video-source')
+    implementation project(':playerkit-examples:example-locale')
 
     // Demo 设置模块
     implementation project(':demo-settings')

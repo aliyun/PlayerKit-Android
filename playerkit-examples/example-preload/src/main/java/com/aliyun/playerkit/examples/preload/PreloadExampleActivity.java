@@ -221,9 +221,9 @@ public class PreloadExampleActivity extends AppCompatActivity {
             mPreloader.cancelTask(mPreloadTaskId);
         }
 
-        // 解绑播放器组件，释放资源
-        if (mPlayerView != null) {
-            mPlayerView.detach();
+        // 销毁播放器控制器，释放资源
+        if (mPlayerController != null) {
+            mPlayerController.destroy();
         }
     }
 
@@ -372,6 +372,7 @@ public class PreloadExampleActivity extends AppCompatActivity {
                 .videoSource(mVideoSource)
                 .videoTitle("Preload Example")
                 .build();
+        mPlayerController.configure(playerModel);
 
         // 3. 注册首帧策略，用于监听首帧时间
         registerFirstFrameStrategy();
@@ -379,8 +380,8 @@ public class PreloadExampleActivity extends AppCompatActivity {
         // 4. 设置事件总线：监听播放器状态变化
         setupEventBus();
 
-        // 5. 绑定控制器和数据到视图
-        mPlayerView.attach(mPlayerController, playerModel);
+        // 5. 将播放控制器附加到播放器视图
+        mPlayerView.attach(mPlayerController);
         mIsPlayerAttached = true;
 
         // 6. 显示首帧时间显示区域
@@ -420,9 +421,9 @@ public class PreloadExampleActivity extends AppCompatActivity {
         // 取消订阅，避免内存泄漏
         unsubscribeEventBus();
 
-        // 解绑播放器组件，释放资源
-        if (mPlayerView != null) {
-            mPlayerView.detach();
+        // 销毁播放器控制器，释放资源
+        if (mPlayerController != null) {
+            mPlayerController.destroy();
         }
 
         // 隐藏首帧时间显示区域

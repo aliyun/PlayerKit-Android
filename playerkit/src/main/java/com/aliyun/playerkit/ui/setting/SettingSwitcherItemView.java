@@ -1,13 +1,12 @@
 package com.aliyun.playerkit.ui.setting;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Switch;
+import androidx.appcompat.widget.SwitchCompat;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,8 +36,7 @@ public class SettingSwitcherItemView extends LinearLayout implements ISettingIte
     private TextView mTvTitle;
 
     // 开关控件
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch mSwitchCompat;
+    private SwitchCompat mSwitchCompat;
 
     // Current bound item
     private SettingItem<Boolean> mItem;
@@ -68,11 +66,11 @@ public class SettingSwitcherItemView extends LinearLayout implements ISettingIte
      * </p>
      */
     private void initView() {
-        LayoutInflater.from(getContext()).inflate(R.layout.item_setting_switcher, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.item_setting_switch, this, true);
 
         // 初始化视图
-        mTvTitle = findViewById(R.id.tv_title);
-        mSwitchCompat = findViewById(R.id.switch_compat);
+        mTvTitle = findViewById(R.id.tv_switcher_title);
+        mSwitchCompat = findViewById(R.id.cb_setting_checkbox);
     }
 
     @NonNull

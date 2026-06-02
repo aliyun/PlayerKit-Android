@@ -16,6 +16,12 @@ import java.lang.annotation.Target;
  * 不同的场景类型会影响播放器的 UI 显示、功能可用性和交互方式。
  * </p>
  * <p>
+ * <strong>维护约束</strong>：新增枚举值时，<strong>必须</strong>同步更新
+ * {@code com.aliyun.playerkit.manager.ScenarioManager} 内的协议值映射数组，
+ * 且 int 常量需从 0 开始连续递增。如未同步，ScenarioManager 会降级输出
+ * {@code unknown} 并记录 ERROR 日志。
+ * </p>
+ * <p>
  * AliPlayerKit Playback Scene Type Definition
  * <p>
  * Defines the behavior patterns of the player in different business scenarios.

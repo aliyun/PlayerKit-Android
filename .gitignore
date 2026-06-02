@@ -42,6 +42,7 @@ perf/
 CLAUDE.md
 .specify/
 specs/
+.qoder/
 
 # ================================
 # Android / Native

@@ -104,6 +104,12 @@ public final class SlotConstants {
                 .excludeScenes(createSet(SceneType.MINIMAL))
                 .build());
 
+        // 选项面板插槽：在 minimal 场景下不显示
+        configs.add(new SlotConfig.Builder()
+                .type(SlotType.OPTION_PANEL)
+                .excludeScenes(createSet(SceneType.MINIMAL))
+                .build());
+
         // 设置菜单插槽：在 minimal 场景下不显示
         configs.add(new SlotConfig.Builder()
                 .type(SlotType.SETTING_MENU)

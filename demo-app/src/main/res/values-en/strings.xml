@@ -50,6 +50,10 @@
     <string name="preload_example_page_title">Preload Example</string>
     <string name="preload_example_example_schema">playerkit://examples/preload</string>
 
+    <!-- Locale Example Page -->
+    <string name="locale_example_page_title">Locale Example</string>
+    <string name="locale_example_page_schema">playerkit://examples/locale</string>
+
     <!-- Settings Page -->
     <string name="settings_page_title">Settings</string>
     <string name="settings_page_schema">playerkit://settings</string>

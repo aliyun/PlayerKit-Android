@@ -103,10 +103,14 @@ public class EventSystemExampleActivity extends AppCompatActivity {
         String vid = getVideoVid();
         String playAuth = getVideoPlayAuth();
         VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(vid, playAuth);
-        AliPlayerModel playerModel = new AliPlayerModel.Builder().videoSource(videoSource).videoTitle("Event System Example").build();
+        AliPlayerModel playerModel = new AliPlayerModel.Builder()
+                .videoSource(videoSource)
+                .videoTitle("Event System Example")
+                .build();
+        mPlayerController.configure(playerModel);
 
-        // 3. 绑定控制器和数据到视图
-        mPlayerView.attach(mPlayerController, playerModel);
+        // 3. 绑定控制器到视图
+        mPlayerView.attach(mPlayerController);
     }
 
     /**
@@ -210,9 +214,9 @@ public class EventSystemExampleActivity extends AppCompatActivity {
             mEventBus.unsubscribe(PlayerEvents.Info.class, mInfoListener);
         }
 
-        // 解绑播放器组件，释放资源
-        if (mPlayerView != null) {
-            mPlayerView.detach();
+        // 销毁播放器控制器，释放资源
+        if (mPlayerController != null) {
+            mPlayerController.destroy();
         }
     }
 

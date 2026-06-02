@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- example-locale モジュール -->
+    <string name="locale_example_title">多言語の例</string>
+    <string name="locale_current_language">現在の言語: %s</string>
+    <string name="locale_translation_header">翻訳結果表示</string>
+
+    <!-- レイアウト：グループタイトル -->
+    <string name="locale_group_language_switch">言語切替</string>
+    <string name="locale_group_translation_results">翻訳結果表示</string>
+
+    <!-- レイアウト：ボタンラベル -->
+    <string name="locale_btn_switch_zh">中国語に切替</string>
+    <string name="locale_btn_switch_en">英語に切替</string>
+    <string name="locale_btn_switch_ja">日本語に切替</string>
+
+
+    <!-- playerkit コアモジュール -->
+    <string name="player_brightness">明るさ</string>
+    <string name="player_volume">音量</string>
+    <string name="player_playback_speed_active">倍速再生中</string>
+    <string name="player_volume_format">%1$d</string>
+    <string name="player_brightness_format">%1$d</string>
+
+    <string name="play_state_error_code_label">エラーコード</string>
+    <string name="play_state_error_message_label">エラーメッセージ</string>
+    <string name="play_state_error_message_default">予期しないエラーが発生しました。</string>
+    <string name="play_state_error_details_format">%1$s: %2$d\n%3$s: %4$s</string>
+
+    <!-- 設定メニュー -->
+    <string name="setting_menu_title">設定</string>
+    <string name="setting_item_speed">再生速度</string>
+    <string name="setting_item_quality">画質</string>
+    <string name="setting_item_loop">ループ再生</string>
+    <string name="setting_item_mute">ミュート</string>
+    <string name="setting_item_mirror">ミラーモード</string>
+    <string name="setting_item_scale">スケールモード</string>
+    <string name="setting_item_rotate">回転モード</string>
+
+    <!-- ログパネルスロット -->
+    <string name="log_panel_title_show">デバッグログパネル（タップで表示）</string>
+    <string name="log_panel_title_hide">デバッグログパネル（タップで閉じる）</string>
+    <string name="log_panel_clear">クリア</string>
+    <string name="log_panel_copy_no_logs">コピーできるログがありません</string>
+    <string name="log_panel_copy_success">ログをクリップボードにコピーしました</string>
+    <string name="log_panel_copy_failed">コピー失敗：システムクリップボードが利用できません</string>
+    <string name="log_panel_fullscreen">フルスクリーン</string>
+    <string name="log_panel_exit_fullscreen">フルスクリーン終了</string>
+    <string name="log_panel_clipboard_label">AliPlayerKit Logs</string>
+
+    <!-- ストラテジー -->
+    <string name="strategy_tip_first_frame_cost">
+        初回フレーム所要時間: %1$dms (準備:%2$dms, レンダリング:%3$dms)
+    </string>
+
+    <!-- カクつき検出ヒント -->
+    <string name="strategy_tip_stutter_detected">
+        カクつき検出：単回所要時間 %1$dms
+    </string>
+
+    <!-- 再生セッション分析ログ -->
+    <string name="strategy_tip_stutter_session_analysis">
+        セッション分析：滞在=%1$dms、再生=%2$dms、カクつき=%3$dms（%4$d 回）
+    </string>
+
+    <!-- トラフィック保護：モバイルネットワーク再生中ヒント -->
+    <string name="strategy_tip_mobile_network_playing">モバイルネットワーク使用中、データ通信で再生しています</string>
+
+    <!-- 横画面ヒントスロット -->
+    <string name="landscape_hint_fullscreen">フルスクリーンで視聴</string>
+
+</resources>

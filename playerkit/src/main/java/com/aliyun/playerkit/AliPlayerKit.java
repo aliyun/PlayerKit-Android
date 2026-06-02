@@ -6,7 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.aliyun.player.AliPlayerFactory;
-import com.aliyun.playerkit.global.GlobalInitializer;
+import com.aliyun.playerkit.config.OnGlobalInitCallback;
+import com.aliyun.playerkit.manager.GlobalManager;
 import com.aliyun.playerkit.logging.logger.DefaultPlayerLogger;
 import com.aliyun.playerkit.logging.logger.IPlayerLogger;
 import com.aliyun.playerkit.preload.DefaultPlayerPreloader;
@@ -74,7 +75,7 @@ public final class AliPlayerKit {
      * AliPlayerKit version number
      * </p>
      */
-    public static final String PLAYER_KIT_VERSION = "7.12.0";
+    public static final String PLAYER_KIT_VERSION = "7.14.0";
 
     // ==================== 状态管理 ====================
 
@@ -132,6 +133,14 @@ public final class AliPlayerKit {
     private static volatile IPlayerPreloader sPreloader = null;
 
     /**
+     * 全局初始化自定义配置回调
+     * <p>
+     * Global initialization custom configuration callback
+     * </p>
+     */
+    private static volatile OnGlobalInitCallback sOnGlobalInitCallback;
+
+    /**
      * 全局 API 同步锁对象
      * <p>
      * Global API synchronization lock object
@@ -150,6 +159,17 @@ public final class AliPlayerKit {
     }
 
     // ==================== 初始化方法 ====================
+
+    /**
+     * 设置全局初始化自定义配置回调。
+     *
+     * <p>必须在 {@link #init(Context)} 之前调用，回调将在全局初始化完成后触发（仅一次）。</p>
+     *
+     * @param callback 全局配置回调，传 null 可取消注册
+     */
+    public static void setOnGlobalInit(@Nullable OnGlobalInitCallback callback) {
+        sOnGlobalInitCallback = callback;
+    }
 
     /**
      * 初始化全局设置
@@ -212,7 +232,13 @@ public final class AliPlayerKit {
                 applicationContext = context.getApplicationContext();
 
                 // 初始化全局设置
-                GlobalInitializer.initialize(applicationContext);
+                GlobalManager.initialize(applicationContext);
+
+                // 调用用户自定义全局初始化回调
+                OnGlobalInitCallback callback = sOnGlobalInitCallback;
+                if (callback != null) {
+                    callback.onGlobalInit();
+                }
 
                 initialized = true;
                 LogHub.i(TAG, "AliPlayerKit initialized successfully");
@@ -332,7 +358,7 @@ public final class AliPlayerKit {
             return;
         }
 
-        GlobalInitializer.clearCaches();
+        GlobalManager.clearCaches();
     }
 
 
@@ -343,7 +369,7 @@ public final class AliPlayerKit {
      * <p>
      * 控制是否启用 Debug 模式。当启用时，即使是在 Release 构建下，也会启用 Debug 相关的功能，
      * 例如：Debug Toast、日志面板等。
-     * 默认值：BuildConfig.DEBUG（仅在 Debug 版本下默认为 true）
+     * 默认值：false（默认关闭，仅在外部通过 {@link #setDebugModeEnabled(boolean)} 显式启用时才会开启）
      * </p>
      * <p>
      * 注意：建议使用 {@link #setDebugModeEnabled(boolean)} 方法来设置，而不是直接修改此变量
@@ -353,16 +379,17 @@ public final class AliPlayerKit {
      * <p>
      * Controls whether Debug mode is enabled. When enabled, Debug-related features will be enabled
      * even in Release builds, such as: Debug Toast, log panel, etc.
-     * Default: BuildConfig.DEBUG (only defaults to true in Debug builds)
+     * Default: false (disabled by default; only enabled when explicitly turned on via
+     * {@link #setDebugModeEnabled(boolean)} from outside)
      * </p>
      */
-    private static volatile boolean debugModeEnabled = BuildConfig.DEBUG;
+    private static volatile boolean debugModeEnabled = false;
 
     /**
      * 是否启用日志面板（Log Panel）显示
      * <p>
      * 控制日志面板插槽（LogPanelSlot）是否在 UI 中显示。
-     * 默认值：BuildConfig.DEBUG（仅在 Debug 版本下默认启用）
+     * 默认值：false（默认关闭，仅在外部通过 {@link #setLogPanelEnabled(boolean)} 显式启用时才会显示）
      * </p>
      * <p>
      * 注意：建议使用 {@link #setLogPanelEnabled(boolean)} 方法来设置，而不是直接修改此变量
@@ -371,10 +398,11 @@ public final class AliPlayerKit {
      * Whether to enable log panel display
      * <p>
      * Controls whether the log panel slot (LogPanelSlot) is displayed in the UI.
-     * Default: BuildConfig.DEBUG (only enabled by default in Debug builds)
+     * Default: false (disabled by default; only shown when explicitly turned on via
+     * {@link #setLogPanelEnabled(boolean)} from outside)
      * </p>
      */
-    private static volatile boolean logPanelEnabled = BuildConfig.DEBUG;
+    private static volatile boolean logPanelEnabled = false;
 
     /**
      * 设置是否启用 Debug 模式
@@ -405,25 +433,19 @@ public final class AliPlayerKit {
     /**
      * 检查 Debug 模式是否已启用
      * <p>
-     * 如果 debugModeEnabled 为 true，则返回 true，即使是在 Release 构建下。
-     * 否则返回 BuildConfig.DEBUG 的值。
+     * 仅当外部通过 {@link #setDebugModeEnabled(boolean)} 显式启用时返回 true，否则返回 false。
      * </p>
      * <p>
      * Check if Debug mode is enabled
      * <p>
-     * Returns true if debugModeEnabled is true, even in Release builds.
-     * Otherwise returns the value of BuildConfig.DEBUG.
+     * Returns true only when Debug mode has been explicitly enabled via
+     * {@link #setDebugModeEnabled(boolean)} from outside. Otherwise returns false.
      * </p>
      *
      * @return true 表示 Debug 模式已启用，false 表示已禁用
      */
     public static boolean isDebugModeEnabled() {
-        // 如果用户手动启用了 Debug 模式，则返回 true
-        if (debugModeEnabled) {
-            return true;
-        }
-        // 否则返回 BuildConfig.DEBUG 的值
-        return BuildConfig.DEBUG;
+        return debugModeEnabled;
     }
 
     /**

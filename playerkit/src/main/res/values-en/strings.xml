@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="player_brightness">Brightness</string>
-    <string name="player_volume">Volume</string>
-    <string name="player_playback_speed_active">Playback Speed Active</string>
-    <string name="player_volume_percent_format">%1$d%%</string>
-    <string name="player_brightness_percent_format">%1$d%%</string>
+    <!-- ==================== Center Display ==================== -->
 
+    <!-- Brightness label -->
+    <string name="player_brightness">Brightness</string>
+    <!-- Volume label -->
+    <string name="player_volume">Volume</string>
+    <!-- Long-press speed playback hint -->
+    <string name="player_playback_speed_active">Playback Speed Active</string>
+    <!-- Volume value format -->
+    <string name="player_volume_format">%1$d</string>
+    <!-- Brightness value format -->
+    <string name="player_brightness_format">%1$d</string>
+
+    <!-- ==================== Play State ==================== -->
+
+    <!-- Error code label -->
     <string name="play_state_error_code_label">Error Code</string>
+    <!-- Error message label -->
     <string name="play_state_error_message_label">Error Message</string>
+    <!-- Default error message -->
     <string name="play_state_error_message_default">An unexpected error occurred.</string>
+    <!-- Error details format -->
     <string name="play_state_error_details_format">%1$s: %2$d\n%3$s: %4$s</string>
 
     <!-- Settings Menu -->
@@ -53,5 +66,33 @@
 
     <!-- Landscape Hint Slot -->
     <string name="landscape_hint_fullscreen">Fullscreen View</string>
+
+    <!-- Universal slider default progress -->
+    <string name="universal_slider_default_progress">50</string>
+
+    <!-- ==================== Bottom Bar ==================== -->
+
+    <!-- Quality button title -->
+    <string name="bottom_bar_title_quality">Quality</string>
+    <!-- Speed button title -->
+    <string name="bottom_bar_title_speed">Speed</string>
+
+    <!-- Loading hint -->
+    <string name="play_state_loading">Video Loading</string>
+    <!-- Snapshot success hint -->
+    <string name="play_state_snapshot_completed">Snapshot Completed</string>
+
+    <!-- ==================== Track Switch ==================== -->
+
+    <!-- Switch success hint -->
+    <string name="play_state_track_switch_completed">Switched to %1$s</string>
+    <!-- Switch failed hint -->
+    <string name="play_state_track_switch_failed">Failed to switch quality</string>
+    <!-- Switch failed detail (Debug mode) -->
+    <string name="play_state_track_switch_failed_detail">Failed to switch quality\n%1$s: %2$d\n%3$s: %4$s</string>
+    <!-- Switch failed error code label -->
+    <string name="play_state_track_switch_failed_code_label">Error Code</string>
+    <!-- Switch failed error message label -->
+    <string name="play_state_track_switch_failed_msg_label">Error Message</string>
 
 </resources>

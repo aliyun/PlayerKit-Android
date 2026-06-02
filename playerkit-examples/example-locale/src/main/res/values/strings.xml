@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="locale_example_title">多语言示例</string>
+    <string name="locale_current_language">当前语言: %s</string>
+    <string name="locale_translation_header">翻译结果展示</string>
+
+    <!-- 布局：分组标题 -->
+    <string name="locale_group_language_switch">语言切换</string>
+    <string name="locale_group_translation_results">翻译结果展示</string>
+
+    <!-- 布局：按钮文案 -->
+    <string name="locale_btn_switch_zh">切换到中文</string>
+    <string name="locale_btn_switch_en">切换到英文</string>
+    <string name="locale_btn_switch_ja">切换到日语</string>
+
+</resources>

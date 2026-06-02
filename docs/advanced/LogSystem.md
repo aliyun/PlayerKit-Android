@@ -1,5 +1,3 @@
-Language: 中文简体 | [English](LogSystem-EN.md)
-
 # **日志系统 (Log System)**
 
 **日志系统 (Log System)** 是 AliPlayerKit 的基础支撑模块。它通过统一的日志中心 LogHub，提供日志输出、级别控制、监听器机制等核心能力，实现播放器运行时信息的可视化与可追溯，为问题定位和性能分析提供关键支持。

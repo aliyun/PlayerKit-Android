@@ -103,10 +103,16 @@ public class LandscapeHintSlot extends BaseSlot {
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        // 布局大小变化时重新计算位置和显示状态
-        requestUpdate();
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        // 宿主尺寸变化时重新计算位置和显示状态。
+        // 使用 post 延迟到下一帧执行，避免在 layout pass 中调用 setLayoutParams 触发二次 layout。
+        post(new Runnable() {
+            @Override
+            public void run() {
+                requestUpdate();
+            }
+        });
     }
 
     @Nullable
@@ -241,7 +247,14 @@ public class LandscapeHintSlot extends BaseSlot {
         if (params == null) {
             params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
         }
-        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        int targetGravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+
+        // 差异化判断：所有布局参数未变化时跳过 setLayoutParams，避免触发不必要的 requestLayout。
+        if (params.gravity == targetGravity && params.topMargin == targetTopMargin && params.bottomMargin == 0) {
+            return;
+        }
+
+        params.gravity = targetGravity;
         params.topMargin = targetTopMargin;
         params.bottomMargin = 0; // Prevent conflict
 

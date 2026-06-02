@@ -3,6 +3,7 @@ package com.aliyun.playerkit.ui.slots;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -92,8 +93,7 @@ public class FullscreenSlot extends BaseSlot {
      */
     private final View.OnSystemUiVisibilityChangeListener systemUiVisibilityChangeListener = visibility -> {
         // 检查系统 UI 是否已隐藏
-        boolean isSystemUiHidden = (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0
-                && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0;
+        boolean isSystemUiHidden = (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0 && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0;
 
         if (isSystemUiHidden && pendingLandscapeOrientation) {
             // 系统 UI 已隐藏，现在可以安全地设置横屏方向
@@ -172,10 +172,7 @@ public class FullscreenSlot extends BaseSlot {
         // 将播放器 View 添加到 Activity 的根布局
         ViewGroup rootView = activity.findViewById(android.R.id.content);
         if (rootView != null) {
-            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-            );
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             rootView.addView(this.hostView, params);
         } else {
             // rootView 为 null，恢复到原始父容器
@@ -203,8 +200,7 @@ public class FullscreenSlot extends BaseSlot {
             // 如果系统 UI 已经隐藏（可能在某些设备上立即生效），立即设置横屏方向
             // 注意：如果 Activity 未配置 configChanges="orientation|screenSize"，会导致 Activity 重建
             int currentVisibility = decorView.getSystemUiVisibility();
-            boolean isSystemUiHidden = (currentVisibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0
-                    && (currentVisibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0;
+            boolean isSystemUiHidden = (currentVisibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0 && (currentVisibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0;
             if (isSystemUiHidden) {
                 activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 pendingLandscapeOrientation = false;
@@ -298,12 +294,7 @@ public class FullscreenSlot extends BaseSlot {
 
         if (enabled) {
             // 进入全屏：隐藏状态栏和导航栏
-            flags = View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+            flags = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
         } else {
             // 退出全屏：显示状态栏和导航栏
             flags = View.SYSTEM_UI_FLAG_VISIBLE;
@@ -379,5 +370,18 @@ public class FullscreenSlot extends BaseSlot {
         originalLayoutParams = null;
 
         super.onDetach();
+    }
+
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (null == getPlayerId()) return;
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            postEvent(new FullscreenEvents.FullScreenChanged(getPlayerId(), true));
+        } else {
+            postEvent(new FullscreenEvents.FullScreenChanged(getPlayerId(), false));
+        }
     }
 }

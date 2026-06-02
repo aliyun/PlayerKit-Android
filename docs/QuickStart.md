@@ -1,5 +1,3 @@
-Language: 中文简体 | [English](QuickStart-EN.md)
-
 > 📚 **推荐阅读路径**
 >
 > [核心能力](./CoreFeatures.md) → [集成准备](./Integration.md) → **快速开始** → [API 参考](./ApiReference.md)
@@ -116,6 +114,8 @@ class MyApplication : Application() {
 
 在 Activity/Fragment 中创建控制器、配置数据、绑定视图：
 
+> **重要**：`configure()` 必须在 `attach()` 之前调用，否则视图绑定时无法获取播放配置。
+
 * **Java**：
 
 ```java
@@ -129,32 +129,31 @@ public class VideoPlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
 
-        // 1. 获取播放器视图
-        playerView = findViewById(R.id.player_view);
-
-        // 2. 创建播放控制器
+        // 1. 创建播放控制器
         controller = new AliPlayerController(this);
 
-        // 3. 配置播放数据（推荐使用 VidAuth 方式）
-        AliPlayerModel model = new AliPlayerModel.Builder()
+        // 2. 配置播放数据（推荐使用 VidAuth 方式）
+        controller.configure(new AliPlayerModel.Builder()
                 .videoSource(VideoSourceFactory.createVidAuthSource(
                         "您的视频 ID",    // 视频 ID
                         "您的播放凭证"    // 播放凭证
                 ))
+                .sceneType(SceneType.VOD)
                 .coverUrl("https://example.com/cover.jpg")  // 替换为实际封面图地址
                 .videoTitle("示例视频")
                 .autoPlay(true)
-                .build();
+                .build());
 
-        // 4. 绑定控制器和视图
-        playerView.attach(controller, model);
+        // 3. 绑定视图
+        playerView = findViewById(R.id.player_view);
+        playerView.attach(controller);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // 5. 解绑并释放资源
-        playerView.detach();
+        // 4. 销毁播放器，释放资源
+        controller.destroy();
     }
 }
 ```
@@ -171,31 +170,30 @@ class VideoPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_player)
 
-        // 1. 获取播放器视图
-        playerView = findViewById(R.id.player_view)
-
-        // 2. 创建播放控制器
+        // 1. 创建播放控制器
         controller = AliPlayerController(this)
 
-        // 3. 配置播放数据（推荐使用 VidAuth 方式）
-        val model = AliPlayerModel.Builder()
+        // 2. 配置播放数据（推荐使用 VidAuth 方式）
+        controller.configure(AliPlayerModel.Builder()
                 .videoSource(VideoSourceFactory.createVidAuthSource(
                         "您的视频 ID",    // 视频 ID
                         "您的播放凭证"    // 播放凭证
                 ))
+                .sceneType(SceneType.VOD)
                 .coverUrl("https://example.com/cover.jpg")  // 替换为实际封面图地址
                 .videoTitle("示例视频")
                 .autoPlay(true)
-                .build()
+                .build())
 
-        // 4. 绑定控制器和视图
-        playerView.attach(controller, model)
+        // 3. 绑定视图
+        playerView = findViewById(R.id.player_view)
+        playerView.attach(controller)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // 5. 解绑并释放资源
-        playerView.detach()
+        // 4. 销毁播放器，释放资源
+        controller.destroy()
     }
 }
 ```

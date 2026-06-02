@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="player_brightness">亮度</string>
-    <string name="player_volume">音量</string>
-    <string name="player_playback_speed_active">倍速播放中</string>
-    <string name="player_volume_percent_format">%1$d%%</string>
-    <string name="player_brightness_percent_format">%1$d%%</string>
+    <!-- ==================== 中心显示控件 ==================== -->
 
+    <!-- 亮度标签 -->
+    <string name="player_brightness">亮度</string>
+    <!-- 音量标签 -->
+    <string name="player_volume">音量</string>
+    <!-- 长按倍速播放提示 -->
+    <string name="player_playback_speed_active">倍速播放中</string>
+    <!-- 音量数值格式 -->
+    <string name="player_volume_format">%1$d</string>
+    <!-- 亮度数值格式 -->
+    <string name="player_brightness_format">%1$d</string>
+
+    <!-- ==================== 播放状态提示 ==================== -->
+
+    <!-- 错误码标签 -->
     <string name="play_state_error_code_label">错误代码</string>
+    <!-- 错误信息标签 -->
     <string name="play_state_error_message_label">错误信息</string>
+    <!-- 错误信息缺省文本 -->
     <string name="play_state_error_message_default">发生了一个意外错误。</string>
+    <!-- 错误详情格式（%1$s:标签, %2$d:错误码, %3$s:标签, %4$s:信息） -->
     <string name="play_state_error_details_format">%1$s: %2$d\n%3$s: %4$s</string>
 
     <!-- 设置菜单 -->
@@ -53,5 +66,35 @@
 
     <!-- 横屏提示插槽 -->
     <string name="landscape_hint_fullscreen">全屏观看</string>
+
+
+    <!-- 通用滑块控件默认进度值 -->
+    <string name="universal_slider_default_progress">50</string>
+
+    <!-- ==================== 底部控制栏 ==================== -->
+
+    <!-- 清晰度按钮标题 -->
+    <string name="bottom_bar_title_quality">清晰度</string>
+    <!-- 倍速按钮标题 -->
+    <string name="bottom_bar_title_speed">倍速</string>
+
+    <!-- 加载中提示 -->
+    <string name="play_state_loading">视频加载中</string>
+    <!-- 截图成功提示 -->
+    <string name="play_state_snapshot_completed">截图已保存</string>
+
+    <!-- ==================== 清晰度切换 ==================== -->
+
+    <!-- 切换成功提示（%1$s:清晰度名称） -->
+    <string name="play_state_track_switch_completed">已切换至 %1$s</string>
+    <!-- 切换失败提示 -->
+    <string name="play_state_track_switch_failed">切换清晰度失败</string>
+    <!-- 切换失败详情（Debug 模式，%1$s:码标签, %2$d:错误码, %3$s:信息标签, %4$s:错误信息） -->
+    <string name="play_state_track_switch_failed_detail">切换清晰度失败\n%1$s: %2$d\n%3$s: %4$s</string>
+    <!-- 切换失败错误码标签 -->
+    <string name="play_state_track_switch_failed_code_label">错误代码</string>
+    <!-- 切换失败错误信息标签 -->
+    <string name="play_state_track_switch_failed_msg_label">错误信息</string>
+
 
 </resources>

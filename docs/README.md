@@ -1,5 +1,3 @@
-Language: 中文简体 | [English](README-EN.md)
-
 >🤖 **AI 友好提示**
 >
 >**本文档结构清晰、步骤明确，适合 AI 读取、理解与执行；也可作为 Skills 使用，由 AI 辅助完成 AliPlayerKit 的接入与使用。**
@@ -36,9 +34,12 @@ Language: 中文简体 | [English](README-EN.md)
 | [插槽系统](./advanced/SlotSystem.md) | 自定义播放器界面组件 |
 | [策略系统](./advanced/StrategySystem.md) | 扩展播放器行为逻辑 |
 | [事件系统](./advanced/EventSystem.md) | 监听和处理播放事件 |
+| [自定义配置](./advanced/CustomConfig.md) | 实现全局和实例级别的播放器自定义配置 |
 | [播放器生命周期策略](./advanced/PlayerLifecycleStrategy.md) | 优化播放器资源管理 |
 | [日志系统](./advanced/LogSystem.md) | 调试和问题排查 |
+| [多语言](./advanced/Locale.md) | 支持多语言切换与自定义语言包 |
 | [多视频源支持](./advanced/VideoSource.md) | 配置 VidAuth、VidSts、URL 等多种视频源 |
+| [场景类型](./advanced/SceneType.md) | 指定不同场景自动适配 UI 行为、手势控制和插槽可见性 |
 
 ---
 

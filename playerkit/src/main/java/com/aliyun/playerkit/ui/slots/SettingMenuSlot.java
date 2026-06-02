@@ -1,13 +1,14 @@
 package com.aliyun.playerkit.ui.slots;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.playerkit.AliPlayerModel;
 import com.aliyun.playerkit.R;
@@ -17,32 +18,30 @@ import com.aliyun.playerkit.data.TrackQuality;
 import com.aliyun.playerkit.event.ControlBarEvents;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
-import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.slot.BaseSlot;
+import com.aliyun.playerkit.slot.SlotElements;
 import com.aliyun.playerkit.ui.setting.SettingConstants;
 import com.aliyun.playerkit.ui.setting.SettingItem;
-import com.aliyun.playerkit.ui.setting.SettingItemType;
+import com.aliyun.playerkit.ui.setting.SettingItemLandscapeAdapter;
+import com.aliyun.playerkit.ui.setting.SettingItemPortraitAdapter;
 import com.aliyun.playerkit.ui.setting.SettingOptions;
-import com.aliyun.playerkit.ui.setting.ISettingItemView;
-import com.aliyun.playerkit.ui.setting.SettingSelectorItemView;
-import com.aliyun.playerkit.ui.setting.SettingSwitcherItemView;
 import com.aliyun.playerkit.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 设置菜单插槽。
  * <p>
  * 提供倍速、清晰度、循环播放等设置项，并与播放器状态保持同步。
+ * 根据屏幕方向自动切换横屏/竖屏布局。
  * </p>
  *
  * <p>
  * Settings menu slot.
  * Provides setting items (speed/quality/loop, etc.) and keeps them in sync with player state.
+ * Automatically switches between landscape/portrait layout based on screen orientation.
  * </p>
  *
  * @author keria
@@ -54,18 +53,28 @@ public class SettingMenuSlot extends BaseSlot {
 
     // 显隐动画时长
     private static final long ANIM_DURATION_MS = 300L;
-    // 默认面板宽度
-    private static final float FALLBACK_PANEL_WIDTH_DP = 300f;
+    // 横屏默认面板宽度
+    private static final float FALLBACK_PANEL_WIDTH_DP = 345f;
+    // 竖屏默认面板高度
+    private static final float FALLBACK_PANEL_HEIGHT_DP = 400f;
+    // 横屏/竖屏容器
+    private View mLandscapeContainer;
+    private View mPortraitContainer;
 
-    // 菜单项
-    private LinearLayout mLlItems;
-    // 菜单内容
-    private View mViewContent;
+    // 适配器
+    private SettingItemLandscapeAdapter mLandscapeAdapter;
+    private SettingItemPortraitAdapter mPortraitAdapter;
 
-    // 设置项
+    // 全量设置项（竖屏使用）
     private final List<SettingItem<?>> mItems = new ArrayList<>();
-    // 设置项视图
-    private final Map<String, ISettingItemView<?>> mHolders = new HashMap<>();
+    // 横屏设置项（过滤掉倍速和清晰度）
+    private final List<SettingItem<?>> mLandscapeItems = new ArrayList<>();
+
+    // 横屏不显示的设置项
+    private static final List<String> LANDSCAPE_EXCLUDED_KEYS = Arrays.asList(
+            SettingConstants.KEY_SPEED,
+            SettingConstants.KEY_QUALITY
+    );
 
     // 是否正在执行动画
     private boolean mIsAnimating;
@@ -111,18 +120,41 @@ public class SettingMenuSlot extends BaseSlot {
     public void onAttach(@NonNull com.aliyun.playerkit.slot.SlotHost host) {
         super.onAttach(host);
 
-        mLlItems = findViewById(R.id.ll_setting_items);
-        mViewContent = findViewById(R.id.ll_menu_content);
+        // 设置背景蒙层和点击关闭
+        setBackgroundColor(0x80000000);
+        setClickable(true);
+        setFocusable(true);
+        setOnClickListener(v -> gone());
 
+        // 查找横竖屏容器
+        mPortraitContainer = findViewById(R.id.ll_portrait_container);
+        mLandscapeContainer = findViewById(R.id.ll_landscape_container);
+
+        // 初始化设置项
         initSettingItems();
-        renderItems();
+
+        // 设置横屏 RecyclerView
+        mLandscapeAdapter = new SettingItemLandscapeAdapter(mLandscapeItems, getContext());
+        RecyclerView landscapeRecycler = findViewById(R.id.rc_landscape_setting_recycler);
+        if (landscapeRecycler != null) {
+            landscapeRecycler.setAdapter(mLandscapeAdapter);
+            landscapeRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        }
+
+        // 设置竖屏 RecyclerView
+        mPortraitAdapter = new SettingItemPortraitAdapter(mItems, getContext());
+        RecyclerView portraitRecycler = findViewById(R.id.rc_portrait_setting_recycler);
+        if (portraitRecycler != null) {
+            portraitRecycler.setAdapter(mPortraitAdapter);
+            portraitRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        }
+
+        // 根据当前方向显示对应容器
+        updateOrientation();
 
         // 默认隐藏
         setVisibility(View.GONE);
         setAlpha(0f);
-
-        // 点击背景隐藏
-        findViewById(R.id.fl_root).setOnClickListener(v -> gone());
 
         // Initial sync
         syncWithPlayerState();
@@ -144,7 +176,7 @@ public class SettingMenuSlot extends BaseSlot {
         mIsAnimating = false;
 
         mItems.clear();
-        mHolders.clear();
+        mLandscapeItems.clear();
 
         super.onUnbindData();
     }
@@ -194,6 +226,63 @@ public class SettingMenuSlot extends BaseSlot {
     }
 
     // ---------------------------------------------------------------------
+    // Orientation
+    // ---------------------------------------------------------------------
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // 方向变化时，若菜单正在显示或动画中则取消动画并立即隐藏
+        if (isShow() || mIsAnimating) {
+            cancelAnimations();
+            setVisibility(View.GONE);
+            setAlpha(0f);
+            mIsAnimating = false;
+            resetTranslations();
+        }
+        updateOrientation();
+    }
+
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    private void updateOrientation() {
+        boolean landscape = isLandscape();
+        if (mLandscapeContainer != null) {
+            mLandscapeContainer.setVisibility(landscape ? View.VISIBLE : View.GONE);
+        }
+        if (mPortraitContainer != null) {
+            mPortraitContainer.setVisibility(landscape ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    @Nullable
+    private View getActiveContentView() {
+        return isLandscape() ? mLandscapeContainer : mPortraitContainer;
+    }
+
+    private void resetTranslations() {
+        if (mLandscapeContainer != null) {
+            mLandscapeContainer.setTranslationX(0);
+        }
+        if (mPortraitContainer != null) {
+            mPortraitContainer.setTranslationY(0);
+        }
+    }
+
+    private void cancelAnimations() {
+        animate().cancel();
+        if (mLandscapeContainer != null) {
+            mLandscapeContainer.animate().cancel();
+        }
+        if (mPortraitContainer != null) {
+            mPortraitContainer.animate().cancel();
+        }
+    }
+
+    // ---------------------------------------------------------------------
     // Visibility & Animation
     // ---------------------------------------------------------------------
 
@@ -213,15 +302,38 @@ public class SettingMenuSlot extends BaseSlot {
         bringToFront();
         setVisibility(View.VISIBLE);
 
-        final float width = resolvePanelWidth();
-        mViewContent.setTranslationX(width);
+        View contentView = getActiveContentView();
+        if (contentView == null) {
+            setVisibility(View.GONE);
+            setAlpha(0f);
+            mIsAnimating = false;
+            return;
+        }
+
         setAlpha(0f);
+        animate().alpha(1f).setDuration(ANIM_DURATION_MS).start();
 
-        ViewPropertyAnimator bgAnim = animate().alpha(1f).setDuration(ANIM_DURATION_MS);
-        ViewPropertyAnimator panelAnim = mViewContent.animate().translationX(0f).setDuration(ANIM_DURATION_MS);
-
-        bgAnim.start();
-        panelAnim.withEndAction(() -> mIsAnimating = false).start();
+        if (isLandscape()) {
+            float width = contentView.getWidth() > 0
+                    ? contentView.getWidth()
+                    : FALLBACK_PANEL_WIDTH_DP * getResources().getDisplayMetrics().density;
+            contentView.setTranslationX(width);
+            contentView.animate()
+                    .translationX(0f)
+                    .setDuration(ANIM_DURATION_MS)
+                    .withEndAction(() -> mIsAnimating = false)
+                    .start();
+        } else {
+            float height = contentView.getHeight() > 0
+                    ? contentView.getHeight()
+                    : FALLBACK_PANEL_HEIGHT_DP * getResources().getDisplayMetrics().density;
+            contentView.setTranslationY(height);
+            contentView.animate()
+                    .translationY(0f)
+                    .setDuration(ANIM_DURATION_MS)
+                    .withEndAction(() -> mIsAnimating = false)
+                    .start();
+        }
     }
 
     @Override
@@ -231,15 +343,40 @@ public class SettingMenuSlot extends BaseSlot {
         }
         mIsAnimating = true;
 
-        final float width = resolvePanelWidth();
-        ViewPropertyAnimator bgAnim = animate().alpha(0f).setDuration(ANIM_DURATION_MS);
-        ViewPropertyAnimator panelAnim = mViewContent.animate().translationX(width).setDuration(ANIM_DURATION_MS);
-
-        bgAnim.start();
-        panelAnim.withEndAction(() -> {
+        View contentView = getActiveContentView();
+        if (contentView == null) {
             setVisibility(View.GONE);
             mIsAnimating = false;
-        }).start();
+            return;
+        }
+
+        animate().alpha(0f).setDuration(ANIM_DURATION_MS).start();
+
+        if (isLandscape()) {
+            float width = contentView.getWidth() > 0
+                    ? contentView.getWidth()
+                    : FALLBACK_PANEL_WIDTH_DP * getResources().getDisplayMetrics().density;
+            contentView.animate()
+                    .translationX(width)
+                    .setDuration(ANIM_DURATION_MS)
+                    .withEndAction(() -> {
+                        setVisibility(View.GONE);
+                        mIsAnimating = false;
+                    })
+                    .start();
+        } else {
+            float height = contentView.getHeight() > 0
+                    ? contentView.getHeight()
+                    : FALLBACK_PANEL_HEIGHT_DP * getResources().getDisplayMetrics().density;
+            contentView.animate()
+                    .translationY(height)
+                    .setDuration(ANIM_DURATION_MS)
+                    .withEndAction(() -> {
+                        setVisibility(View.GONE);
+                        mIsAnimating = false;
+                    })
+                    .start();
+        }
     }
 
     /**
@@ -261,71 +398,42 @@ public class SettingMenuSlot extends BaseSlot {
         }
     }
 
-    /**
-     * 解析设置菜单面板的宽度
-     * <p>
-     * 如果面板宽度已知，则返回该宽度。否则，将使用备用值。
-     * </p>
-     *
-     * @return 设置菜单面板的宽度
-     *
-     * <p>
-     * Resolve the width of the setting menu panel.
-     * If the panel width is already known, it will be returned. Otherwise, a fallback value will be used.
-     * </p>
-     * @return The width of the setting menu panel.
-     */
-    private float resolvePanelWidth() {
-        float width = mViewContent.getWidth();
-        if (width > 0) {
-            return width;
-        }
-        return FALLBACK_PANEL_WIDTH_DP * getResources().getDisplayMetrics().density;
-    }
-
     // ---------------------------------------------------------------------
     // Data & Rendering
     // ---------------------------------------------------------------------
 
     /**
      * 初始化设置项
+     * <p>
+     * 根据场景类型和元素可见性配置过滤设置项。
+     * </p>
      *
      * <p>
-     * Initialize the setting items.
+     * Initialize and filter setting items based on scene type and element visibility.
      * </p>
      */
     private void initSettingItems() {
         mItems.clear();
-        mItems.addAll(SettingConstants.createDefaultItems(getContext(), this));
-    }
-
-    /**
-     * 渲染设置项
-     *
-     * <p>
-     * Render the setting items.
-     * </p>
-     */
-    private void renderItems() {
-        mLlItems.removeAllViews();
-        mHolders.clear();
-
-        for (SettingItem<?> item : mItems) {
+        mLandscapeItems.clear();
+        for (SettingItem<?> item : SettingConstants.createDefaultItems(this)) {
             // 特定场景下隐藏倍速设置项
-            if ((mSceneType == SceneType.LIVE || mSceneType == SceneType.RESTRICTED) && SettingConstants.KEY_SPEED.equals(item.key)) {
+            if ((mSceneType == SceneType.LIVE || mSceneType == SceneType.RESTRICTED)
+                    && SettingConstants.KEY_SPEED.equals(item.key)) {
                 continue;
             }
             // 直播场景下隐藏循环播放设置项
             if (mSceneType == SceneType.LIVE && SettingConstants.KEY_LOOP.equals(item.key)) {
                 continue;
             }
-
-            ISettingItemView<?> itemView = createItemView(item);
-            if (itemView == null) {
+            // 根据 hiddenSlotElements 配置隐藏对应元素
+            String elementKey = mapToSlotElementKey(item.key);
+            if (elementKey != null && !isElementVisible(elementKey)) {
                 continue;
             }
-            mHolders.put(item.key, itemView);
-            mLlItems.addView(itemView.getView());
+            mItems.add(item);
+            if (!LANDSCAPE_EXCLUDED_KEYS.contains(item.key)) {
+                mLandscapeItems.add(item);
+            }
         }
     }
 
@@ -338,46 +446,31 @@ public class SettingMenuSlot extends BaseSlot {
      * </p>
      */
     private void updateItemsForScene() {
-        // 如果已经渲染过，需要重新渲染以应用场景限制
-        if (!mHolders.isEmpty()) {
-            renderItems();
-        }
+        initSettingItems();
+        notifyAdapters();
     }
 
     /**
-     * 为指定的设置项创建视图
-     *
-     * @param item 要创建视图的设置项
-     * @param item The setting item to create a view for.
-     * @return 创建的设置项视图，如果设置项类型不支持则返回 null
-     *
-     * <p>
-     * Create a setting item view for the given setting item.
-     * </p>
-     * @return The created setting item view, or null if the item type is not supported.
+     * 通知适配器数据已变化
      */
-    @SuppressWarnings("unchecked")
-    @Nullable
-    private ISettingItemView<?> createItemView(@NonNull SettingItem<?> item) {
-        if (item.type == SettingItemType.SELECTOR) {
-            SettingSelectorItemView view = new SettingSelectorItemView<>(getContext());
-            view.bind(item);
-            return view;
-        } else if (item.type == SettingItemType.SWITCHER) {
-            SettingSwitcherItemView view = new SettingSwitcherItemView(getContext());
-            view.bind((SettingItem<Boolean>) item);
-            return view;
-        } else {
-            LogHub.e(TAG, "Unsupported item type: " + item.type);
-            return null;
+    private void notifyAdapters() {
+        if (mLandscapeAdapter != null) {
+            mLandscapeAdapter.notifyDataSetChanged();
+        }
+        if (mPortraitAdapter != null) {
+            mPortraitAdapter.notifyDataSetChanged();
         }
     }
 
     /**
      * 单一数据源：从 {@link IPlayerStateStore} 同步 UI
+     * <p>
+     * 批量更新所有设置项数据后统一通知适配器刷新，避免多次无效刷新。
+     * </p>
      *
      * <p>
      * Single source of truth: sync UI from {@link IPlayerStateStore}.
+     * Batch-updates all item data, then notifies adapters once.
      * </p>
      */
     private void syncWithPlayerState() {
@@ -389,96 +482,121 @@ public class SettingMenuSlot extends BaseSlot {
         // Track quality.
         List<TrackQuality> qualityList = store.getTrackQualityList();
         if (qualityList != null && !qualityList.isEmpty()) {
-            updateClarityOptions(qualityList);
-            updateSelectedTrack(store.getCurrentTrackIndex());
+            applyClarityOptions(qualityList);
+            applySelectedTrack(store.getCurrentTrackIndex());
         }
 
         // Common settings.
-        updateItemValue(SettingConstants.KEY_SPEED, store.getCurrentSpeed());
-        updateItemValue(SettingConstants.KEY_LOOP, store.isLoop());
-        updateItemValue(SettingConstants.KEY_MUTE, store.isMute());
-        updateItemValue(SettingConstants.KEY_SCALE, store.getCurrentScaleType());
-        updateItemValue(SettingConstants.KEY_MIRROR, store.getCurrentMirrorType());
-        updateItemValue(SettingConstants.KEY_ROTATE, store.getCurrentRotation());
+        applyItemValue(SettingConstants.KEY_SPEED, store.getCurrentSpeed());
+        applyItemValue(SettingConstants.KEY_LOOP, store.isLoop());
+        applyItemValue(SettingConstants.KEY_MUTE, store.isMute());
+        applyItemValue(SettingConstants.KEY_SCALE, store.getCurrentScaleType());
+        applyItemValue(SettingConstants.KEY_MIRROR, store.getCurrentMirrorType());
+        applyItemValue(SettingConstants.KEY_ROTATE, store.getCurrentRotation());
+
+        notifyAdapters();
     }
 
     /**
-     * 更新设置项的值
+     * 更新设置项的值并通知适配器刷新（事件驱动调用）。
      *
      * @param key      设置项的键
      * @param newValue 要设置的新值
      */
     private void updateItemValue(@NonNull String key, @Nullable Object newValue) {
-        if (newValue == null) {
-            return;
+        if (applyItemValue(key, newValue)) {
+            notifyAdapters();
         }
-        ISettingItemView<?> view = mHolders.get(key);
-        if (view == null) {
-            return;
-        }
-
-        // Safe by construction: keys are bound to item types in SettingConstants#createDefaultItems.
-        @SuppressWarnings("unchecked") ISettingItemView<Object> v = (ISettingItemView<Object>) view;
-        v.updateValueOnly(newValue);
     }
 
     /**
-     * 更新设置项的清晰度选项
+     * 仅更新设置项数据，不通知适配器。
+     *
+     * @return true 如果数据被更新
+     */
+    @SuppressWarnings("unchecked")
+    private boolean applyItemValue(@NonNull String key, @Nullable Object newValue) {
+        if (newValue == null) {
+            return false;
+        }
+        SettingItem<Object> item = findItem(key);
+        if (item == null) {
+            return false;
+        }
+        item.currentValue = newValue;
+        return true;
+    }
+
+    /**
+     * 更新清晰度选项并通知适配器刷新（事件驱动调用）。
      *
      * @param qualityList 轨道质量列表
      */
     private void updateClarityOptions(@Nullable List<TrackQuality> qualityList) {
-        if (qualityList == null || qualityList.isEmpty()) {
-            return;
-        }
-
-        ISettingItemView<?> view = mHolders.get(SettingConstants.KEY_QUALITY);
-        if (!(view instanceof SettingSelectorItemView)) {
-            return;
-        }
-
-        @SuppressWarnings("unchecked")
-        SettingSelectorItemView<TrackQuality> selector = (SettingSelectorItemView<TrackQuality>) view;
-
-        SettingItem<TrackQuality> item = findItem(SettingConstants.KEY_QUALITY);
-        if (item == null) return;
-
-        TrackQuality[] arr = qualityList.toArray(new TrackQuality[0]);
-        item.options = SettingOptions.of(arr);
-
-        // Only set default selection when current is empty.
-        if (item.currentValue == null) {
-            selector.updateValueOnly(arr[0]);
-        } else {
-            // Refresh value text if options changed but selection remains.
-            selector.updateValueOnly(item.currentValue);
+        if (applyClarityOptions(qualityList)) {
+            notifyAdapters();
         }
     }
 
     /**
-     * 更新设置项的已选轨道。
+     * 仅更新清晰度选项数据，不通知适配器。
+     *
+     * @return true 如果数据被更新
+     */
+    private boolean applyClarityOptions(@Nullable List<TrackQuality> qualityList) {
+        if (qualityList == null || qualityList.isEmpty()) {
+            return false;
+        }
+
+        SettingItem<TrackQuality> item = findItem(SettingConstants.KEY_QUALITY);
+        if (item == null) {
+            return false;
+        }
+
+        TrackQuality[] arr = qualityList.toArray(new TrackQuality[0]);
+        item.options = SettingOptions.of(arr);
+
+        if (item.currentValue == null) {
+            item.currentValue = arr[0];
+        }
+        return true;
+    }
+
+    /**
+     * 更新已选轨道并通知适配器刷新（事件驱动调用）。
      *
      * @param trackIndex 已选轨道的索引
      */
     private void updateSelectedTrack(int trackIndex) {
-        SettingItem<TrackQuality> item = findItem(SettingConstants.KEY_QUALITY);
-        if (item == null) return;
+        if (applySelectedTrack(trackIndex)) {
+            notifyAdapters();
+        }
+    }
 
-        ISettingItemView<?> view = mHolders.get(SettingConstants.KEY_QUALITY);
-        if (view == null) return;
+    /**
+     * 仅更新已选轨道数据，不通知适配器。
+     *
+     * @return true 如果数据被更新
+     */
+    private boolean applySelectedTrack(int trackIndex) {
+        SettingItem<TrackQuality> item = findItem(SettingConstants.KEY_QUALITY);
+        if (item == null) {
+            return false;
+        }
 
         SettingOptions<TrackQuality> options = item.options;
         if (options == null) {
-            return;
+            return false;
         }
 
         for (int i = 0; i < options.size(); i++) {
             TrackQuality q = options.get(i);
             if (q.getIndex() == trackIndex) {
-                ((ISettingItemView<TrackQuality>) view).updateValueOnly(q);
-                return;
+                item.currentValue = q;
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -497,5 +615,33 @@ public class SettingMenuSlot extends BaseSlot {
             }
         }
         return null;
+    }
+
+    /**
+     * 将设置项的 key 映射为插槽元素 key
+     *
+     * @param itemKey 设置项的 key
+     * @return 对应的插槽元素 key，如果没有映射则返回 null
+     */
+    @Nullable
+    private String mapToSlotElementKey(@NonNull String itemKey) {
+        switch (itemKey) {
+            case SettingConstants.KEY_SPEED:
+                return SlotElements.SettingMenu.SPEED;
+            case SettingConstants.KEY_QUALITY:
+                return SlotElements.SettingMenu.TRACK_INFO;
+            case SettingConstants.KEY_LOOP:
+                return SlotElements.SettingMenu.LOOP;
+            case SettingConstants.KEY_MUTE:
+                return SlotElements.SettingMenu.MUTE;
+            case SettingConstants.KEY_MIRROR:
+                return SlotElements.SettingMenu.MIRROR_MODE;
+            case SettingConstants.KEY_SCALE:
+                return SlotElements.SettingMenu.SCALE_MODE;
+            case SettingConstants.KEY_ROTATE:
+                return SlotElements.SettingMenu.ROTATE_MODE;
+            default:
+                return null;
+        }
     }
 }

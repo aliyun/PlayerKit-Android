@@ -11,6 +11,7 @@ import androidx.annotation.AnyThread;
 import androidx.annotation.StringRes;
 
 import com.aliyun.playerkit.AliPlayerKit;
+import com.aliyun.playerkit.locale.PlayerLocale;
 
 /**
  * @author keria
@@ -41,7 +42,7 @@ public final class ToastUtils {
      */
     @AnyThread
     public static void showToast(@StringRes int resId) {
-        String message = getString(resId);
+        String message = PlayerLocale.get(resId);
         if (!TextUtils.isEmpty(message)) {
             showToast(message, Toast.LENGTH_SHORT);
         }
@@ -60,7 +61,7 @@ public final class ToastUtils {
      */
     @AnyThread
     public static void showToastLong(@StringRes int resId) {
-        String message = getString(resId);
+        String message = PlayerLocale.get(resId);
         if (!TextUtils.isEmpty(message)) {
             showToast(message, Toast.LENGTH_LONG);
         }
@@ -113,28 +114,10 @@ public final class ToastUtils {
     }
 
     /**
-     * 从资源中获取字符串，若失败则返回 null 并记录警告
-     */
-    private static String getString(@StringRes int resId) {
-        Context context = ContextUtils.getSafeToastContext();
-        if (context == null) {
-            Log.w(TAG, "getString failed: context is null, resId=" + resId);
-            return null;
-        }
-
-        try {
-            return context.getString(resId);
-        } catch (Exception e) {
-            Log.e(TAG, "GetString resource failed: id=" + resId, e);
-            return null;
-        }
-    }
-
-    /**
      * 控制 Debug Toast 是否启用
      * <p>
-     * 如果 AliPlayerKit 的 Debug 模式已启用，则返回 true，即使是在 Release 构建下。
-     * 否则返回 BuildConfig.DEBUG 的值。
+     * 仅当外部通过 {@link AliPlayerKit#setDebugModeEnabled(boolean)} 显式启用 Debug 模式时返回 true，
+     * 否则返回 false（默认关闭，不再依赖 BuildConfig.DEBUG）。
      * </p>
      */
     private static boolean isDebugToastAllowed() {

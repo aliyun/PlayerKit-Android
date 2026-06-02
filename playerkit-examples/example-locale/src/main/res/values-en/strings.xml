@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="locale_example_title">Locale Example</string>
+    <string name="locale_current_language">Current Language: %s</string>
+    <string name="locale_translation_header">Translation Results</string>
+
+    <!-- Layout: Group Titles -->
+    <string name="locale_group_language_switch">Language Switch</string>
+    <string name="locale_group_translation_results">Translation Results</string>
+
+    <!-- Layout: Button Labels -->
+    <string name="locale_btn_switch_zh">Switch to Chinese</string>
+    <string name="locale_btn_switch_en">Switch to English</string>
+    <string name="locale_btn_switch_ja">Switch to Japanese</string>
+
+</resources>

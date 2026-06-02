@@ -44,6 +44,9 @@ public class VideoSourceExampleActivity extends AppCompatActivity {
     // 播放器组件视图
     private AliPlayerView mPlayerView;
 
+    // 播放器控制器
+    private AliPlayerController mPlayerController;
+
     private LinearLayout mLlSourceSelection;
     private Button mBtnUrlSource;
     private Button mBtnVidAuthSource;
@@ -197,7 +200,7 @@ public class VideoSourceExampleActivity extends AppCompatActivity {
      */
     private void playVideo(VideoSource videoSource) {
         // 创建播放控制器
-        AliPlayerController playerController = new AliPlayerController(this);
+        mPlayerController = new AliPlayerController(this);
 
         // 构建播放数据
         AliPlayerModel playerModel = new AliPlayerModel.Builder()
@@ -205,8 +208,9 @@ public class VideoSourceExampleActivity extends AppCompatActivity {
                 .videoTitle("Video Source Example")
                 .build();
 
-        // 绑定控制器和数据到视图
-        mPlayerView.attach(playerController, playerModel);
+        // 配置数据并绑定控制器到视图
+        mPlayerController.configure(playerModel);
+        mPlayerView.attach(mPlayerController);
 
         // 隐藏选择区域，显示播放器
         mLlSourceSelection.setVisibility(View.GONE);
@@ -217,9 +221,9 @@ public class VideoSourceExampleActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        // 解绑播放器组件，释放资源
-        if (mPlayerView != null) {
-            mPlayerView.detach();
+        // 销毁播放器控制器，释放资源
+        if (mPlayerController != null) {
+            mPlayerController.destroy();
         }
     }
 

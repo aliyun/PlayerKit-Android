@@ -2,26 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ll_landscape_hint"
-    android:layout_width="wrap_content"
-    android:layout_height="36dp"
+    android:layout_width="@dimen/fullscreen_view_width"
+    android:layout_height="@dimen/fullscreen_view_height"
     android:background="@drawable/bg_landscape_hint"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp"
     tools:visibility="visible">
 
     <ImageView
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:src="@drawable/ic_fullscreen_white" />
+        android:layout_gravity="center_vertical"
+        android:layout_width="@dimen/fullscreen_button_size"
+        android:layout_height="@dimen/fullscreen_button_size"
+        android:src="@drawable/ic_fullscreen_hint" />
 
     <TextView
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:layout_marginStart="@dimen/fullscreen_tv_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
         android:text="@string/landscape_hint_fullscreen"
         android:textColor="@android:color/white"
-        android:textSize="12dp" />
+        android:textSize="@dimen/common_text_12" />
 
 </LinearLayout>

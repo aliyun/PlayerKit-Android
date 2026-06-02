@@ -1,5 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 日志面板默认高度 -->
+
+    <!-- ==================== 通用/基础样式 ==================== -->
+
+    <!-- ==================== 日志面板 ==================== -->
+
+    <!-- 日志面板默认高度 (用于调试或展示日志信息的区域) -->
     <dimen name="log_panel_default_height">240dp</dimen>
+    <!-- 日志面板头部高度 -->
+    <dimen name="log_panel_header_height">40dp</dimen>
+    <!-- 日志面板头部水平内边距 -->
+    <dimen name="log_panel_header_padding_horizontal">12dp</dimen>
+    <!-- 日志面板头部垂直内边距 -->
+    <dimen name="log_panel_header_padding_vertical">8dp</dimen>
+    <!-- 日志面板标题字体大小 -->
+    <dimen name="log_panel_title_text_size">12sp</dimen>
+    <!-- 日志面板按钮水平内边距 -->
+    <dimen name="log_panel_btn_padding_horizontal">8dp</dimen>
+    <!-- 日志面板按钮垂直内边距 -->
+    <dimen name="log_panel_btn_padding_vertical">4dp</dimen>
+    <!-- 日志面板按钮字体大小 -->
+    <dimen name="log_panel_btn_text_size">11sp</dimen>
+    <!-- 日志面板分隔线高度 -->
+    <dimen name="log_panel_divider_height">0.5dp</dimen>
+    <!-- 日志面板内容区内边距 -->
+    <dimen name="log_panel_content_padding">8dp</dimen>
+    <!-- 日志面板日志字体大小 -->
+    <dimen name="log_panel_log_text_size">10sp</dimen>
+
+    <!-- ==================== 顶部栏 ==================== -->
+
+    <!-- 顶部栏默认高度 -->
+    <dimen name="top_bar_default_height">48dp</dimen>
+    <!-- 返回按钮默认高度 -->
+    <dimen name="top_bar_icon_back_height">18dp</dimen>
+    <!-- 返回按钮默认右外边距 -->
+    <dimen name="top_bar_icon_back_right_margin">6dp</dimen>
+    <!-- 图标默认右边距 -->
+    <dimen name="top_bar_icon_right_margin">20dp</dimen>
+    <!-- 截图按钮左边距 -->
+    <dimen name="top_bar_icon_snapshot_left_margin">27dp</dimen>
+    <!-- 竖屏标题字体大小 -->
+    <dimen name="top_bar_portrait_title_size">16sp</dimen>
+    <!-- 竖屏标题高度 -->
+    <dimen name="top_bar_portrait_title_height">24dp</dimen>
+    <!-- 竖屏按钮左右外边距 -->
+    <dimen name="top_bar_portrait_icon_lr_margin">20dp</dimen>
+    <!-- 横屏标题字体大小 -->
+    <dimen name="top_bar_landscape_title_size">16sp</dimen>
+    <!-- 横屏标题高度 -->
+    <dimen name="top_bar_landscape_title_height">24dp</dimen>
+    <!-- 横屏按钮左右外边距 -->
+    <dimen name="top_bar_landscape_icon_lr_margin">34dp</dimen>
+
+    <!-- ==================== 通用图标 ==================== -->
+
+    <!-- 通用图标默认大小 (适用于大多数列表项或工具栏图标) -->
+    <dimen name="common_icon_size">30dp</dimen>
+    <!-- 通用图标默认内边距 (适用于大多数列表项或工具栏图标) -->
+    <dimen name="common_icon_padding">3dp</dimen>
+
+    <!-- ==================== 通用字体 ==================== -->
+
+    <!-- 通用字体大小 - 12sp -->
+    <dimen name="common_text_12">12sp</dimen>
+    <!-- 通用字体大小 - 14sp -->
+    <dimen name="common_text_14">14sp</dimen>
+    <!-- 通用字体大小 - 16sp -->
+    <dimen name="common_text_16">16sp</dimen>
+    <!-- 通用字体大小 - 18sp -->
+    <dimen name="common_text_18">18sp</dimen>
+
+    <!-- ==================== 底部控制栏 ==================== -->
+
+    <!-- 竖屏水平内边距 -->
+    <dimen name="bottom_bar_portrait_padding_horizontal">20dp</dimen>
+    <!-- 竖屏垂直内边距 -->
+    <dimen name="bottom_bar_portrait_padding_vertical">8dp</dimen>
+    <!-- 横屏水平内边距 -->
+    <dimen name="bottom_bar_landscape_padding_horizontal">34dp</dimen>
+    <!-- 横屏垂直内边距 -->
+    <dimen name="bottom_bar_landscape_padding_vertical">11dp</dimen>
+    <!-- 底部栏子项水平间距 -->
+    <dimen name="bottom_bar_item_margin_horizontal">8dp</dimen>
+    <!-- 底部栏子项垂直间距（SeekBar 上下留白） -->
+    <dimen name="bottom_bar_item_margin_vertical">12dp</dimen>
+    <!-- 底部栏按钮水平间距（清晰度/倍速等文字按钮） -->
+    <dimen name="bottom_bar_btn_margin_horizontal">15dp</dimen>
+
+    <!-- ==================== 视频进度条 ==================== -->
+    <!-- 注意：这些尺寸专门用于视频进度条的轨道(track)部分 -->
+
+    <!-- 进度条轨道高度 (背景条粗细) -->
+    <dimen name="video_slider_track_height">4dp</dimen>
+    <!-- 进度条轨道圆角半径 (高度的一半，实现半圆头效果) -->
+    <dimen name="video_slider_track_radius">2dp</dimen>
+    <!-- 进度条轨道内边距 (滑块手柄与轨道边缘的安全距离，防止遮挡) -->
+    <dimen name="video_slider_track_padding_normal">8dp</dimen>
+    <!-- 进度条滑块手柄正常尺寸直径 -->
+    <dimen name="video_slider_thumb_size_normal">8dp</dimen>
+    <!-- 进度条滑块手柄大尺寸直径 -->
+    <dimen name="video_slider_thumb_size_big">14dp</dimen>
+    <!-- 进度条滑块手柄内缩距离 (扩大触摸热区，视觉大小不变) -->
+    <dimen name="video_slider_thumb_inset">12dp</dimen>
+
+    <!-- ==================== 通用滑块控件 (UniversalSliderView) ==================== -->
+    <!-- 注意：这是自定义组合控件的整体尺寸，非内部 SeekBar 的尺寸 -->
+
+    <!-- 控件整体宽度 (包含图标+滑块+数值) -->
+    <dimen name="universal_slider_view_width">180dp</dimen>
+    <!-- 控件整体高度 -->
+    <dimen name="universal_slider_view_height">45dp</dimen>
+    <!-- 控件圆角半径 -->
+    <dimen name="universal_slider_view_radius">8dp</dimen>
+    <!-- 控件内边距 -->
+    <dimen name="universal_slider_padding">10dp</dimen>
+    <!-- 左侧图标大小 (如亮度太阳图标、音量喇叭图标) -->
+    <dimen name="universal_slider_icon_size">24dp</dimen>
+    <!-- 右侧文字最小宽度 -->
+    <dimen name="universal_slider_text_min_width">20dp</dimen>
+
+    <!-- ==================== 居中显示控件 ==================== -->
+
+    <!-- 居中显示区域顶部边距 -->
+    <dimen name="center_display_margin_top">110dp</dimen>
+    <!-- 居中显示区域左右边距 -->
+    <dimen name="center_display_margin_horizontal">14dp</dimen>
+    <!-- 居中显示区域上下边距 -->
+    <dimen name="center_display_margin_vertical">10dp</dimen>
+
+    <!-- ==================== 播放状态显示控件 ==================== -->
+
+    <!-- 播放状态卡片最小宽度 -->
+    <dimen name="play_state_min_width">98dp</dimen>
+    <!-- 播放状态卡片最大宽度 -->
+    <dimen name="play_state_max_width">178dp</dimen>
+    <!-- 播放状态卡片最大高度 -->
+    <dimen name="play_state_max_height">68dp</dimen>
+    <!-- 播放状态卡片最小高度 -->
+    <dimen name="play_state_min_height">24dp</dimen>
+    <!-- 播放状态卡片内边距 -->
+    <dimen name="play_state_padding">16dp</dimen>
+    <!-- 播放状态卡片子项间距 -->
+    <dimen name="play_state_item_margin">16dp</dimen>
+    <!-- 播放状态卡片背景圆角半径 -->
+    <dimen name="play_state_shape_radius">8dp</dimen>
+    <!-- 播放状态文本行间距 -->
+    <dimen name="play_state_line_spacing">6dp</dimen>
+
+
+    <!-- ==================== 设置选择器 ==================== -->
+
+    <!-- 设置选择器项高度 -->
+    <dimen name="setting_selector_item_height">56dp</dimen>
+    <!-- 设置选择器水平内边距 -->
+    <dimen name="setting_selector_padding_horizontal">16dp</dimen>
+    <!-- 设置选择器字体大小 -->
+    <dimen name="setting_selector_text_size">14sp</dimen>
+    <!-- 设置选择器箭头图标大小 -->
+    <dimen name="setting_selector_arrow_size">16dp</dimen>
+    <!-- 设置选择器箭头左边距 -->
+    <dimen name="setting_selector_arrow_margin">4dp</dimen>
+
+    <!-- ==================== 设置面板 ==================== -->
+
+    <!-- 设置项高度 横屏-->
+    <dimen name="setting_item_height_land">54dp</dimen>
+    <!-- 设置项高度 竖屏-->
+    <dimen name="setting_item_height_portrait">46dp</dimen>
+    <!-- 设置项水平内边距 -->
+    <dimen name="setting_item_padding_horizontal">20dp</dimen>
+    <!-- 设置项分隔线高度 -->
+    <dimen name="setting_divider_height">1dp</dimen>
+    <!-- 横屏设置面板宽度 -->
+    <dimen name="setting_landscape_panel_width">345dp</dimen>
+    <!-- 横屏设置面板水平内边距 -->
+    <dimen name="setting_landscape_panel_padding_horizontal">16dp</dimen>
+    <!-- 横屏设置面板顶部内边距 -->
+    <dimen name="setting_landscape_panel_padding_top">20dp</dimen>
+    <!-- 横屏设置面板底部内边距 -->
+    <dimen name="setting_landscape_panel_padding_bottom">24dp</dimen>
+    <!-- 竖屏设置面板内边距 -->
+    <dimen name="setting_portrait_panel_padding">20dp</dimen>
+    <!-- 设置面板圆角 -->
+    <dimen name="setting_panel_radius">16dp</dimen>
+    <!-- 设置开关宽度 -->
+    <dimen name="setting_switch_width">32dp</dimen>
+    <!-- 设置开关高度 -->
+    <dimen name="setting_switch_height">18dp</dimen>
+
+    <!-- ==================== 选项面板（横屏倍速/清晰度） ==================== -->
+
+    <!-- 底部选项面板宽度 -->
+    <dimen name="bottom_bar_option_panel_width">200dp</dimen>
+    <!-- 底部选项面板列表项高度 -->
+    <dimen name="bottom_bar_option_panel_item_height">54dp</dimen>
+
+    <!-- ==================== 全屏观看组件 ==================== -->
+    <!-- 全屏观看组件宽度 -->
+    <dimen name="fullscreen_view_width">94dp</dimen>
+    <!-- 全屏观看组件高度 -->
+    <dimen name="fullscreen_view_height">32dp</dimen>
+    <!-- 全屏观看按钮尺寸 -->
+    <dimen name="fullscreen_button_size">18dp</dimen>
+    <!-- 全屏观看按钮外边距 -->
+    <dimen name="fullscreen_tv_margin">4dp</dimen>
+    <!-- 全屏观看背景圆角角度 -->
+    <dimen name="fullscreen_button_radius">18dp</dimen>
+    <!-- 全屏观看背景边框size -->
+    <dimen name="fullscreen_button_border">1dp</dimen>
 </resources>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/bottom_bar_landscape_padding_horizontal"
+    android:paddingTop="@dimen/bottom_bar_landscape_padding_vertical"
+    android:paddingEnd="@dimen/bottom_bar_landscape_padding_horizontal"
+    android:paddingBottom="@dimen/bottom_bar_landscape_padding_vertical">
+
+    <!--  播放进度/播放时长  -->
+    <TextView
+        android:id="@+id/tv_time_landscape"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/bottom_bar_item_margin_horizontal"
+        android:textColor="@color/common_text_white"
+        android:shadowColor="@color/top_bar_tv_shadow"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="2"
+        android:textSize="@dimen/common_text_14" />
+
+    <SeekBar
+        android:id="@+id/seek_bar_landscape"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/bottom_bar_item_margin_vertical"
+        android:layout_marginBottom="@dimen/bottom_bar_item_margin_vertical"
+        android:max="100"
+        android:maxHeight="@dimen/video_slider_track_height"
+        android:minHeight="@dimen/video_slider_track_height"
+        android:paddingStart="@dimen/video_slider_track_padding_normal"
+        android:paddingEnd="@dimen/video_slider_track_padding_normal"
+        android:progressDrawable="@drawable/bg_video_slider"
+        android:splitTrack="false"
+        android:thumb="@drawable/thumb_video_slider_landscape"
+        android:thumbOffset="@dimen/video_slider_track_padding_normal" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/video_slider_track_padding_normal">
+
+        <!-- 左侧：播放按钮 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_play_pause_landscape"
+                android:layout_width="@dimen/common_icon_size"
+                android:layout_height="@dimen/common_icon_size"
+                android:layout_gravity="start|center_vertical"
+                android:padding="@dimen/common_icon_padding"
+                android:src="@drawable/ic_play_pause_selector" />
+
+            <ImageView
+                android:id="@+id/iv_replay_landscape"
+                android:layout_width="@dimen/common_icon_size"
+                android:layout_height="@dimen/common_icon_size"
+                android:padding="@dimen/common_icon_padding"
+                android:src="@drawable/ic_replay"
+                android:visibility="gone" />
+
+
+        </LinearLayout>
+
+        <!-- 右侧：容器，包含清晰度和倍速 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/tv_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/bottom_bar_btn_margin_horizontal"
+                android:layout_marginEnd="@dimen/bottom_bar_btn_margin_horizontal"
+                android:text="@string/bottom_bar_title_speed"
+                android:textColor="@color/common_text_white"
+                android:shadowColor="@color/top_bar_tv_shadow"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="2" />
+
+            <TextView
+                android:id="@+id/tv_quality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/bottom_bar_btn_margin_horizontal"
+                android:text="@string/bottom_bar_title_quality"
+                android:textColor="@color/common_text_white"
+                android:shadowColor="@color/top_bar_tv_shadow"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="2" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+</LinearLayout>

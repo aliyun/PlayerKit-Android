@@ -60,6 +60,19 @@ public class SettingItem<T> {
     public final @SettingItemType int type;
 
     /**
+     * 设置项所属分组索引。
+     * <p>
+     * 相同 group 值的项在 UI 中共享一个圆角卡片背景。
+     * </p>
+     *
+     * <p>
+     * Group index this item belongs to.
+     * Items with the same group value share a rounded-corner card background in UI.
+     * </p>
+     */
+    public int group = -1; // -1表示未分组，避免与有效分组索引0冲突
+
+    /**
      * 当前选中的值。
      * <p>
      * 对于 {@link SettingItemType#SELECTOR}，表示当前选中的选项值；

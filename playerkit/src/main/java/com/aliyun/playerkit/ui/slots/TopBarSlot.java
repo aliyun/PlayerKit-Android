@@ -2,6 +2,8 @@ package com.aliyun.playerkit.ui.slots;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +17,7 @@ import com.aliyun.playerkit.event.FullscreenEvents;
 import com.aliyun.playerkit.event.GestureEvents;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
+import com.aliyun.playerkit.slot.SlotElements;
 import com.aliyun.playerkit.slot.SlotHost;
 import com.aliyun.playerkit.utils.ContextUtil;
 import com.aliyun.playerkit.utils.StringUtil;
@@ -60,6 +63,14 @@ public class TopBarSlot extends BaseControlBarSlot {
     private ImageView mIvBack;
 
     /**
+     * 下载按钮
+     * <p>
+     * 点击后下载当前播放。
+     * </p>
+     */
+    private ImageView mIvDownload;
+
+    /**
      * 设置按钮
      * <p>
      * 点击后显示设置界面。
@@ -85,35 +96,70 @@ public class TopBarSlot extends BaseControlBarSlot {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.layout_top_bar_slot;
+        return isLandscape() ? R.layout.layout_landscape_top_bar_slot : R.layout.layout_portrait_top_bar_slot;
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        reloadLayout();
+    }
+
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    private void reloadLayout() {
+        removeAllViews();
+        int layoutId = isLandscape() ? R.layout.layout_landscape_top_bar_slot : R.layout.layout_portrait_top_bar_slot;
+        View.inflate(getContext(), layoutId, this);
+        bindViews();
+        SlotHost host = getHost();
+        if (host != null && host.getModel() != null) {
+            onBindData(host.getModel());
+        }
+    }
+
+    @Override
+    protected void onRegisterElements() {
+        registerElement(SlotElements.TopBar.BACK, mIvBack);
+        registerElement(SlotElements.TopBar.TITLE, mTvTitle);
+        registerElement(SlotElements.TopBar.SNAPSHOT, mIvSnapshot);
+        // DOWNLOAD: 功能未实现，不注册到框架，保持 XML 中的 gone 状态
+        // registerElement(SlotElements.TopBar.DOWNLOAD,mIvDownload)
+        registerElement(SlotElements.TopBar.SETTINGS, mIvSettings);
     }
 
     @Override
     public void onAttach(@NonNull SlotHost host) {
         super.onAttach(host);
+        bindViews();
+    }
 
-        // 初始化 UI 组件
-        mTvTitle = findViewByIdCompat(R.id.tv_title);
+    private void bindViews() {
+        mTvTitle = findViewByIdCompat(R.id.tv_top_bar_title);
 
-        // 设置返回按钮点击事件
         mIvBack = findViewByIdCompat(R.id.iv_back);
         mIvBack.setOnClickListener(v -> {
-            // 处理返回事件
             handleBackEvent();
             notifyInteraction();
         });
 
-        // 设置设置按钮点击事件
         mIvSettings = findViewByIdCompat(R.id.iv_settings);
         mIvSettings.setOnClickListener(v -> {
             postEvent(new ControlBarEvents.ShowSettings(mPlayerId));
             notifyInteraction();
         });
 
-        // 设置截图按钮点击事件
         mIvSnapshot = findViewByIdCompat(R.id.iv_snapshot);
         mIvSnapshot.setOnClickListener(v -> {
             snapshot();
+            notifyInteraction();
+        });
+
+        mIvDownload = findViewByIdCompat(R.id.iv_download);
+        mIvDownload.setOnClickListener(v -> {
+            // TODO: 添加下载功能
             notifyInteraction();
         });
     }
@@ -149,8 +195,6 @@ public class TopBarSlot extends BaseControlBarSlot {
 
         if (event instanceof GestureEvents.SingleTapEvent) {
             onSingleTap((GestureEvents.SingleTapEvent) event);
-        } else if (event instanceof PlayerEvents.SnapshotCompleted) {
-            onSnapshotCompleted((PlayerEvents.SnapshotCompleted) event);
         }
     }
 
@@ -170,23 +214,6 @@ public class TopBarSlot extends BaseControlBarSlot {
             postEvent(new ControlBarEvents.Hide(event.playerId));
         } else {
             postEvent(new ControlBarEvents.Show(event.playerId));
-        }
-    }
-
-    /**
-     * 处理截图完成事件
-     * <p>
-     * 当截图操作完成时调用，显示截图结果提示。
-     * </p>
-     *
-     * @param event 截图完成事件，不能为 null
-     */
-    private void onSnapshotCompleted(@NonNull PlayerEvents.SnapshotCompleted event) {
-        if (event.result) {
-            String toastText = "Snapshot Success: " + event.width + "x" + event.height + ", " + event.snapshotPath;
-            ToastUtils.showToast(toastText);
-        } else {
-            ToastUtils.showToast("Snapshot Failed");
         }
     }
 

@@ -1,60 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:background="#80000000"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:layout_gravity="bottom">
 
-    <!--  播放按钮  -->
-    <ImageView
-        android:id="@+id/iv_play_pause"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="8dp"
-        android:src="@drawable/ic_play_white" />
-
-    <!--  刷新按钮（可选：直播场景）  -->
-    <ImageView
-        android:id="@+id/iv_replay"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="8dp"
-        android:src="@drawable/ic_replay_white"
-        android:visibility="gone" />
-
-    <!--  播放进度条  -->
-    <SeekBar
-        android:id="@+id/seek_bar"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/ll_view_portrait"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:maxHeight="4dp"
-        android:minHeight="4dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:progressDrawable="@android:drawable/progress_horizontal"
-        android:splitTrack="false"
-        android:thumbOffset="8dp" />
+        android:background="@color/common_transparent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/bottom_bar_portrait_padding_horizontal"
+        android:paddingTop="@dimen/bottom_bar_portrait_padding_vertical"
+        android:paddingEnd="@dimen/bottom_bar_portrait_padding_horizontal"
+        android:paddingBottom="@dimen/bottom_bar_portrait_padding_vertical">
 
-    <!--  播放进度/播放时长  -->
-    <TextView
-        android:id="@+id/tv_time"
-        android:layout_width="wrap_content"
+
+        <!--  播放按钮  -->
+        <ImageView
+            android:id="@+id/iv_play_pause"
+            android:layout_width="@dimen/common_icon_size"
+            android:layout_height="@dimen/common_icon_size"
+            android:padding="@dimen/common_icon_padding"
+            android:src="@drawable/ic_play_pause_selector" />
+
+        <!--  刷新按钮（可选：直播场景）  -->
+        <ImageView
+            android:id="@+id/iv_replay"
+            android:layout_width="@dimen/common_icon_size"
+            android:layout_height="@dimen/common_icon_size"
+            android:padding="@dimen/common_icon_padding"
+            android:src="@drawable/ic_replay"
+            android:visibility="gone" />
+
+        <!--  播放进度条  -->
+        <SeekBar
+            android:id="@+id/seek_bar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:max="100"
+            android:maxHeight="@dimen/video_slider_track_height"
+            android:minHeight="@dimen/video_slider_track_height"
+            android:paddingStart="@dimen/video_slider_track_padding_normal"
+            android:paddingEnd="@dimen/video_slider_track_padding_normal"
+            android:progressDrawable="@drawable/bg_video_slider"
+            android:splitTrack="false"
+            android:thumb="@drawable/thumb_video_slider"
+            android:thumbOffset="@dimen/video_slider_track_padding_normal" />
+
+        <!--  播放进度/播放时长  -->
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/bottom_bar_item_margin_horizontal"
+            android:textColor="@color/common_text_white"
+            android:shadowColor="@color/top_bar_tv_shadow"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="2"
+            android:textSize="@dimen/common_text_14" />
+
+        <!--  全屏按钮  -->
+        <ImageView
+            android:id="@+id/iv_fullscreen"
+            android:layout_width="@dimen/common_icon_size"
+            android:layout_height="@dimen/common_icon_size"
+            android:layout_marginStart="@dimen/bottom_bar_item_margin_horizontal"
+            android:padding="@dimen/common_icon_padding"
+            android:src="@drawable/ic_fullscreen" />
+
+
+    </LinearLayout>
+
+
+    <ViewStub
+        android:id="@+id/stub_bottom_bar_landscape"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textColor="#FFFFFF"
-        android:textSize="12dp" />
+        android:layout="@layout/layout_bottom_bar_slot_landscape" />
 
-    <!--  全屏按钮  -->
-    <ImageView
-        android:id="@+id/iv_fullscreen"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:padding="8dp"
-        android:src="@drawable/ic_fullscreen_white" />
-
-</LinearLayout>
+</FrameLayout>

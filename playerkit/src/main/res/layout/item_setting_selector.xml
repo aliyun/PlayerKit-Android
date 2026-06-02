@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="@dimen/setting_selector_item_height"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:paddingStart="@dimen/setting_selector_padding_horizontal"
+    android:paddingEnd="@dimen/setting_selector_padding_horizontal">
 
     <!--  设置标题展示  -->
     <TextView
@@ -15,8 +15,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="#FFFFFF"
-        android:textSize="14dp"
+        android:textColor="@color/common_text_white"
+        android:textSize="@dimen/setting_selector_text_size"
         tools:text="倍速" />
 
     <!--  设置值展示  -->
@@ -24,16 +24,16 @@
         android:id="@+id/tv_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#AAAAAA"
-        android:textSize="14dp"
+        android:textColor="@color/setting_subtitle_color"
+        android:textSize="@dimen/setting_selector_text_size"
         tools:text="1.0x" />
 
     <!--  点击引导图标  -->
     <ImageView
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="4dp"
+        android:layout_width="@dimen/setting_selector_arrow_size"
+        android:layout_height="@dimen/setting_selector_arrow_size"
+        android:layout_marginStart="@dimen/setting_selector_arrow_margin"
         android:src="@drawable/ic_selector_arrow_right"
-        app:tint="#AAAAAA" />
+        app:tint="@color/setting_subtitle_color" />
 
 </LinearLayout>

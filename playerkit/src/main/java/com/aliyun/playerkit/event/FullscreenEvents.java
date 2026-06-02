@@ -38,5 +38,27 @@ public final class FullscreenEvents {
             super(playerId);
         }
     }
+
+
+    /**
+     * 全屏状态变更事件
+     * <p>
+     * 全屏切换完成后触发，携带当前全屏状态。
+     * </p>
+     * <p>
+     * Fullscreen State Changed Event
+     * <p>
+     * Triggered after fullscreen transition completes, carrying the current fullscreen state.
+     * </p>
+     */
+    public static final class FullScreenChanged extends PlayerEvent {
+
+        public final boolean isFullscreen;
+
+        public FullScreenChanged(@NonNull String playerId, boolean isFullscreen) {
+            super(playerId);
+            this.isFullscreen = isFullscreen;
+        }
+    }
 }
 

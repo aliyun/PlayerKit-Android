@@ -33,6 +33,7 @@ import com.aliyun.playerkit.event.PlayerEventBus;
 import com.aliyun.playerkit.event.PlayerEvents;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.converter.PlayerTypeConverter;
+import com.aliyun.playerkit.manager.ScenarioManager;
 import com.aliyun.playerkit.utils.BitmapUtil;
 import com.aliyun.playerkit.utils.FileUtil;
 import com.aliyun.playerkit.utils.StringUtil;
@@ -334,6 +335,10 @@ public class MediaPlayer implements IMediaPlayer {
 
                 TrackQuality quality = PlayerTrackConverter.convert(trackInfo);
                 stateStore.updateCurrentTrackIndex(quality.getIndex());
+
+                // 发布流切换完成事件
+                PlayerEventBus.getInstance().post(new PlayerEvents.TrackSwitchCompleted(playerId, quality));
+
             }
 
             /**
@@ -351,6 +356,14 @@ public class MediaPlayer implements IMediaPlayer {
             @Override
             public void onChangedFail(TrackInfo trackInfo, ErrorInfo errorInfo) {
                 LogHub.e(TAG, "onChangedFail", "trackInfo=" + formatTrackInfo(trackInfo), "errorInfo=" + formatErrorInfo(errorInfo));
+                if (trackInfo == null) {
+                    return;
+                }
+
+                TrackQuality quality = PlayerTrackConverter.convert(trackInfo);
+
+                // 发布流切换失败事件
+                PlayerEventBus.getInstance().post(new PlayerEvents. TrackSwitchFailed(playerId, quality, errorInfo));
             }
         });
     }
@@ -442,6 +455,11 @@ public class MediaPlayer implements IMediaPlayer {
         // 注意：prepare 以后可以同步调用 start 操作，onPrepared 回调完成后会自动起播
         aliPlayer.setAutoPlay(model.isAutoPlay());
 
+        // 应用 SDK 内部能力识别数据，用于播放体验优化与问题诊断
+        String scenarioFlag = ScenarioManager.buildScenarioFlag(model.getSceneType(), videoSource.getSourceType());
+        aliPlayer.setOption(IPlayer.SCENARIO_FLAG, scenarioFlag);
+
+        // 开始 prepare 操作
         stateStore.updatePlayState(PlayerState.PREPARING);
         aliPlayer.prepare();
     }
@@ -594,6 +612,13 @@ public class MediaPlayer implements IMediaPlayer {
         LogHub.i(TAG, "selectTrack: " + trackQuality, playerId);
         // 启用精准跳转模式。在此模式下，播放器在切换到新的清晰度轨道后，会尝试从最精确的时间点开始播放，以保证音视频同步和流畅性，但切换过程可能会稍慢。
         aliPlayer.selectTrack(trackQuality.getIndex(), ENABLE_ACCURATE_SEEK);
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    @Override
+    public <T> T getInternalPlayer() {
+        return (T) aliPlayer;
     }
 
     @NonNull
