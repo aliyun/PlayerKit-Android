@@ -63,16 +63,6 @@
             android:shadowRadius="2"
             android:textSize="@dimen/common_text_14" />
 
-        <!--  全屏按钮  -->
-        <ImageView
-            android:id="@+id/iv_fullscreen"
-            android:layout_width="@dimen/common_icon_size"
-            android:layout_height="@dimen/common_icon_size"
-            android:layout_marginStart="@dimen/bottom_bar_item_margin_horizontal"
-            android:padding="@dimen/common_icon_padding"
-            android:src="@drawable/ic_fullscreen" />
-
-
     </LinearLayout>
 
 

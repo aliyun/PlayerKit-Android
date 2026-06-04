@@ -235,7 +235,7 @@ Custom slots need to implement the `ISlot` interface, which defines the slot lif
 | `SlotType.PLAY_STATE` | Playback State Slot: Displays playback state (such as error messages, loading, etc.) |
 | `SlotType.LOG_PANEL` | Log Panel Slot: Displays player log information for debugging |
 | `SlotType.TOP_BAR` | Top Control Bar Slot: Displays back button, title, settings, etc. |
-| `SlotType.BOTTOM_BAR` | Bottom Control Bar Slot: Displays playback controls, progress bar, fullscreen toggle, etc. |
+| `SlotType.BOTTOM_BAR` | Bottom Control Bar Slot: Displays playback controls, progress bar, etc. |
 | `SlotType.SETTING_MENU` | Settings Menu Slot: Displays settings menu (such as speed, resolution, mirror, rotation, etc.) |
 
 ### **2.4 SceneType**

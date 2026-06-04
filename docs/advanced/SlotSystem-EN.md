@@ -124,7 +124,6 @@ AliPlayerKit defines 5 playback scenes. Slot behavior automatically adapts under
 | Progress bar | Draggable | Not draggable | Draggable | Not draggable | ✗ |
 | Time display | ✓ | ✓ | ✓ | ✓ | ✗ |
 | Refresh button | ✗ | ✓ | ✗ | ✗ | ✗ |
-| Fullscreen button | ✓ | ✓ | ✓ | ✓ | ✗ |
 
 ---
 

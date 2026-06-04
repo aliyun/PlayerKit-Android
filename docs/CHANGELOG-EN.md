@@ -2,12 +2,12 @@
 
 Language: [中文简体](CHANGELOG.md) | English
 
-## [7.14.0] - 2026-06-02
+## [7.15.0] - 2026-06-04
 
 ### SDK Upgrade
 
-- AliyunPlayer: 7.12.0 → 7.14.0
-- AlivcArtc: 7.12.0 → 7.14.0
+- AliyunPlayer: 7.12.0 → 7.15.0
+- AlivcArtc: 7.12.0 → 7.15.0
 
 ### Breaking Changes
 
@@ -34,6 +34,8 @@ Language: [中文简体](CHANGELOG.md) | English
 
 ### Changed
 
+- **Removed fullscreen button from portrait bottom bar**: The fullscreen button is no longer displayed in portrait mode; users enter fullscreen exclusively via `LandscapeHintSlot`.
+- **Setting item control update**: Replaced `SwitchCompat` with custom `CheckBox` in the settings menu for a unified toggle style.
 - Debug features are disabled by default and must be explicitly enabled via public setters.
 - The log panel is collapsed by default.
 - The seek bar uses `Math.round` to fix precision issues.
@@ -50,8 +52,7 @@ Language: [中文简体](CHANGELOG.md) | English
 
 - Added the SceneType configuration guide (`docs/advanced/SceneType.md`).
 - Added the Locale internationalization documentation (`docs/advanced/Locale.md`).
-- Added full English documentation translation.
-- Added documentation site language switching support (sidebar and content synchronization).
+- Added full English documentation translation and dynamic language switching support for the documentation site.
 - Updated contact information and added GitHub issue templates.
 
 ## [7.12.0] - 2025-03-11

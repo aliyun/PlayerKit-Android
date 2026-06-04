@@ -80,13 +80,6 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      */
     private TextView mTvTime;
 
-    /**
-     * 全屏按钮
-     * <p>
-     * 点击后切换全屏模式。
-     * </p>
-     */
-    private ImageView mIvFullscreen;
 
     // ==================== 状态变量 ====================
 
@@ -181,7 +174,6 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
     protected void onRegisterElements() {
         registerElement(SlotElements.BottomBar.PLAY, visible -> setViewVisible(visible, mIvPlayPause, mIvPlayPauseLS));
         registerElement(SlotElements.BottomBar.REFRESH, visible -> setViewVisible(visible, mIvReplay, mIvReplayLS));
-        registerElement(SlotElements.BottomBar.FULLSCREEN, mIvFullscreen);
         // PROGRESS 控制多个 View，保持 SlotElementHandle 方式
         registerElement(SlotElements.BottomBar.PROGRESS, visible -> setViewVisible(visible, mSeekBar, mTvTime, mSeekBarLS, mTvTimeLS));
     }
@@ -203,9 +195,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         // 初始化时间显示
         mTvTime = findViewByIdCompat(R.id.tv_time);
 
-        // 初始化全屏按钮
-        mIvFullscreen = findViewByIdCompat(R.id.iv_fullscreen);
-        setViewClickListener(this, mIvPlayPause, mIvReplay, mIvFullscreen);
+        setViewClickListener(this, mIvPlayPause, mIvReplay);
 
         // 初始化进度条并设置监听器
         mSeekBar = findViewByIdCompat(R.id.seek_bar);
@@ -615,11 +605,6 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         else if (id == R.id.iv_replay || id == R.id.iv_replay_landscape) {
             notifyInteraction();
             postEvent(new PlayerCommand.Replay(mPlayerId));
-        }
-        // 全屏
-        else if (id == R.id.iv_fullscreen) {
-            notifyInteraction();
-            postEvent(new FullscreenEvents.Toggle(mPlayerId));
         }
         // 清晰度
         else if (id == R.id.tv_quality) {

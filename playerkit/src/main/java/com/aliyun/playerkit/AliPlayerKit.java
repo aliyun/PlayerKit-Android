@@ -75,7 +75,7 @@ public final class AliPlayerKit {
      * AliPlayerKit version number
      * </p>
      */
-    public static final String PLAYER_KIT_VERSION = "7.14.0";
+    public static final String PLAYER_KIT_VERSION = "7.15.0";
 
     // ==================== 状态管理 ====================
 
