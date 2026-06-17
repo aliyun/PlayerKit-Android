@@ -25,6 +25,10 @@
     <!-- 滑块控件背景色（深灰色半透明） -->
     <color name="universal_slider_background">#CC1C1D22</color>
 
+    <!-- ==================== 弹窗遮罩颜色 ==================== -->
+    <!-- 弹窗半透明遮罩背景（50% 透明度黑色） -->
+    <color name="dialog_overlay_background">#80000000</color>
+
     <!-- ==================== 设置面板颜色 ==================== -->
     <!-- 面板背景色（深黑色半透明） -->
     <color name="setting_panel_bg">#E61C1D22</color>
