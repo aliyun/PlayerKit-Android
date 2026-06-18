@@ -363,7 +363,7 @@ public class MediaPlayer implements IMediaPlayer {
                 TrackQuality quality = PlayerTrackConverter.convert(trackInfo);
 
                 // 发布流切换失败事件
-                PlayerEventBus.getInstance().post(new PlayerEvents. TrackSwitchFailed(playerId, quality, errorInfo));
+                PlayerEventBus.getInstance().post(new PlayerEvents.TrackSwitchFailed(playerId, quality, errorInfo));
             }
         });
     }

@@ -176,32 +176,45 @@ public abstract class BaseSettingItemAdapter extends RecyclerView.Adapter<Recycl
         SettingItem<T> item = (SettingItem<T>) rawItem;
 
         holder.tvTitle.setText(item.title);
-        holder.llOptionsContainer.removeAllViews();
 
         SettingOptions<T> options = item.options;
-        if (options == null || options.size() == 0) {
+        int optionCount = options != null ? options.size() : 0;
+
+        LinearLayout container = holder.llOptionsContainer;
+        int existingCount = container.getChildCount();
+
+        if (existingCount > optionCount) {
+            container.removeViews(optionCount, existingCount - optionCount);
+        }
+
+        if (optionCount == 0) {
             return;
         }
 
         SettingItem.ValueFormatter<T> formatter = item.formatter;
 
-        for (int i = 0; i < options.size(); i++) {
+        for (int i = 0; i < optionCount; i++) {
             T optionValue = options.get(i);
 
-            TextView optionView = new TextView(mContext);
+            TextView optionView;
+            if (i < existingCount) {
+                optionView = (TextView) container.getChildAt(i);
+                optionView.setOnClickListener(null);
+            } else {
+                optionView = new TextView(mContext);
+                optionView.setTextSize(12);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                lp.setMarginStart(dp2px(16));
+                optionView.setLayoutParams(lp);
+                container.addView(optionView);
+            }
+
             String displayText = formatter != null ? formatter.format(optionValue) : String.valueOf(optionValue);
             optionView.setText(displayText);
-            optionView.setTextSize(12);
-
-            boolean isSelected = Objects.equals(optionValue, item.currentValue);
-            applyOptionTextStyle(optionView, isSelected);
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            lp.setMarginStart(dp2px(16));
-            optionView.setLayoutParams(lp);
+            applyOptionTextStyle(optionView, Objects.equals(optionValue, item.currentValue));
 
             optionView.setOnClickListener(v -> {
                 if (Objects.equals(optionValue, item.currentValue)) {
@@ -211,10 +224,8 @@ public abstract class BaseSettingItemAdapter extends RecyclerView.Adapter<Recycl
                 if (item.listener != null) {
                     item.listener.onValueChanged(item, optionValue);
                 }
-                refreshOptionStyles(holder.llOptionsContainer, item);
+                refreshOptionStyles(container, item);
             });
-
-            holder.llOptionsContainer.addView(optionView);
         }
     }
 
