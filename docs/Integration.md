@@ -29,7 +29,7 @@ AliPlayerKit 提供两种集成方案，您可以根据业务需求选择：
 
 下图展示了完整的集成流程：
 
-![Integration](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Integration.png)
+![Integration](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/Integration.png)
 
 ---
 

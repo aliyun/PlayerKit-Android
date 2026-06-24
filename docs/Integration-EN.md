@@ -29,7 +29,7 @@ AliPlayerKit provides two integration solutions. You can choose based on your bu
 
 The following diagram shows the complete integration process:
 
-![Integration](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Integration-EN.png)
+![Integration](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/Integration-EN.png)
 
 ---
 

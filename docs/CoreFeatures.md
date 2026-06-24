@@ -29,7 +29,7 @@ AliPlayerKit 的设计目标并不仅限于播放器 UI 组件，而是将其定
 
 在架构层级上，**AliPlayerKit 位于播放器内核之上**，通过统一的 UI 组件体系与播放场景抽象，承载不同播放业务的共性能力：
 
-![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/ProductArchitecture.png)
+![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/ProductArchitecture.png)
 
 | 层级       | 定位           | 模块位置            | 职责                                                         |
 | ---------- | -------------- | ------------------- | ------------------------------------------------------------ |
@@ -53,7 +53,7 @@ AliPlayerKit 的设计目标并不仅限于播放器 UI 组件，而是将其定
 
 AliPlayerKit 采用经典的 **MVC 架构**，将播放器拆分为独立的组件：
 
-![InterfaceDesign](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/InterfaceDesign.png)
+![InterfaceDesign](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/InterfaceDesign.png)
 
 ### **2.2 组件职责**
 
@@ -258,7 +258,7 @@ classDiagram
 
 核心接口的完整调用流程，涵盖从创建、绑定、播放到释放的全生命周期：
 
-![CallSequence](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/CallSequence.png)
+![CallSequence](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/CallSequence.png)
 
 > **快速接入**：完整接入步骤请参阅 [快速开始](./QuickStart.md)。
 

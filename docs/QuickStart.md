@@ -26,7 +26,7 @@
 
 下图展示了 **组件层接入** 的流程：
 
-![QuickStart](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/QuickStart.png)
+![QuickStart](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/QuickStart.png)
 
 ---
 

@@ -4,15 +4,15 @@ Language: [中文](README.md) | English
 
 # **AliPlayerKit Android**
 
-[![Platform](https://img.shields.io/badge/Platform-Android-brightgreen)](https://www.android.com/) [![Docs](https://img.shields.io/badge/Docs-AliPlayer-blue?logo=aliyun)](https://www.alibabacloud.com/help/en/apsara-video-sdk/) [![website](https://img.shields.io/badge/Product-VOD-FF6A00)](https://www.alibabacloud.com/en/product/apsaravideo-for-vod)
+[![Platform](https://img.shields.io/badge/Platform-Android%20API%2021%2B-brightgreen)](https://www.android.com/) [![Language](https://img.shields.io/badge/Language-Java-orange)](https://www.java.com/) [![Gradle](https://img.shields.io/badge/Gradle-compatible-green)](https://gradle.org/) [![website](https://img.shields.io/badge/Product-VOD-FF6A00)](https://www.alibabacloud.com/en/product/apsaravideo-for-vod)
 
 ---
 
 ## **1. Project Introduction**
 
-**AliPlayerKit is a core player UI architecture designed for video business scenarios.**
+**AliPlayerKit** is Alibaba Cloud's **player UI integration solution** for video applications, offering **low-code, extensible player UI components** and **scenario-based solutions**. 
 
-It provides **low-code, extensible player UI components** and **scenario-based solutions**, enabling applications to **rapidly build complete video playback capabilities** **without dealing with complex player APIs or UI implementations**.
+By encapsulating player capabilities and UI interactions, it enables rapid development of app playback features with minimal integration effort — no need to call underlying player APIs directly or build complex player UIs from scratch.
 
 ---
 
@@ -22,6 +22,13 @@ It provides **low-code, extensible player UI components** and **scenario-based s
 - **Out-of-the-Box UI Components** — Configurable player UI components covering basic playback and common interaction capabilities.
 - **Scenario-based Solutions** — Built-in typical business scenarios such as medium/long video, short video, live streaming, and playlists, enabling rapid construction of complete playback experiences.
 - **Highly Extensible Architecture** — The slot system supports flexible UI composition, while the strategy system supports flexible extension of business logic.
+- **Unified Cross-platform Architecture** — Shared design philosophy and API semantics across platforms, reducing multi-platform integration and maintenance costs.
+
+| Platform | Description | Source | Docs |
+|----------|-------------|--------|------|
+| **Android** | Native Android player UI components & scenario solutions | [PlayerKit-Android](https://github.com/aliyun/PlayerKit-Android) | [Online Docs](https://aliyun.github.io/PlayerKit-Android/) |
+| **iOS** | Native iOS player UI components & scenario solutions | [PlayerKit-iOS](https://github.com/aliyun/PlayerKit-iOS) | [Online Docs](https://aliyun.github.io/PlayerKit-iOS/) |
+| **Flutter** | Cross-platform Flutter player widget | [player_widget](https://github.com/aliyun/player_widget) | [Online Docs](https://aliyun.github.io/player_widget/) |
 
 ---
 
@@ -29,7 +36,7 @@ It provides **low-code, extensible player UI components** and **scenario-based s
 
 In terms of architecture, **AliPlayerKit sits on top of the player core**, providing a unified UI component system and playback scenario abstraction to host the common capabilities of various playback businesses:
 
-![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/ProductArchitecture-EN.png)
+![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/ProductArchitecture-EN.png)
 
 The project module structure is as follows:
 
@@ -61,7 +68,7 @@ This index provides a clear documentation structure with step-by-step instructio
 
 AliPlayerKit provides two integration approaches. The complete integration flow is as follows:
 
-![Integration](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Integration-EN.png)
+![Integration](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/Integration-EN.png)
 
 > **Detailed Steps**: See [Integration](./docs/Integration-EN.md). For more information, refer to the [Documentation Index](./docs/README-EN.md).
 
@@ -78,7 +85,7 @@ AliPlayerKit adopts a **layered architecture design**, providing two integration
 
 In just a few steps, you can easily implement video playback. The diagram below shows the **component layer integration** flow:
 
-![QuickStart](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/QuickStart-EN.png)
+![QuickStart](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/QuickStart-EN.png)
 
 > **Detailed Steps**: See [Quick Start](./docs/QuickStart-EN.md). For more information, refer to the [Documentation Index](./docs/README-EN.md).
 

@@ -26,7 +26,7 @@ In just a few steps, you can easily implement video playback! **AliPlayerKit pro
 
 The diagram below shows the **component-layer integration** process:
 
-![QuickStart](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/QuickStart-EN.png)
+![QuickStart](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/QuickStart-EN.png)
 
 ---
 
