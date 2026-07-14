@@ -11,10 +11,10 @@
 | Scene | Description | Typical Business | Differences vs. VOD |
 |-------|-------------|------------------|---------------------|
 | `VOD` | Default scene; no explicit setup needed. Supports all controls | General VOD, courses, media library | — |
-| `LIVE` | Live streams have no fixed duration; timeline operations are disabled automatically | Live streaming, sports events, live commerce | Disables seek/fast-forward/playback-speed; hides `coverImage` and `seekThumbnail` |
+| `LIVE` | Live streams have no fixed duration; timeline operations are disabled automatically | Live streaming, sports events, live commerce | Disables seek/fast-forward/playback-speed; hides `cover` (cover image) |
 | `VIDEO_LIST` | Disables vertical gestures to avoid conflicting with list scrolling | Feeds, short-video lists | Disables volume/brightness vertical gestures; otherwise identical to VOD |
-| `RESTRICTED` | Anti-skip; ensures users watch sequentially and completely | Exam monitoring, training courses | Disables seek/fast-forward/playback-speed; hides `coverImage` and `seekThumbnail` |
-| `MINIMAL` | Pure picture; all controls must be implemented by you | Background playback, fully custom UI | Hides all control components and gestures; only `playerSurface`/`playState`/`overlays` are visible |
+| `RESTRICTED` | Anti-skip; ensures users watch sequentially and completely | Exam monitoring, training courses | Disables seek/fast-forward/playback-speed; hides `cover` (cover image) |
+| `MINIMAL` | Pure picture; all controls must be implemented by you | Background playback, fully custom UI | Hides all control components and gestures; only `playerSurface` is visible |
 
 ---
 
@@ -48,11 +48,8 @@ The slot system automatically toggles component visibility based on the scene ty
 | Slot | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
 |------|-----|------|------------|------------|---------|
 | playerSurface | ✓ | ✓ | ✓ | ✓ | ✓ |
-| playState | ✓ | ✓ | ✓ | ✓ | ✓ |
-| overlays | ✓ | ✓ | ✓ | ✓ | ✓ |
-| coverImage | ✓ | ✗ | ✓ | ✗ | ✗ |
-| seekThumbnail | ✓ | ✗ | ✓ | ✗ | ✗ |
-| playControl | ✓ | ✓ | ✓ | ✓ | ✗ |
+| playState | ✓ | ✓ | ✓ | ✓ | ✗ |
+| cover | ✓ | ✗ | ✓ | ✗ | ✗ |
 | topBar | ✓ | ✓ | ✓ | ✓ | ✗ |
 | bottomBar | ✓ | ✓ | ✓ | ✓ | ✗ |
 | settingMenu | ✓ | ✓ | ✓ | ✓ | ✗ |

@@ -96,6 +96,8 @@ AliPlayerKit 中的事件分为两大类：
 | `SetRotationCompleted` | 旋转设置完成 | `rotation` |
 | `TrackQualityListUpdated` | 清晰度列表更新 | `trackQualityList` |
 | `TrackSelected` | 清晰度选择完成 | `trackIndex` |
+| `TrackSwitchCompleted` | 清晰度切换完成 | `quality` 目标清晰度 |
+| `TrackSwitchFailed` | 清晰度切换失败 | `quality` 目标清晰度, `errorInfo` 错误信息 |
 
 ### **3.2 播放命令 (PlayerCommand)**
 
@@ -148,14 +150,17 @@ AliPlayerKit 中的事件分为两大类：
 | `Hide` | 隐藏控制栏 |
 | `ResetTimer` | 重置自动隐藏计时器 |
 | `ShowSettings` | 显示设置界面 |
+| `ShowSpeedPanel` | 显示倍速选择面板（横屏场景） |
+| `ShowQualityPanel` | 显示清晰度选择面板（横屏场景） |
 
 ### **3.5 全屏事件 (FullscreenEvents)**
 
 全屏模式切换事件。
 
-| 事件 | 说明 |
-|-----|------|
-| `Toggle` | 切换全屏状态 |
+| 事件 | 说明 | 携带数据 |
+|-----|------|---------|
+| `Toggle` | 切换全屏状态 | - |
+| `FullScreenChanged` | 全屏状态变更完成 | `isFullscreen` 是否全屏 |
 
 ### **3.6 生命周期事件 (PlayerLifecycleEvents)**
 

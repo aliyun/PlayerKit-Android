@@ -185,7 +185,12 @@ The slot system is AliPlayerKit's UI extension mechanism, allowing developers to
 
 | Method | Parameters | Description |
 |-----|------|------|
-| `register(SlotType, SlotBuilder)` | type, builder | Register a slot builder (overriding the default implementation) |
+| `register(SlotType, SlotBuilder)` | type, builder | Register a slot builder (lambda form, overriding the default implementation) |
+| `register(SlotType, Class<? extends View>)` | type, slotClass | Register a slot class via reflection |
+| `register(SlotType, int)` | type, layoutId | Register a slot via a layout resource ID |
+| `register(CustomSlotType, SlotBuilder)` | type, builder | Register a custom slot type |
+| `unregister(SlotType)` | type | Unregister a slot, returning the removed builder |
+| `isRegistered(SlotType)` | type | Check whether a slot type is registered |
 
 **Visibility Control Methods**
 
@@ -205,9 +210,7 @@ The slot system is AliPlayerKit's UI extension mechanism, allowing developers to
 | `clearAll()` | - | void | Clear all registered slots (start from blank) |
 | `rebuildSlots()` | - | void | Rebuild all slots |
 | `getSlotView(SlotType)` | slotType: Slot type | View | Get the slot view of the specified type |
-| `bindData(AliPlayerModel)` | model: Playback data | void | Bind playback data to the slot system |
-| `unbindData()` | - | void | Unbind playback data |
-| `updateSceneType(int)` | sceneType: Scene type | void | Update scene type and rebuild slots |
+| `updateSceneType(int)` | sceneType: Scene type | void | Update scene type using an incremental strategy that only refreshes affected slots |
 
 ### **2.2 ISlot (Slot Interface)**
 
@@ -237,6 +240,7 @@ Custom slots need to implement the `ISlot` interface, which defines the slot lif
 | `SlotType.TOP_BAR` | Top Control Bar Slot: Displays back button, title, settings, etc. |
 | `SlotType.BOTTOM_BAR` | Bottom Control Bar Slot: Displays playback controls, progress bar, etc. |
 | `SlotType.SETTING_MENU` | Settings Menu Slot: Displays settings menu (such as speed, resolution, mirror, rotation, etc.) |
+| `SlotType.OPTION_PANEL` | Option Panel Slot: Independent selection panel for speed/resolution shown in landscape scenarios |
 
 ### **2.4 SceneType**
 
@@ -277,8 +281,8 @@ For details, see [Slot System](./advanced/SlotSystem-EN.md).
 | Method | Return | Description |
 |-----|-------|------|
 | `isValid()` | boolean | Check whether the video source is valid |
-| `getType()` | int | Get the video source type |
-| `getSourceId()` | String | Get the video source ID |
+| `getSourceType()` | int | Get the video source type |
+| `getMediaId()` | String | Get the video source ID |
 
 ---
 
@@ -333,6 +337,7 @@ For details, see [Slot System](./advanced/SlotSystem-EN.md).
 |-----|-------|------|
 | `getPlayerId()` | String | Get the unique player identifier |
 | `getStateStore()` | IPlayerStateStore | Get the state store interface |
+| `getInternalPlayer()` | T | Get the underlying native player instance, used to perform low-level SDK configuration in `OnPlayerConfigCallback` |
 
 ### **4.2 ScaleType**
 
@@ -682,11 +687,11 @@ The global initialization configuration callback interface, triggered after `Ali
 
 ### **11.2 OnPlayerConfigCallback**
 
-The instance-level player configuration callback interface, triggered before `prepare()` within `configure()`.
+The instance-level player configuration callback interface, triggered after `setDataSource()` within `configure()`.
 
 | Method | Parameters | Description |
 |------|------|------|
-| `void onPlayerConfig(IMediaPlayer player)` | player - Player instance | Configuration callback called before prepare() |
+| `void onPlayerConfig(IMediaPlayer player)` | player - Player instance | Configuration callback called after `setDataSource()`; use `player.getInternalPlayer()` to access low-level SDK configuration |
 
 **Registration**: `AliPlayerModel.Builder.onPlayerConfig(OnPlayerConfigCallback callback)`
 

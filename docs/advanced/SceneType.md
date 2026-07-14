@@ -11,10 +11,10 @@
 | 场景 | 说明 | 适用业务 | 与 VOD 的差异 |
 |------|------|---------|---------------|
 | `VOD` | 默认场景，无需显式指定。支持全部控制能力 | 常规点播、课程、媒体库 | — |
-| `LIVE` | 实时流无固定时长，自动禁用时间轴操作 | 直播、赛事、电商直播 | 禁用进度拖拽/快进/倍速；隐藏 `coverImage`、`seekThumbnail` |
+| `LIVE` | 实时流无固定时长，自动禁用时间轴操作 | 直播、赛事、电商直播 | 禁用进度拖拽/快进/倍速；隐藏 `cover`（封面图） |
 | `VIDEO_LIST` | 禁用垂直手势，避免与列表滚动冲突 | 信息流、短视频列表 | 禁用音量/亮度垂直手势；其余与 VOD 一致 |
-| `RESTRICTED` | 防跳播，确保用户按序完整观看 | 考试监控、培训课程 | 禁用进度拖拽/快进/倍速；隐藏 `coverImage`、`seekThumbnail` |
-| `MINIMAL` | 纯净画面，所有控制需自行实现 | 背景播放、完全自定义 UI | 隐藏所有控制组件和手势；仅 `playerSurface`/`playState`/`overlays` 可见 |
+| `RESTRICTED` | 防跳播，确保用户按序完整观看 | 考试监控、培训课程 | 禁用进度拖拽/快进/倍速；隐藏 `cover`（封面图） |
+| `MINIMAL` | 纯净画面，所有控制需自行实现 | 背景播放、完全自定义 UI | 隐藏所有控制组件和手势；仅 `playerSurface` 可见 |
 
 ---
 
@@ -48,11 +48,8 @@ playerView.attach(controller);
 | 插槽 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
 |-----|-----|------|------------|------------|---------|
 | playerSurface | ✓ | ✓ | ✓ | ✓ | ✓ |
-| playState | ✓ | ✓ | ✓ | ✓ | ✓ |
-| overlays | ✓ | ✓ | ✓ | ✓ | ✓ |
-| coverImage | ✓ | ✗ | ✓ | ✗ | ✗ |
-| seekThumbnail | ✓ | ✗ | ✓ | ✗ | ✗ |
-| playControl | ✓ | ✓ | ✓ | ✓ | ✗ |
+| playState | ✓ | ✓ | ✓ | ✓ | ✗ |
+| cover | ✓ | ✗ | ✓ | ✗ | ✗ |
 | topBar | ✓ | ✓ | ✓ | ✓ | ✗ |
 | bottomBar | ✓ | ✓ | ✓ | ✓ | ✗ |
 | settingMenu | ✓ | ✓ | ✓ | ✓ | ✗ |
