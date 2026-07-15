@@ -75,7 +75,8 @@
 | LOG_PANEL | 日志面板，调试时显示播放器日志 | LogPanelSlot |
 | TOP_BAR | 顶部控制栏，显示返回/标题/设置等 | TopBarSlot |
 | BOTTOM_BAR | 底部控制栏，显示播放控制/进度条等 | BottomBarSlot |
-| SETTING_MENU | 设置菜单，显示倍速/清晰度/镜像等设置 | SettingMenuSlot |
+| SETTING_MENU | 设置菜单，显示倍速/清晰度/镜像等设置（无 UI 事件桥接层，实际 UI 由 SettingMenuDialogFragment 弹窗承载） | SettingMenuSlot |
+| OPTION_PANEL | 选项面板，横屏场景下显示倍速/清晰度等独立选择面板 | OptionPanelSlot |
 
 ### **3.2 场景适配**
 
@@ -94,16 +95,17 @@ AliPlayerKit 定义了 5 种播放场景，不同场景下插槽行为自动适�
 | 插槽 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
 |-----|-----|------|------------|------------|---------|
 | PLAYER_SURFACE | ✓ | ✓ | ✓ | ✓ | ✓ |
-| FULLSCREEN | ✓ | ✓ | ✓ | ✓ | ✓ |
+| FULLSCREEN | ✓ | ✓ | ✓ | ✓ | ✗ |
 | GESTURE_CONTROL | ✓ | ✓ | ✓ | ✓ | ✗ |
 | LANDSCAPE_HINT | ✓ | ✓ | ✓ | ✓ | ✗ |
 | COVER | ✓ | ✗ | ✓ | ✗ | ✗ |
 | CENTER_DISPLAY | ✓ | ✓ | ✓ | ✓ | ✗ |
-| PLAY_STATE | ✓ | ✓ | ✓ | ✓ | ✓ |
+| PLAY_STATE | ✓ | ✓ | ✓ | ✓ | ✗ |
 | LOG_PANEL | 可配置 | 可配置 | 可配置 | 可配置 | ✗ |
 | TOP_BAR | ✓ | ✓ | ✓ | ✓ | ✗ |
 | BOTTOM_BAR | ✓ | ✓ | ✓ | ✓ | ✗ |
 | SETTING_MENU | ✓ | ✓ | ✓ | ✓ | ✗ |
+| OPTION_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ |
 
 **手势行为差异**：
 

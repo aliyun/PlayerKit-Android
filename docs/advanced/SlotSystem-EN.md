@@ -75,7 +75,8 @@ The Slot System decouples UI components from the player component, allowing cust
 | LOG_PANEL | Log panel, displays player logs during debugging | LogPanelSlot |
 | TOP_BAR | Top Bar, displays back/title/settings, etc. | TopBarSlot |
 | BOTTOM_BAR | Bottom Bar, displays playback controls/progress bar | BottomBarSlot |
-| SETTING_MENU | Settings Menu, displays speed/quality/mirror settings | SettingMenuSlot |
+| SETTING_MENU | Settings Menu, displays speed/quality/mirror settings (headless event bridge; actual UI is rendered by SettingMenuDialogFragment) | SettingMenuSlot |
+| OPTION_PANEL | Option panel, an independent selection panel for speed/quality shown in landscape scenarios | OptionPanelSlot |
 
 ### **3.2 Scene Adaptation**
 
@@ -94,16 +95,17 @@ AliPlayerKit defines 5 playback scenes. Slot behavior automatically adapts under
 | Slot | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
 |------|-----|------|------------|------------|---------|
 | PLAYER_SURFACE | ✓ | ✓ | ✓ | ✓ | ✓ |
-| FULLSCREEN | ✓ | ✓ | ✓ | ✓ | ✓ |
+| FULLSCREEN | ✓ | ✓ | ✓ | ✓ | ✗ |
 | GESTURE_CONTROL | ✓ | ✓ | ✓ | ✓ | ✗ |
 | LANDSCAPE_HINT | ✓ | ✓ | ✓ | ✓ | ✗ |
 | COVER | ✓ | ✗ | ✓ | ✗ | ✗ |
 | CENTER_DISPLAY | ✓ | ✓ | ✓ | ✓ | ✗ |
-| PLAY_STATE | ✓ | ✓ | ✓ | ✓ | ✓ |
+| PLAY_STATE | ✓ | ✓ | ✓ | ✓ | ✗ |
 | LOG_PANEL | Configurable | Configurable | Configurable | Configurable | ✗ |
 | TOP_BAR | ✓ | ✓ | ✓ | ✓ | ✗ |
 | BOTTOM_BAR | ✓ | ✓ | ✓ | ✓ | ✗ |
 | SETTING_MENU | ✓ | ✓ | ✓ | ✓ | ✗ |
+| OPTION_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ |
 
 **Gesture Behavior Differences**:
 

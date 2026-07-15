@@ -185,7 +185,12 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 
 | 方法 | 参数 | 说明 |
 |-----|------|------|
-| `register(SlotType, SlotBuilder)` | type, builder | 注册插槽构建器（覆盖默认实现） |
+| `register(SlotType, SlotBuilder)` | type, builder | 注册插槽构建器（lambda 形式，覆盖默认实现） |
+| `register(SlotType, Class<? extends View>)` | type, slotClass | 通过反射注册插槽类 |
+| `register(SlotType, int)` | type, layoutId | 通过布局资源 ID 注册插槽 |
+| `register(CustomSlotType, SlotBuilder)` | type, builder | 注册自定义插槽类型 |
+| `unregister(SlotType)` | type | 注销插槽，返回被移除的构建器 |
+| `isRegistered(SlotType)` | type | 查询插槽类型是否已注册 |
 
 **可见性控制方法**
 
@@ -205,9 +210,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `clearAll()` | - | void | 清除所有已注册的插槽（从空白开始） |
 | `rebuildSlots()` | - | void | 重建所有插槽 |
 | `getSlotView(SlotType)` | slotType: 插槽类型 | View | 获取指定类型的插槽视图 |
-| `bindData(AliPlayerModel)` | model: 播放数据 | void | 绑定播放数据到插槽系统 |
-| `unbindData()` | - | void | 解绑播放数据 |
-| `updateSceneType(int)` | sceneType: 场景类型 | void | 更新场景类型并重建插槽 |
+| `updateSceneType(int)` | sceneType: 场景类型 | void | 更新场景类型，采用增量策略只刷新受影响的插槽 |
 
 ### **2.2 ISlot（插槽接口）**
 
@@ -237,6 +240,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `SlotType.TOP_BAR` | 顶部控制栏插槽：显示返回按钮、标题、设置等 |
 | `SlotType.BOTTOM_BAR` | 底部控制栏插槽：显示播放控制、进度条等 |
 | `SlotType.SETTING_MENU` | 设置菜单插槽：用于显示设置菜单（如倍速、清晰度、镜像、旋转等） |
+| `SlotType.OPTION_PANEL` | 选项面板插槽：用于横屏场景下显示倍速/清晰度等选项的独立选择面板 |
 
 ### **2.4 SceneType（播放场景）**
 
@@ -277,8 +281,8 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | 方法 | 返回值 | 说明 |
 |-----|-------|------|
 | `isValid()` | boolean | 检查视频源是否有效 |
-| `getType()` | int | 获取视频源类型 |
-| `getSourceId()` | String | 获取视频源 ID |
+| `getSourceType()` | int | 获取视频源类型 |
+| `getMediaId()` | String | 获取视频源 ID |
 
 ---
 
@@ -333,6 +337,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 |-----|-------|------|
 | `getPlayerId()` | String | 获取播放器唯一标识 |
 | `getStateStore()` | IPlayerStateStore | 获取状态存储接口 |
+| `getInternalPlayer()` | T | 获取底层原生播放器实例，用于在 `OnPlayerConfigCallback` 中进行底层 SDK 配置 |
 
 ### **4.2 ScaleType（渲染填充模式）**
 
@@ -682,11 +687,11 @@ AliPlayerKit 提供双层级自定义配置机制，允许开发者在关键时�
 
 ### **11.2 OnPlayerConfigCallback（实例级播放器配置回调）**
 
-实例级播放器配置回调接口，在 `configure()` 中 `prepare()` 前触发。
+实例级播放器配置回调接口，在 `configure()` 中 `setDataSource()` 之后触发。
 
 | 方法 | 参数 | 说明 |
 |------|------|------|
-| `void onPlayerConfig(IMediaPlayer player)` | player - 播放器实例 | prepare() 前调用的配置回调 |
+| `void onPlayerConfig(IMediaPlayer player)` | player - 播放器实例 | `setDataSource()` 之后调用的配置回调，可通过 `player.getInternalPlayer()` 访问底层 SDK 配置能力 |
 
 **注册方式**: `AliPlayerModel.Builder.onPlayerConfig(OnPlayerConfigCallback callback)`
 

@@ -59,7 +59,7 @@ AliPlayerKit 采用经典的 **MVC 架构**，将播放器拆分为独立的组�
 
 | 组件 | 类型 | 职责 | 生命周期 |
 |-----|------|------|---------|
-| `AliPlayerKit` | 全局入口 | 全局配置、缓存管理、版本信息 | 应用级 |
+| `AliPlayerKit` | 全局入口 | 全局配置、缓存管理、版本信息、日志管理、预加载管理 | 应用级 |
 | `AliPlayerView` | View | UI 展示、插槽管理、生命周期绑定 | 页面级 |
 | `AliPlayerController` | Controller | 播放控制、状态管理、事件分发 | 页面级 |
 | `AliPlayerModel` | Model | 配置数据封装、Builder 模式 | 请求级 |
@@ -276,7 +276,7 @@ UI 组件与播放器核心彻底解耦，定制不再意味着修改源码，�
 
 ### **3.2 策略系统**
 
-**策略系统** 将播放器的业务逻辑封装为独立的策略组件，每个策略承载一个明确的功能，如首帧耗时统计、卡顿检测、流量保护、记忆播放等。
+**策略系统** 将播放器的业务逻辑封装为独立的策略组件，每个策略承载一个明确的功能，如首帧耗时统计、卡顿检测、流量保护等。
 
 业务方可以在策略层进行扩展，而无需侵入框架核心。每个策略职责单一、相互隔离，既可以在不同播放器实例间复用，也支持按需启用或禁用。框架升级与业务定制各行其道，互不干扰。
 
@@ -325,7 +325,7 @@ AliPlayerKit 支持多种视频源类型，**推荐使用 VidAuth 方式**：
 | 层级 | 注册方式 | 触发时机 | 典型场景 |
 |------|---------|---------|----------|
 | 全局 | `AliPlayerKit.setOnGlobalInit()` | `init()` 完成后（仅一次） | setOption、全局日志级别 |
-| 实例 | `AliPlayerModel.Builder.onPlayerConfig()` | `configure()` 中 `prepare()` 前 | setPlayConfig、Referer |
+| 实例 | `AliPlayerModel.Builder.onPlayerConfig()` | `configure()` 中 `setDataSource()` 之后 | setConfig、Referer |
 
 详见 [自定义配置](./advanced/CustomConfig.md)。
 

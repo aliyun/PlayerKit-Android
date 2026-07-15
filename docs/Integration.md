@@ -337,6 +337,7 @@ AliPlayerKit 内部依赖以下 SDK：
 | SDK | 说明 |
 |-----|------|
 | **AliPlayer SDK** | 阿里云播放器 SDK，提供视频解码、渲染及播放控制等基础播放能力 |
+| **AlivcArtc** | 播放器与 RTS 低延时直播组件的桥接层，版本号需与 AliPlayer SDK 保持一致，需要和 RtsSDK 一起集成 |
 | **RtsSDK** | 阿里云 RTS SDK，提供 RTS 超低延时直播播放能力，支持毫秒级延迟的实时流媒体播放 |
 
 如需升级底层 SDK 版本，可参考以下步骤。
@@ -364,7 +365,10 @@ AliPlayerKit 内部依赖以下 SDK：
    ```groovy
    def player_sdk_version = "x.x.x"  // 替换为目标版本
    api "com.aliyun.sdk.android:AliyunPlayer:$player_sdk_version-full"
-   
+
+   // AlivcArtc 桥接层版本号需与播放器版本保持一致
+   api "com.aliyun.sdk.android:AlivcArtc:$player_sdk_version"
+
    // RtsSDK 版本号需与播放器版本保持一致
    def rts_sdk_version = "x.x.x"  // 替换为目标版本
    api "com.aliyun.rts.android:RtsSDK:$rts_sdk_version"

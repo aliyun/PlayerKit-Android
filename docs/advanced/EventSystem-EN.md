@@ -96,6 +96,8 @@ State change events produced internally by the player to notify external compone
 | `SetRotationCompleted` | Rotation setting completed | `rotation` |
 | `TrackQualityListUpdated` | Quality list updated | `trackQualityList` |
 | `TrackSelected` | Quality selection completed | `trackIndex` |
+| `TrackSwitchCompleted` | Quality switch completed | `quality` target quality |
+| `TrackSwitchFailed` | Quality switch failed | `quality` target quality, `errorInfo` error info |
 
 ### **3.2 Player Commands (PlayerCommand)**
 
@@ -148,14 +150,17 @@ Control bar visibility synchronization events.
 | `Hide` | Hide control bar |
 | `ResetTimer` | Reset auto-hide timer |
 | `ShowSettings` | Show settings UI |
+| `ShowSpeedPanel` | Show the speed selection panel (landscape) |
+| `ShowQualityPanel` | Show the quality selection panel (landscape) |
 
 ### **3.5 Fullscreen Events (FullscreenEvents)**
 
 Fullscreen mode toggle events.
 
-| Event | Description |
-|-------|-------------|
-| `Toggle` | Toggle fullscreen state |
+| Event | Description | Data |
+|-------|-------------|------|
+| `Toggle` | Toggle fullscreen state | - |
+| `FullScreenChanged` | Fullscreen state change completed | `isFullscreen` whether fullscreen |
 
 ### **3.6 Player Lifecycle Events (PlayerLifecycleEvents)**
 

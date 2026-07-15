@@ -59,7 +59,7 @@ AliPlayerKit adopts the classic **MVC architecture**, splitting the player into 
 
 | Component | Type | Responsibilities | Lifecycle |
 |-----|------|------|---------|
-| `AliPlayerKit` | Global Entry | Global configuration, cache management, version information | Application-level |
+| `AliPlayerKit` | Global Entry | Global configuration, cache management, version information, log management, preload management | Application-level |
 | `AliPlayerView` | View | UI presentation, slot management, lifecycle binding | Page-level |
 | `AliPlayerController` | Controller | Playback control, state management, event dispatching | Page-level |
 | `AliPlayerModel` | Model | Configuration data encapsulation, Builder pattern | Request-level |
@@ -276,7 +276,7 @@ For details, see [Slot System](./advanced/SlotSystem-EN.md).
 
 ### **3.2 Strategy System**
 
-The **Strategy System** encapsulates the player's business logic into independent strategy components, each carrying a clear responsibility — such as first-frame timing statistics, stuttering detection, traffic protection, memory playback, etc.
+The **Strategy System** encapsulates the player's business logic into independent strategy components, each carrying a clear responsibility — such as first-frame timing statistics, stuttering detection, traffic protection, etc.
 
 Business teams can extend at the strategy layer without intruding into the framework core. Each strategy has a single responsibility and is isolated from others; strategies can be reused across player instances and enabled or disabled on demand. Framework upgrades and business customizations operate independently and do not interfere with each other.
 
@@ -325,7 +325,7 @@ For details, see [Multi Video Source Support](./advanced/VideoSource-EN.md).
 | Layer | Registration | Trigger Timing | Typical Use Cases |
 |------|---------|---------|----------|
 | Global | `AliPlayerKit.setOnGlobalInit()` | After `init()` completes (only once) | setOption, global log level |
-| Instance | `AliPlayerModel.Builder.onPlayerConfig()` | Inside `configure()`, before `prepare()` | setPlayConfig, Referer |
+| Instance | `AliPlayerModel.Builder.onPlayerConfig()` | Inside `configure()`, after `setDataSource()` | setConfig, Referer |
 
 For details, see [Custom Config](./advanced/CustomConfig-EN.md).
 

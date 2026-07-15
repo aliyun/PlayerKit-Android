@@ -319,9 +319,12 @@ private void switchToReusePool() {
         mCurrentStrategy.clear();
     }
 
-    // 2. Switch to the reuse pool strategy
-    mCurrentStrategy = ReusePoolLifecycleStrategy.getInstance();
-    mCurrentStrategy.setMaxPoolSize(3);
+    // 2. Switch to the reuse pool strategy (setMaxPoolSize is specific to
+    //    ReusePoolLifecycleStrategy and is not on the IPlayerLifecycleStrategy
+    //    interface, so it must be called on a concretely-typed variable)
+    ReusePoolLifecycleStrategy reusePoolStrategy = ReusePoolLifecycleStrategy.getInstance();
+    reusePoolStrategy.setMaxPoolSize(3);
+    mCurrentStrategy = reusePoolStrategy;
 
     // 3. Preload
     mCurrentStrategy.preload(this, 2);
