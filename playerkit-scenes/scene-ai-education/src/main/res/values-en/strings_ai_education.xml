@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_education_chapter">Chapters</string>
+    <string name="ai_education_ai_analysis">AI Analysis</string>
+    <string name="ai_education_chapter_count">Chapters %d segments</string>
+    <string name="ai_education_summary">Summary</string>
+    <string name="ai_education_scene_title">AI Education Scene</string>
+
+    <string name="ai_education_error_server_unreachable">Cannot connect to App Server, please check network or server settings</string>
+    <string name="ai_education_error_ai_content_load_failed">Failed to load AI content</string>
+</resources>

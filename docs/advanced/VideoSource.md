@@ -190,10 +190,6 @@ VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(
 // 2. 创建播放数据
 AliPlayerModel model = new AliPlayerModel.Builder()
     .videoSource(videoSource)
-    .coverUrl("https://example.com/cover.jpg")
-    .videoTitle("Sample Video")
-    .sceneType(SceneType.VOD)
-    .autoPlay(true)
     .build();
 
 // 3. 创建控制器

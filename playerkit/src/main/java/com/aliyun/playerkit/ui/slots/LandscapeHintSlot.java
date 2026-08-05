@@ -45,6 +45,16 @@ import java.util.List;
  */
 public class LandscapeHintSlot extends BaseSlot {
 
+    /**
+     * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
+            PlayerEvents.VideoSizeChanged.class,
+            PlayerEvents.Prepared.class,
+            PlayerEvents.StateChanged.class,
+            PlayerEvents.SetScaleTypeCompleted.class
+    );
+
     // 提示按钮与视频内容之间的间距
     private static final int HINT_MARGIN_DP = 20;
 
@@ -118,12 +128,7 @@ public class LandscapeHintSlot extends BaseSlot {
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        return Arrays.asList(
-                PlayerEvents.VideoSizeChanged.class,
-                PlayerEvents.Prepared.class,
-                PlayerEvents.StateChanged.class,
-                PlayerEvents.SetScaleTypeCompleted.class
-        );
+        return OBSERVED_EVENTS;
     }
 
     @Override

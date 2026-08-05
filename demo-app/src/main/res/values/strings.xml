@@ -22,6 +22,10 @@
     <string name="short_video_page_title">短视频列表播放</string>
     <string name="short_video_page_schema">playerkit://scenes/shortvideo</string>
 
+    <!-- AI 教育场景页面 -->
+    <string name="ai_education_page_title">AI 教育</string>
+    <string name="ai_education_page_schema">playerkit://scenes/aieducation</string>
+
     <!-- 视频源使用示例页面 -->
     <string name="video_source_example_page_title">视频源使用示例</string>
     <string name="video_source_example_page_schema">playerkit://examples/videosource</string>

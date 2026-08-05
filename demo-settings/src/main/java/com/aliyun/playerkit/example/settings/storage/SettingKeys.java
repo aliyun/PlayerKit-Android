@@ -59,5 +59,4 @@ public final class SettingKeys {
      * </p>
      */
     public static final String KEY_DISABLE_SCREENSHOT = "key_disable_screenshot";
-
 }

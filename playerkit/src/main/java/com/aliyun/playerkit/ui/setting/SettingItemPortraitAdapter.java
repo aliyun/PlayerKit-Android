@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.playerkit.R;
+import com.aliyun.playerkit.utils.DensityUtil;
 
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class SettingItemPortraitAdapter extends BaseSettingItemAdapter {
     public SettingItemPortraitAdapter(@NonNull List<SettingItem<?>> items, @NonNull Context context) {
         super(items, context);
         this.mCardBgColor = ContextCompat.getColor(context, R.color.setting_panel_item_bg);
-        this.mCornerRadiusPx = dp2px(CARD_CORNER_RADIUS_DP);
+        this.mCornerRadiusPx = DensityUtil.dip2px(mContext, CARD_CORNER_RADIUS_DP);
         float r = mCornerRadiusPx;
         this.mRadiiAll = new float[]{r, r, r, r, r, r, r, r};
         this.mRadiiTop = new float[]{r, r, r, r, 0, 0, 0, 0};
@@ -116,7 +117,7 @@ public class SettingItemPortraitAdapter extends BaseSettingItemAdapter {
         // 分组间距
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) holder.itemView.getLayoutParams();
         if (lp != null) {
-            lp.topMargin = isFirst && position != 0 ? dp2px(GROUP_SPACING_DP) : 0;
+            lp.topMargin = isFirst && position != 0 ? DensityUtil.dip2px(mContext, GROUP_SPACING_DP) : 0;
             holder.itemView.setLayoutParams(lp);
         }
 

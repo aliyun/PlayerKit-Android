@@ -36,6 +36,8 @@ AliPlayerKit 的设计目标并不仅限于播放器 UI 组件，而是将其定
 | **组件层** | 播放器 UI 组件 | `playerkit/`        | 提供开箱即用、可配置的播放器 UI 组件，覆盖基础播放与常见交互能力。 |
 | **场景层** | 场景化解决方案 | `playerkit-scenes/` | 围绕短剧、中长视频、直播等典型场景，提供标准化接入示例，帮助客户以少量代码快速搭建完整播放能力。 |
 
+> 📌 **场景方案示例**：[AI 教育场景](./scenes/AiEducation.md) — 面向课程/知识视频，提供 AI 章节划分、摘要、知识点解析等增强播放体验。
+
 ---
 
 ## **2. 核心架构**
@@ -328,6 +330,22 @@ AliPlayerKit 支持多种视频源类型，**推荐使用 VidAuth 方式**：
 | 实例 | `AliPlayerModel.Builder.onPlayerConfig()` | `configure()` 中 `setDataSource()` 之后 | setConfig、Referer |
 
 详见 [自定义配置](./advanced/CustomConfig.md)。
+
+### **3.8 VID All-in-One 播放体验**
+
+依托 AliPlayerKit 与阿里云视频点播 VOD 的协同能力，业务侧仅需传入视频 VID，即可自动获取播放资源，以及关联的视频标题、封面图和缩略图等媒资信息，减少播放地址获取、媒资信息传递及端侧参数配置，简化播放接入。
+
+AliPlayerKit 会在播放器 `prepared` 后自动从云端 MediaInfo 中提取以下媒体信息，并通过事件系统分发给对应 Slot 消费：
+
+| 媒体信息 | 事件 | 消费 Slot | 说明 |
+|---------|------|----------|------|
+| 封面图 URL | `CoverUrlReady` | CoverSlot | 播放前展示封面图 |
+| 视频标题 | `VideoTitleReady` | TopBarSlot | 顶部栏展示视频标题 |
+| 缩略图 URL | `ThumbnailUrlReady` | SeekThumbnailSlot | 拖动进度条时展示缩略图 |
+
+**优先级规则：** 通过 `AliPlayerModel.Builder` 手动配置的值优先级高于 MediaInfo 自动获取。仅当未手动配置时，才使用 MediaInfo 中的值。
+
+> 💡 该能力需要阿里云播放器 SDK 版本 ≥ 7.16.0。
 
 ---
 

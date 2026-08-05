@@ -76,6 +76,7 @@
 | TOP_BAR | 顶部控制栏，显示返回/标题/设置等 | TopBarSlot |
 | BOTTOM_BAR | 底部控制栏，显示播放控制/进度条等 | BottomBarSlot |
 | SETTING_MENU | 设置菜单，显示倍速/清晰度/镜像等设置（无 UI 事件桥接层，实际 UI 由 SettingMenuDialogFragment 弹窗承载） | SettingMenuSlot |
+| SEEK_THUMBNAIL | 进度条缩略图预览 | SeekThumbnailSlot |
 | OPTION_PANEL | 选项面板，横屏场景下显示倍速/清晰度等独立选择面板 | OptionPanelSlot |
 
 ### **3.2 场景适配**
@@ -768,6 +769,7 @@ AliPlayerKit 的插槽系统采用**显式层级控制**机制，通过 `order` 
 | PLAY_STATE | 60 | 状态层 | 加载中/错误提示 |
 | LOG_PANEL | 70 | 调试层 | 日志面板 |
 | TOP_BAR | 80 | 控制层 | 顶部控制栏 |
+| SEEK_THUMBNAIL | 85 | 控制层 | 进度条缩略图预览。拖动进度条时显示目标时间点的视频帧缩略图与时间戳。需要 AliPlayer SDK ≥ 7.16.0 |
 | BOTTOM_BAR | 90 | 控制层 | 底部控制栏 |
 | SETTING_MENU | 100 | 菜单层 | 设置菜单浮层 |
 | OPTION_PANEL | 110 | 菜单层 | 选项面板（横屏倍速/清晰度） |

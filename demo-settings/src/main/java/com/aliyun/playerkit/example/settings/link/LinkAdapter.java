@@ -35,7 +35,16 @@ import java.util.List;
  * @author keria
  * @date 2026/01/04
  */
-public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder> {
+public class LinkAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    /**
+     * 配置项视图类型：普通项
+     */
+    private static final int VIEW_TYPE_ITEM = 0;
+    /**
+     * 配置项视图类型：分隔项
+     */
+    private static final int VIEW_TYPE_DIVIDER = 1;
 
     /**
      * 链接配置项列表
@@ -81,6 +90,17 @@ public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder
     }
 
     /**
+     * 获取视图类型
+     *
+     * @param position 位置
+     * @return 视图类型
+     */
+    @Override
+    public int getItemViewType(int position) {
+        return mItems.get(position).isDivider() ? VIEW_TYPE_DIVIDER : VIEW_TYPE_ITEM;
+    }
+
+    /**
      * 创建 ViewHolder
      * <p>
      * 加载布局文件并创建对应的 ViewHolder 实例。
@@ -92,7 +112,11 @@ public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder
      */
     @NonNull
     @Override
-    public LinkViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == VIEW_TYPE_DIVIDER) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_link_divider, parent, false);
+            return new DividerViewHolder(view);
+        }
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_link, parent, false);
         return new LinkViewHolder(view);
     }
@@ -107,8 +131,10 @@ public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder
      * @param position 数据位置
      */
     @Override
-    public void onBindViewHolder(@NonNull LinkViewHolder holder, int position) {
-        holder.bind(mItems.get(position));
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof LinkViewHolder) {
+            ((LinkViewHolder) holder).bind(mItems.get(position));
+        }
     }
 
     /**
@@ -119,6 +145,15 @@ public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder
     @Override
     public int getItemCount() {
         return mItems.size();
+    }
+
+    /**
+     * Divider ViewHolder (no binding needed)
+     */
+    static class DividerViewHolder extends RecyclerView.ViewHolder {
+        DividerViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
     }
 
     /**

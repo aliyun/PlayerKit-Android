@@ -50,6 +50,12 @@ public class FullscreenSlot extends BaseSlot {
     private static final String TAG = "FullscreenSlot";
 
     /**
+     * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS =
+            Collections.singletonList(FullscreenEvents.Toggle.class);
+
+    /**
      * 播放器组件的宿主视图
      */
     @Nullable
@@ -121,7 +127,7 @@ public class FullscreenSlot extends BaseSlot {
 
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        return Collections.singletonList(FullscreenEvents.Toggle.class);
+        return OBSERVED_EVENTS;
     }
 
     @Override

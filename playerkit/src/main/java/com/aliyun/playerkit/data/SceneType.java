@@ -34,13 +34,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(TYPE_USE)
-@IntDef({
-        SceneType.VOD,
-        SceneType.LIVE,
-        SceneType.VIDEO_LIST,
-        SceneType.RESTRICTED,
-        SceneType.MINIMAL,
-})
+@IntDef({SceneType.VOD, SceneType.LIVE, SceneType.VIDEO_LIST, SceneType.RESTRICTED, SceneType.MINIMAL, SceneType.AI_VOD,})
 public @interface SceneType {
 
     /**
@@ -157,4 +151,40 @@ public @interface SceneType {
      * </p>
      */
     int MINIMAL = 4;
+
+    /**
+     * AI 增强点播场景
+     * <p>
+     * 适用于教育课程、知识视频、内容分析与内容理解等需要 AI 能力增强的点播场景。
+     * </p>
+     * <p>
+     * 功能特性：继承 VOD 场景的基础播放能力，包括 Seek、倍速播放和手势操作等；
+     * 同时支持进度条按章节拆分、章节导航、Seek 过程中的章节信息展示，以及章节解析、
+     * 图文解析等 AI 内容解析能力。
+     * </p>
+     * <p>
+     * 前提条件：章节相关功能需通过
+     * {@link com.aliyun.playerkit.AliPlayerModel.Builder#chapters(java.util.List)}
+     * 提供章节数据。
+     * </p>
+     * <p>
+     * AI-Enhanced VOD Scene
+     * </p>
+     * <p>
+     * Designed for AI-enhanced video-on-demand scenarios such as educational courses,
+     * knowledge-based videos, content analysis, and content understanding.
+     * </p>
+     * <p>
+     * Features: Inherits the standard playback capabilities of the VOD scene,
+     * including seeking, playback speed control, and gesture controls. It also supports
+     * chapter-based progress bar segmentation, chapter navigation, chapter information
+     * display while seeking, and AI-powered content analysis such as chapter analysis
+     * and illustrated content analysis.
+     * </p>
+     * <p>
+     * Prerequisite: Chapter-related features require chapter data to be provided through
+     * {@link com.aliyun.playerkit.AliPlayerModel.Builder#chapters(java.util.List)}.
+     * </p>
+     */
+    int AI_VOD = 5;
 }

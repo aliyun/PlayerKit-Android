@@ -39,6 +39,20 @@ public class LinkItem {
     private String link;
 
     /**
+     * Whether this item is a section divider
+     */
+    private final boolean divider;
+
+    /**
+     * Creates a section divider item
+     *
+     * @return a divider LinkItem instance
+     */
+    public static LinkItem divider() {
+        return new LinkItem(0, "", "", true);
+    }
+
+    /**
      * 构造函数
      * <p>
      * 使用默认空字符串作为初始链接内容。
@@ -48,7 +62,7 @@ public class LinkItem {
      * @param key       存储键名
      */
     public LinkItem(int nameResId, String key) {
-        this(nameResId, key, "");
+        this(nameResId, key, "", false);
     }
 
     /**
@@ -59,9 +73,26 @@ public class LinkItem {
      * @param link      初始链接内容
      */
     public LinkItem(int nameResId, String key, String link) {
+        this(nameResId, key, link, false);
+    }
+
+    /**
+     * Internal constructor
+     */
+    private LinkItem(int nameResId, String key, String link, boolean divider) {
         this.nameResId = nameResId;
         this.key = key;
         this.link = link;
+        this.divider = divider;
+    }
+
+    /**
+     * Whether this item represents a section divider
+     *
+     * @return true if divider
+     */
+    public boolean isDivider() {
+        return divider;
     }
 
     /**

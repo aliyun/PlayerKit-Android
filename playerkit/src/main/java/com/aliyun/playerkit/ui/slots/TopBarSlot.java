@@ -44,6 +44,18 @@ import java.util.List;
  */
 public class TopBarSlot extends BaseControlBarSlot {
 
+    /**
+     * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
+            GestureEvents.SingleTapEvent.class,
+            ControlBarEvents.Show.class,
+            ControlBarEvents.Hide.class,
+            ControlBarEvents.ResetTimer.class,
+            PlayerEvents.SnapshotCompleted.class,
+            PlayerEvents.VideoTitleReady.class
+    );
+
     // ==================== UI 组件 ====================
 
     /**
@@ -61,6 +73,9 @@ public class TopBarSlot extends BaseControlBarSlot {
      * </p>
      */
     private ImageView mIvBack;
+
+    // Whether external title is used (higher priority than MediaInfo)
+    private boolean mExternalTitleUsed = false;
 
     /**
      * 下载按钮
@@ -172,6 +187,9 @@ public class TopBarSlot extends BaseControlBarSlot {
         String title = model.getVideoTitle();
         if (StringUtil.isNotEmpty(title)) {
             mTvTitle.setText(title);
+            mExternalTitleUsed = true;
+        } else {
+            mExternalTitleUsed = false;
         }
     }
 
@@ -180,13 +198,7 @@ public class TopBarSlot extends BaseControlBarSlot {
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        return Arrays.asList(
-                GestureEvents.SingleTapEvent.class,
-                ControlBarEvents.Show.class,
-                ControlBarEvents.Hide.class,
-                ControlBarEvents.ResetTimer.class,
-                PlayerEvents.SnapshotCompleted.class
-        );
+        return OBSERVED_EVENTS;
     }
 
     @Override
@@ -195,6 +207,8 @@ public class TopBarSlot extends BaseControlBarSlot {
 
         if (event instanceof GestureEvents.SingleTapEvent) {
             onSingleTap((GestureEvents.SingleTapEvent) event);
+        } else if (event instanceof PlayerEvents.VideoTitleReady) {
+            onVideoTitleReady((PlayerEvents.VideoTitleReady) event);
         }
     }
 
@@ -215,6 +229,17 @@ public class TopBarSlot extends BaseControlBarSlot {
         } else {
             postEvent(new ControlBarEvents.Show(event.playerId));
         }
+    }
+
+    /**
+     * Handle video title ready event from MediaInfo.
+     * <p>
+     * Only takes effect when no external video title is configured.
+     * </p>
+     */
+    private void onVideoTitleReady(@NonNull PlayerEvents.VideoTitleReady event) {
+        if (mExternalTitleUsed) return;
+        mTvTitle.post(() -> mTvTitle.setText(event.title));
     }
 
     /**

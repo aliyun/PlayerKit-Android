@@ -138,10 +138,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
                         "您的视频 ID",    // 视频 ID
                         "您的播放凭证"    // 播放凭证
                 ))
-                .sceneType(SceneType.VOD)
-                .coverUrl("https://example.com/cover.jpg")  // 替换为实际封面图地址
-                .videoTitle("示例视频")
-                .autoPlay(true)
                 .build());
 
         // 3. 绑定视图
@@ -179,10 +175,6 @@ class VideoPlayerActivity : AppCompatActivity() {
                         "您的视频 ID",    // 视频 ID
                         "您的播放凭证"    // 播放凭证
                 ))
-                .sceneType(SceneType.VOD)
-                .coverUrl("https://example.com/cover.jpg")  // 替换为实际封面图地址
-                .videoTitle("示例视频")
-                .autoPlay(true)
                 .build())
 
         // 3. 绑定视图
@@ -199,6 +191,8 @@ class VideoPlayerActivity : AppCompatActivity() {
 ```
 
 > **提示**：如果暂时无法获取 **视频 ID** 和 **播放凭证**，可使用 `SceneConstants.java` 中提供的示例数据进行测试，以便快速跑通示例。
+
+> 💡 使用 VID 方式播放时，封面图、标题、Seek 缩略图等媒资信息会自动从云端获取，无需手动配置。
 
 ### **步骤 3（可选）：处理返回键**
 

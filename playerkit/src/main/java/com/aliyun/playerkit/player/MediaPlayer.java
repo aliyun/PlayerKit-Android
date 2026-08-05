@@ -1,6 +1,7 @@
 package com.aliyun.playerkit.player;
 
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import com.aliyun.player.IPlayer;
 import com.aliyun.player.bean.ErrorInfo;
 import com.aliyun.player.nativeclass.MediaInfo;
 import com.aliyun.player.nativeclass.PlayerConfig;
+import com.aliyun.player.nativeclass.Thumbnail;
 import com.aliyun.player.nativeclass.TrackInfo;
 import com.aliyun.player.source.UrlSource;
 import com.aliyun.player.source.VidAuth;
@@ -312,7 +314,12 @@ public class MediaPlayer implements IMediaPlayer {
         });
 
         // 媒体信息回调
-        aliPlayer.setOnTrackReadyListener(this::createTrackInfoList);
+        aliPlayer.setOnTrackReadyListener(mediaInfo -> {
+            createTrackInfoList(mediaInfo);
+            extractCoverUrl(mediaInfo);
+            extractVideoTitle(mediaInfo);
+            extractThumbnailUrl(mediaInfo);
+        });
 
         // 清晰度切换回调
         aliPlayer.setOnTrackChangedListener(new IPlayer.OnTrackChangedListener() {
@@ -663,6 +670,80 @@ public class MediaPlayer implements IMediaPlayer {
         TrackQuality firstVideoTrack = filterVideoTrackQualityList.isEmpty() ? null : filterVideoTrackQualityList.get(0);
         if (firstVideoTrack != null) {
             stateStore.updateCurrentTrackIndex(firstVideoTrack.getIndex());
+        }
+    }
+
+    /**
+     * 提取封面图 URL
+     * <p>
+     * 从 MediaInfo 中提取封面图 URL，用于播放前的封面图展示。
+     * 提取成功后通过事件通知相关 Slot 初始化封面图能力。
+     * </p>
+     * <p>
+     * SDK 版本要求：通过 {@code aliPlayer.getMediaInfo().getCoverUrl()} 获取封面图 URL
+     * 需要阿里云播放器 SDK 版本 ≥ 7.16.0，低版本 SDK 该接口可能返回 null。
+     * </p>
+     * Extract cover URL from MediaInfo and publish event.
+     * <p>
+     * Extracts cover URL from MediaInfo for cover image display before playback.
+     * Posts event to notify relevant Slots to initialize cover image capability.
+     * </p>
+     */
+    private void extractCoverUrl(MediaInfo mediaInfo) {
+        if (mediaInfo == null) return;
+        String coverUrl = mediaInfo.getCoverUrl();
+        if (!TextUtils.isEmpty(coverUrl)) {
+            PlayerEventBus.getInstance().post(new PlayerEvents.CoverUrlReady(playerId, coverUrl));
+        }
+    }
+
+    /**
+     * 提取视频标题
+     * <p>
+     * 从 MediaInfo 中提取视频标题，用于显示视频标题。
+     * 提取成功后通过事件通知相关 Slot 初始化视频标题能力。
+     * </p>
+     * <p>
+     * SDK 版本要求：通过 {@code aliPlayer.getMediaInfo().getTitle()} 获取视频标题
+     * 需要阿里云播放器 SDK 版本 ≥ 7.16.0，低版本 SDK 该接口可能返回 null。
+     * </p>
+     * Extracts video title from MediaInfo and publishes event.
+     */
+    private void extractVideoTitle(MediaInfo mediaInfo) {
+        if (mediaInfo == null) return;
+        String title = mediaInfo.getTitle();
+        if (!TextUtils.isEmpty(title)) {
+            PlayerEventBus.getInstance().post(new PlayerEvents.VideoTitleReady(playerId, title));
+        }
+    }
+
+    /**
+     * 提取缩略图 URL
+     * <p>
+     * 从 MediaInfo 中提取缩略图 URL，用于 Seek 时的缩略图预览。
+     * 提取成功后通过事件通知相关 Slot 初始化缩略图能力。
+     * </p>
+     * <p>
+     * SDK 版本要求：通过 {@code aliPlayer.getMediaInfo().getThumbnailList()} 获取缩略图 URL
+     * 需要阿里云播放器 SDK 版本 ≥ 7.16.0，低版本 SDK 该接口可能返回 null。
+     * </p>
+     * <p>
+     * Extract Thumbnail URL
+     * <p>
+     * Extracts thumbnail URL from MediaInfo for seek thumbnail preview.
+     * Posts event to notify relevant Slots to initialize thumbnail capability.
+     * </p>
+     */
+    private void extractThumbnailUrl(MediaInfo mediaInfo) {
+        if (mediaInfo == null) return;
+        List<Thumbnail> thumbnailList = mediaInfo.getThumbnailList();
+        if (thumbnailList != null && !thumbnailList.isEmpty()) {
+            Thumbnail thumbnail = thumbnailList.get(0);
+            if (thumbnail == null) return;
+            String thumbnailUrl = thumbnail.mURL;
+            if (!TextUtils.isEmpty(thumbnailUrl)) {
+                PlayerEventBus.getInstance().post(new PlayerEvents.ThumbnailUrlReady(playerId, thumbnailUrl));
+            }
         }
     }
 

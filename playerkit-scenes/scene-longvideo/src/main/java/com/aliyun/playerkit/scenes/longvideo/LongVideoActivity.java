@@ -64,7 +64,6 @@ public class LongVideoActivity extends AppCompatActivity {
         VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(vid, playAuth);
         AliPlayerModel playerModel = new AliPlayerModel.Builder()
                 .videoSource(videoSource)
-                .videoTitle("Long Video")
                 .build();
 
         // 步骤 4：配置数据并绑定控制器到视图

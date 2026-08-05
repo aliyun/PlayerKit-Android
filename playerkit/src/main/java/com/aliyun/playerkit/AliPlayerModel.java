@@ -4,8 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.aliyun.playerkit.config.OnPlayerConfigCallback;
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.data.VideoSource;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * AliPlayerKit 播放数据模型
@@ -48,15 +53,38 @@ public class AliPlayerModel {
      * <p>
      * Cover image URL (optional).
      * </p>
+     *
+     * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取封面图，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+     * Recommended to use Vid binding; SDK will automatically obtain cover URL after prepared (requires AliPlayer SDK ≥ 7.16.0).
      */
     @Nullable
     private final String coverUrl;
+
+    /**
+     * 缩略图 URL（可选）
+     * <p>
+     * 用于 Seek 时通过 ThumbnailHelper 获取实时缩略图。
+     * </p>
+     * <p>
+     * Thumbnail URL (optional)
+     * <p>
+     * Used to retrieve real-time thumbnails via ThumbnailHelper during seeking.
+     * </p>
+     *
+     * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取缩略图列表，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+     * Recommended to use Vid binding; SDK will automatically obtain thumbnail list after prepared (requires AliPlayer SDK ≥ 7.16.0).
+     */
+    @Nullable
+    private final String thumbnailUrl;
 
     /**
      * 视频标题（可选）
      * <p>
      * Video title (optional).
      * </p>
+     *
+     * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取视频标题，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+     * Recommended to use Vid binding; SDK will automatically obtain video title after prepared (requires AliPlayer SDK ≥ 7.16.0).
      */
     @Nullable
     private final String videoTitle;
@@ -112,6 +140,24 @@ public class AliPlayerModel {
     private final OnPlayerConfigCallback onPlayerConfig;
 
     /**
+     * 章节信息列表（可选）
+     * <p>
+     * 仅在 {@link SceneType#AI_VOD} 场景下使用。
+     * 提供后，BottomBarSlot 会自动在进度条上绘制章节标记点，
+     * 并在用户 Seek 时显示当前章节信息。
+     * </p>
+     * <p>
+     * Chapter info list (optional)
+     * <p>
+     * Only used in {@link SceneType#AI_VOD} scene.
+     * When provided, BottomBarSlot will automatically draw chapter markers on the progress bar
+     * and display chapter info during seek.
+     * </p>
+     */
+    @Nullable
+    private final List<ChapterInfo> chapters;
+
+    /**
      * 私有构造函数，通过 Builder 创建实例
      * <p>
      * Private constructor, create instance through Builder
@@ -123,6 +169,7 @@ public class AliPlayerModel {
         this.videoSource = builder.videoSource;
         this.sceneType = builder.sceneType;
         this.coverUrl = builder.coverUrl;
+        this.thumbnailUrl = builder.thumbnailUrl;
         this.videoTitle = builder.videoTitle;
         this.autoPlay = builder.autoPlay;
         this.traceId = builder.traceId;
@@ -130,6 +177,7 @@ public class AliPlayerModel {
         this.isHardWareDecode = builder.isHardWareDecode;
         this.allowedScreenSleep = builder.allowedScreenSleep;
         this.onPlayerConfig = builder.onPlayerConfig;
+        this.chapters = builder.chapters != null ? Collections.unmodifiableList(new ArrayList<>(builder.chapters)) : null;
     }
 
     /**
@@ -170,10 +218,27 @@ public class AliPlayerModel {
      * </p>
      *
      * @return 封面图 URL，可能为 null
+     * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取封面图，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+     * Recommended to use Vid binding; SDK will automatically obtain cover URL after prepared (requires AliPlayer SDK ≥ 7.16.0).
      */
     @Nullable
     public String getCoverUrl() {
         return coverUrl;
+    }
+
+    /**
+     * 获取缩略图 URL
+     * <p>
+     * Get thumbnail URL for seek preview.
+     * </p>
+     *
+     * @return 缩略图 URL，可能为 null
+     * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取缩略图列表，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+     * Recommended to use Vid binding; SDK will automatically obtain thumbnail list after prepared (requires AliPlayer SDK ≥ 7.16.0).
+     */
+    @Nullable
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
 
     /**
@@ -183,6 +248,8 @@ public class AliPlayerModel {
      * </p>
      *
      * @return 视频标题，可能为 null
+     * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取视频标题，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+     * Recommended to use Vid binding; SDK will automatically obtain video title after prepared (requires AliPlayer SDK ≥ 7.16.0).
      */
     @Nullable
     public String getVideoTitle() {
@@ -264,6 +331,19 @@ public class AliPlayerModel {
     }
 
     /**
+     * 获取章节信息列表
+     * <p>
+     * Get chapter info list
+     * </p>
+     *
+     * @return 章节信息列表（不可变），如果未设置则返回 null
+     */
+    @Nullable
+    public List<ChapterInfo> getChapters() {
+        return chapters;
+    }
+
+    /**
      * 播放器数据构建器
      * <p>
      * 采用 Builder 模式，方便创建 {@link AliPlayerModel} 实例。
@@ -293,6 +373,11 @@ public class AliPlayerModel {
          * 封面图地址，可以为 null
          */
         private String coverUrl;
+
+        /**
+         * 缩略图 URL
+         */
+        private String thumbnailUrl;
 
         /**
          * 视频标题，可以为 null
@@ -328,6 +413,11 @@ public class AliPlayerModel {
          * 实例级播放器自定义配置回调
          */
         private OnPlayerConfigCallback onPlayerConfig;
+
+        /**
+         * 章节信息列表
+         */
+        private List<ChapterInfo> chapters;
 
         /**
          * 设置视频资源对象
@@ -388,10 +478,32 @@ public class AliPlayerModel {
          *
          * @param value 封面图 URL，可以为 null
          * @return 构建器实例，支持链式调用
+         * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取封面图，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+         * Recommended to use Vid binding; SDK will automatically obtain cover URL after prepared (requires AliPlayer SDK ≥ 7.16.0).
          */
         @NonNull
         public Builder coverUrl(@Nullable String value) {
             this.coverUrl = value;
+            return this;
+        }
+
+        /**
+         * 设置缩略图 URL
+         * <p>
+         * 用于 Seek 时通过 ThumbnailHelper 获取实时缩略图。
+         * </p>
+         * <p>
+         * Set thumbnail URL for seek preview via ThumbnailHelper.
+         * </p>
+         *
+         * @param value 缩略图 URL，可以为 null
+         * @return 构建器实例，支持链式调用
+         * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取缩略图列表，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+         * Recommended to use Vid binding; SDK will automatically obtain thumbnail list after prepared (requires AliPlayer SDK ≥ 7.16.0).
+         */
+        @NonNull
+        public Builder thumbnailUrl(@Nullable String value) {
+            this.thumbnailUrl = value;
             return this;
         }
 
@@ -410,6 +522,8 @@ public class AliPlayerModel {
          *
          * @param value 视频标题，可以为 null
          * @return 构建器实例，支持链式调用
+         * @apiNote 推荐使用 Vid 方式绑定视频源，SDK 将在 prepared 后自动获取视频标题，无需手动设置（需要阿里云播放器 SDK 版本 ≥ 7.16.0）。
+         * Recommended to use Vid binding; SDK will automatically obtain video title after prepared (requires AliPlayer SDK ≥ 7.16.0).
          */
         @NonNull
         public Builder videoTitle(@Nullable String value) {
@@ -529,6 +643,30 @@ public class AliPlayerModel {
         }
 
         /**
+         * 设置章节信息列表
+         * <p>
+         * 仅在 {@link SceneType#AI_VOD} 场景下有效。
+         * 提供后，播放器会自动在进度条上绘制章节标记点，
+         * 并在用户 Seek 时显示当前章节信息。
+         * </p>
+         * <p>
+         * Set chapter info list
+         * <p>
+         * Only effective in {@link SceneType#AI_VOD} scene.
+         * When provided, the player will automatically draw chapter markers on the progress bar
+         * and display chapter info during seek.
+         * </p>
+         *
+         * @param value 章节信息列表，可以为 null
+         * @return 构建器实例，支持链式调用
+         */
+        @NonNull
+        public Builder chapters(@Nullable List<ChapterInfo> value) {
+            this.chapters = value;
+            return this;
+        }
+
+        /**
          * 构建 {@link AliPlayerModel} 实例
          * <p>
          * Build {@link AliPlayerModel} instance
@@ -574,6 +712,7 @@ public class AliPlayerModel {
                 "videoSource=" + videoSource +
                 ", sceneType=" + sceneType +
                 ", coverUrl='" + coverUrl + '\'' +
+                ", thumbnailUrl='" + thumbnailUrl + '\'' +
                 ", videoTitle='" + videoTitle + '\'' +
                 ", autoPlay=" + autoPlay +
                 ", traceId='" + traceId + '\'' +
@@ -581,6 +720,7 @@ public class AliPlayerModel {
                 ", isHardWareDecode=" + isHardWareDecode +
                 ", allowedScreenSleep=" + allowedScreenSleep +
                 ", onPlayerConfig=" + onPlayerConfig +
+                ", chapters=" + chapters +
                 '}';
     }
 }

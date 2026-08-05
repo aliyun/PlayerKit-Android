@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/chapter_content_padding_horizontal"
+    android:paddingTop="@dimen/chapter_content_padding_vertical"
+    android:paddingEnd="@dimen/chapter_content_padding_horizontal"
+    android:paddingBottom="@dimen/chapter_content_padding_vertical">
+
+    <ImageView
+        android:id="@+id/iv_thumbnail"
+        android:layout_width="@dimen/chapter_thumbnail_width"
+        android:layout_height="@dimen/chapter_thumbnail_height"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/chapter_content_text_margin_start"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_chapter_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/common_text_white"
+            android:textSize="@dimen/common_text_14" />
+
+        <TextView
+            android:id="@+id/tv_chapter_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/chapter_content_time_margin_top"
+            android:textColor="@color/chapter_secondary_text"
+            android:textSize="@dimen/common_text_12" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_playing_indicator"
+        android:layout_width="@dimen/chapter_content_icon_size"
+        android:layout_height="@dimen/chapter_content_icon_size"
+        android:layout_marginStart="@dimen/chapter_content_icon_margin_start"
+        android:src="@drawable/ic_playing_indicator"
+        android:visibility="gone"
+        android:contentDescription="@null" />
+
+</LinearLayout>

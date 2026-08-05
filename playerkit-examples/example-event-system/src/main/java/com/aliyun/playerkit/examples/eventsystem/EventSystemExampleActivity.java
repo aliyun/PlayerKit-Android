@@ -105,7 +105,6 @@ public class EventSystemExampleActivity extends AppCompatActivity {
         VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(vid, playAuth);
         AliPlayerModel playerModel = new AliPlayerModel.Builder()
                 .videoSource(videoSource)
-                .videoTitle("Event System Example")
                 .build();
         mPlayerController.configure(playerModel);
 

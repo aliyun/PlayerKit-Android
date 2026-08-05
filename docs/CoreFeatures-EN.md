@@ -36,6 +36,8 @@ In terms of architecture, **AliPlayerKit sits on top of the player core**, provi
 | **Component Layer** | Player UI Components | `playerkit/` | Provides out-of-the-box, configurable player UI components covering basic playback and common interactions. |
 | **Scene Layer** | Scenario-based Solutions | `playerkit-scenes/` | Provides standardized integration examples for typical scenarios such as short drama, medium/long video, and live streaming, helping clients rapidly build complete playback capabilities with minimal code. |
 
+> 📌 **Scenario Solution Example**: [AI Education Scene](./scenes/AiEducation-EN.md) — For courses and knowledge videos, providing AI chapter segmentation, summaries, knowledge point analysis, and other enhanced playback experiences.
+
 ---
 
 ## **2. Core Architecture**
@@ -328,6 +330,22 @@ For details, see [Multi Video Source Support](./advanced/VideoSource-EN.md).
 | Instance | `AliPlayerModel.Builder.onPlayerConfig()` | Inside `configure()`, after `setDataSource()` | setConfig, Referer |
 
 For details, see [Custom Config](./advanced/CustomConfig-EN.md).
+
+### **3.8 VID All-in-One Playback**
+
+Through the integration of AliPlayerKit with ApsaraVideo VOD, applications only need to pass a video VID to automatically retrieve the playback resources and associated media information, including the video title, cover image, and thumbnails. This reduces the need to obtain playback URLs, transfer media information, and configure client-side parameters, simplifying playback integration.
+
+After the player enters the `prepared` state, AliPlayerKit automatically extracts the following media information from the cloud-based `MediaInfo` and distributes it to the corresponding Slots through the event system:
+
+| Media Information | Event               | Consumer Slot       | Description                                               |
+| ----------------- | ------------------- | ------------------- | --------------------------------------------------------- |
+| Cover Image URL   | `CoverUrlReady`     | `CoverSlot`         | Displays the cover image before playback                  |
+| Video Title       | `VideoTitleReady`   | `TopBarSlot`        | Displays the video title in the top bar                   |
+| Thumbnail URL     | `ThumbnailUrlReady` | `SeekThumbnailSlot` | Displays thumbnails while the user drags the progress bar |
+
+**Priority rule:** Values manually configured through `AliPlayerModel.Builder` take precedence over values automatically retrieved from `MediaInfo`. Values from `MediaInfo` are used only when the corresponding fields have not been manually configured.
+
+> 💡 This feature requires Alibaba Cloud Player SDK 7.16.0 or later.
 
 ---
 

@@ -13,7 +13,7 @@ import com.aliyun.playerkit.strategy.BaseStrategy;
 import com.aliyun.playerkit.strategy.StrategyContext;
 import com.aliyun.playerkit.utils.ToastUtils;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,6 +34,17 @@ import java.util.List;
 public class StutterDetectStrategy extends BaseStrategy {
 
     private static final String TAG = "StutterDetectStrategy";
+
+    /**
+     * 本策略需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
+            PlayerEvents.LoadingBegin.class,
+            PlayerEvents.LoadingEnd.class,
+            PlayerEvents.StateChanged.class,
+            PlayerEvents.Prepared.class,
+            PlayerEvents.FirstFrameRendered.class
+    );
 
     // Note keria: 暂且不设置卡顿阈值，哪怕 1ms 也会认为卡顿
     private static final int DEFAULT_THRESHOLD_MS = 0;
@@ -149,13 +160,7 @@ public class StutterDetectStrategy extends BaseStrategy {
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        List<Class<? extends PlayerEvent>> events = new ArrayList<>();
-        events.add(PlayerEvents.LoadingBegin.class);
-        events.add(PlayerEvents.LoadingEnd.class);
-        events.add(PlayerEvents.StateChanged.class);
-        events.add(PlayerEvents.Prepared.class);
-        events.add(PlayerEvents.FirstFrameRendered.class);
-        return events;
+        return OBSERVED_EVENTS;
     }
 
     @Override

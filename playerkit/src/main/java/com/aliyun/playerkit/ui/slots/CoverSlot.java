@@ -17,7 +17,7 @@ import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.utils.StringUtil;
 import com.bumptech.glide.Glide;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,8 +40,19 @@ public class CoverSlot extends BaseSlot {
 
     private static final String TAG = "CoverSlot";
 
+    /**
+     * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
+            PlayerEvents.FirstFrameRendered.class,
+            PlayerEvents.CoverUrlReady.class
+    );
+
     // 封面图视图
     private ImageView mCoverImageView;
+
+    // Whether external cover URL is used (higher priority than MediaInfo)
+    private boolean mExternalCoverUsed = false;
 
     public CoverSlot(@NonNull Context context) {
         super(context);
@@ -75,10 +86,11 @@ public class CoverSlot extends BaseSlot {
         // 检查封面图 URL
         String coverUrl = model.getCoverUrl();
         if (StringUtil.isNotEmpty(coverUrl)) {
+            mExternalCoverUsed = true;
             loadCover(coverUrl);
         } else {
-            LogHub.i(TAG, "No cover url found in data, hide cover");
-            gone();
+            mExternalCoverUsed = false;
+            LogHub.i(TAG, "No external cover url, waiting for MediaInfo");
         }
     }
 
@@ -112,14 +124,27 @@ public class CoverSlot extends BaseSlot {
 
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        return Collections.singletonList(PlayerEvents.FirstFrameRendered.class);
+        return OBSERVED_EVENTS;
     }
 
     @Override
     protected void onEvent(@NonNull PlayerEvent event) {
         if (event instanceof PlayerEvents.FirstFrameRendered) {
             onFirstFrameRendered((PlayerEvents.FirstFrameRendered) event);
+        } else if (event instanceof PlayerEvents.CoverUrlReady) {
+            onCoverUrlReady((PlayerEvents.CoverUrlReady) event);
         }
+    }
+
+    /**
+     * Handle cover URL ready event from MediaInfo.
+     * <p>
+     * Only takes effect when no external cover URL is configured.
+     * </p>
+     */
+    private void onCoverUrlReady(@NonNull PlayerEvents.CoverUrlReady event) {
+        if (mExternalCoverUsed) return;
+        mCoverImageView.post(() -> loadCover(event.coverUrl));
     }
 
     /**

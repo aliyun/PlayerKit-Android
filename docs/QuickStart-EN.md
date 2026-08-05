@@ -138,10 +138,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
                         "Your Video ID",    // Video ID
                         "Your PlayAuth"     // Playback credential
                 ))
-                .sceneType(SceneType.VOD)
-                .coverUrl("https://example.com/cover.jpg")  // Replace with the actual cover image URL
-                .videoTitle("Sample Video")
-                .autoPlay(true)
                 .build());
 
         // 3. Bind the view
@@ -179,10 +175,6 @@ class VideoPlayerActivity : AppCompatActivity() {
                         "Your Video ID",    // Video ID
                         "Your PlayAuth"     // Playback credential
                 ))
-                .sceneType(SceneType.VOD)
-                .coverUrl("https://example.com/cover.jpg")  // Replace with the actual cover image URL
-                .videoTitle("Sample Video")
-                .autoPlay(true)
                 .build())
 
         // 3. Bind the view
@@ -199,6 +191,8 @@ class VideoPlayerActivity : AppCompatActivity() {
 ```
 
 > **Tip**: If you are temporarily unable to obtain a **Video ID** and **PlayAuth**, you can use the example data provided in `SceneConstants.java` for testing, in order to quickly run through the example.
+
+> 💡 When playing a video by VID, associated media information—including the cover image, title, and seek thumbnails—is automatically retrieved from the cloud, with no manual configuration required.
 
 ### **Step 3 (Optional): Handle the Back Key**
 

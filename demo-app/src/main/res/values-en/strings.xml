@@ -22,6 +22,10 @@
     <string name="short_video_page_title">Short Video Playback</string>
     <string name="short_video_page_schema">playerkit://scenes/shortvideo</string>
 
+    <!-- AI Education Page -->
+    <string name="ai_education_page_title">AI Education</string>
+    <string name="ai_education_page_schema">playerkit://scenes/aieducation</string>
+
     <!-- Video Source Example Page -->
     <string name="video_source_example_page_title">Video Source Example</string>
     <string name="video_source_example_page_schema">playerkit://examples/videosource</string>

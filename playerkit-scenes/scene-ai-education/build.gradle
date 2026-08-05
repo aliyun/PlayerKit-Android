@@ -1,0 +1,65 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace = "com.aliyun.playerkit.scenes.aieducation"
+
+    compileSdkVersion 33
+    buildToolsVersion "33.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 33
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+def okhttp_version = "4.8.1"
+def glide_version = "4.13.0"
+def gson_version = "2.8.0"
+def markwon_version = "4.6.2"
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'com.google.android.material:material:1.6.0'
+
+    // Markdown rendering
+    implementation "io.noties.markwon:core:$markwon_version"
+    implementation "io.noties.markwon:html:$markwon_version"
+    implementation "io.noties.markwon:ext-tables:$markwon_version"
+    implementation "io.noties.markwon:ext-strikethrough:$markwon_version"
+    implementation "io.noties.markwon:image-glide:$markwon_version"
+
+    // OkHttp库，用于高效的网络请求
+    // OkHttp library for efficient network requests
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+
+    // Glide库，图片加载和缓存的工具
+    // Glide library for loading and caching images
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+
+    // Gson库，用于将Java对象与JSON之间进行转换
+    // Gson library for converting Java objects to and from JSON
+    implementation "com.google.code.gson:gson:$gson_version"
+
+    // AliPlayerKit core module
+    implementation project(':playerkit')
+
+    // Scene common (provides SceneConstants)
+    implementation project(':playerkit-scenes:scene-common')
+}

@@ -2,7 +2,6 @@ package com.aliyun.playerkit.ui.slots;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -17,7 +16,7 @@ import com.aliyun.playerkit.data.TrackQuality;
 import com.aliyun.playerkit.event.ControlBarEvents;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
-import com.aliyun.playerkit.slot.BaseSlot;
+import com.aliyun.playerkit.slot.BasePanelSlot;
 import com.aliyun.playerkit.slot.SlotElements;
 import com.aliyun.playerkit.ui.setting.SettingConstants;
 import com.aliyun.playerkit.ui.setting.SettingItem;
@@ -25,24 +24,56 @@ import com.aliyun.playerkit.ui.setting.SettingMenuDialogFragment;
 import com.aliyun.playerkit.ui.setting.SettingOptions;
 import com.aliyun.playerkit.utils.StringUtil;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * 设置菜单插槽（Stub）。
+ * 设置菜单插槽（控制器角色）。
  * <p>
- * 无 UI 的事件桥接层，仍注册为 SETTING_MENU 参与 element 体系。
- * 接收 ShowSettings 事件后，构建过滤后的设置项并弹出 {@link SettingMenuDialogFragment}。
+ * 继承 {@link BasePanelSlot}，保持统一 API、状态管理和防重入能力。
+ * 自身不渲染面板内容，仅作为控制器，将面板的实际渲染委托给
+ * {@link SettingMenuDialogFragment}（拥有独立 Window，从屏幕边界弹出）。
  * </p>
  *
  * @author keria
  */
-public class SettingMenuSlot extends BaseSlot {
+public class SettingMenuSlot extends BasePanelSlot {
 
     private static final String TAG = "SettingMenuSlot";
-    private static final String DIALOG_TAG = "SettingMenuDialog";
+
+    private static final String FRAGMENT_TAG = "SettingMenuDialog";
+
+    /**
+     * 横屏模式下需要排除的设置项 key 列表。
+     * <p>
+     * 横屏时倍速和清晰度由独立的 Slot 控制，无需在设置菜单中重复展示。
+     * </p>
+     */
+    private static final List<String> LANDSCAPE_EXCLUDED_KEYS = Arrays.asList(
+            SettingConstants.KEY_SPEED, SettingConstants.KEY_QUALITY);
+
+    /**
+     * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
+            ControlBarEvents.ShowSettings.class,
+            PlayerEvents.SetSpeedCompleted.class,
+            PlayerEvents.SetLoopCompleted.class,
+            PlayerEvents.SetMuteCompleted.class,
+            PlayerEvents.SetScaleTypeCompleted.class,
+            PlayerEvents.SetMirrorTypeCompleted.class,
+            PlayerEvents.SetRotationCompleted.class,
+            PlayerEvents.TrackQualityListUpdated.class,
+            PlayerEvents.TrackSelected.class
+    );
+
+    // -- DialogFragment --
+
+    @Nullable
+    private SettingMenuDialogFragment mDialogFragment;
+
+    // -- Data --
 
     @Nullable
     private String mPlayerId;
@@ -50,22 +81,65 @@ public class SettingMenuSlot extends BaseSlot {
     @SceneType
     private int mSceneType = SceneType.VOD;
 
+    /**
+     * 全量设置项列表（竖屏使用）
+     */
     private final List<SettingItem<?>> mItems = new ArrayList<>();
 
-    @Nullable
-    private WeakReference<SettingMenuDialogFragment> mDialogRef;
+    /**
+     * 横屏设置项列表（排除了 LANDSCAPE_EXCLUDED_KEYS 中的项）
+     */
+    private final List<SettingItem<?>> mLandscapeItems = new ArrayList<>();
+
+    // ==================== 构造 ====================
 
     public SettingMenuSlot(@NonNull Context context) {
         super(context);
+        // 该 Slot 不渲染任何内容，始终不可见
+        setVisibility(View.GONE);
     }
 
-    public SettingMenuSlot(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    /**
+     * 不加载布局，该 Slot 仅作为控制器。
+     */
+    @Override
+    protected int getLayoutId() {
+        return 0;
     }
 
-    public SettingMenuSlot(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    // ==================== BasePanelSlot 实现 ====================
+
+    @Override
+    protected void onPerformShowAnimation() {
+        FragmentActivity activity = getFragmentActivity();
+        if (activity == null) return;
+        if (activity.isFinishing() || activity.isDestroyed()) return;
+        FragmentManager fm = activity.getSupportFragmentManager();
+        if (fm.isStateSaved()) return;
+
+        mDialogFragment = SettingMenuDialogFragment.newInstance();
+        mDialogFragment.setItems(mItems, mLandscapeItems);
+        mDialogFragment.setOnDismissListener(() -> {
+            // DialogFragment 被关闭时（用户操作或系统行为），同步 Slot 状态。
+            // hidePanel() 内部有 mIsShowing 防重入守卫，如果是 Slot 主动调用的
+            // hidePanel → onPerformHideAnimation 路径，此时 mIsShowing 已为 false，
+            // 再次调用 hidePanel() 会被守卫拦截，不会产生循环。
+            mDialogFragment = null;
+            hidePanel();
+        });
+        mDialogFragment.show(fm, FRAGMENT_TAG);
     }
+
+    @Override
+    protected void onPerformHideAnimation() {
+        SettingMenuDialogFragment fragment = mDialogFragment;
+        mDialogFragment = null;
+        if (fragment != null && fragment.isAdded()) {
+            fragment.dismissWithAnimation();
+        }
+    }
+
+    // ==================== Slot 生命周期 ====================
 
     @Override
     public void onAttach(@NonNull com.aliyun.playerkit.slot.SlotHost host) {
@@ -82,33 +156,61 @@ public class SettingMenuSlot extends BaseSlot {
 
     @Override
     public void onUnbindData() {
-        dismissDialog();
+        if (isShowing()) {
+            hidePanel();
+        }
         mPlayerId = null;
         mSceneType = SceneType.VOD;
-        mItems.clear();
+        clearItems();
         super.onUnbindData();
+    }
+
+    @Override
+    public void onDetach() {
+        if (mDialogFragment != null) {
+            mDialogFragment.dismissAllowingStateLoss();
+            mDialogFragment = null;
+        }
+        clearItems();
+        super.onDetach();
     }
 
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        dismissDialog();
+        if (isShowing()) {
+            // 旋转时直接隐藏面板（同原实现行为）
+            hidePanel();
+        }
     }
+
+    // ==================== 公开 API ====================
+
+    @Override
+    public boolean isShow() {
+        return isShowing();
+    }
+
+    @Override
+    public void show() {
+        if (!isShowing()) {
+            doShowPanel();
+        }
+    }
+
+    @Override
+    public void gone() {
+        if (isShowing()) {
+            hidePanel();
+        }
+    }
+
+    // ==================== 事件处理 ====================
 
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        return Arrays.asList(
-                ControlBarEvents.ShowSettings.class,
-                PlayerEvents.SetSpeedCompleted.class,
-                PlayerEvents.SetLoopCompleted.class,
-                PlayerEvents.SetMuteCompleted.class,
-                PlayerEvents.SetScaleTypeCompleted.class,
-                PlayerEvents.SetMirrorTypeCompleted.class,
-                PlayerEvents.SetRotationCompleted.class,
-                PlayerEvents.TrackQualityListUpdated.class,
-                PlayerEvents.TrackSelected.class
-        );
+        return OBSERVED_EVENTS;
     }
 
     @Override
@@ -118,7 +220,7 @@ public class SettingMenuSlot extends BaseSlot {
         }
 
         if (event instanceof ControlBarEvents.ShowSettings) {
-            toggleDialog();
+            togglePanel();
         } else if (event instanceof PlayerEvents.TrackQualityListUpdated) {
             updateClarityOptions(((PlayerEvents.TrackQualityListUpdated) event).trackQualityList);
         } else if (event instanceof PlayerEvents.TrackSelected) {
@@ -138,21 +240,17 @@ public class SettingMenuSlot extends BaseSlot {
         }
     }
 
-    // ---------------------------------------------------------------------
-    // Dialog management
-    // ---------------------------------------------------------------------
+    // ==================== 面板显隐 ====================
 
-    private void toggleDialog() {
-        if (isDialogShowing()) {
-            dismissDialog();
+    private void togglePanel() {
+        if (isShowing()) {
+            hidePanel();
         } else {
-            showDialog();
+            doShowPanel();
         }
     }
 
-    private void showDialog() {
-        FragmentManager fm = getFragmentManager();
-        if (fm == null || fm.isStateSaved()) return;
+    private void doShowPanel() {
         if (mPlayerId == null) return;
 
         postEvent(new ControlBarEvents.Hide(mPlayerId));
@@ -160,72 +258,16 @@ public class SettingMenuSlot extends BaseSlot {
         buildItems();
         syncWithPlayerState();
 
-        SettingMenuDialogFragment dialog = SettingMenuDialogFragment.newInstance();
-        dialog.setItems(mItems);
-        dialog.show(fm, DIALOG_TAG);
-        mDialogRef = new WeakReference<>(dialog);
+        showPanel();
     }
 
-    private void dismissDialog() {
-        if (!isDialogShowing()) {
-            mDialogRef = null;
-            return;
-        }
-        SettingMenuDialogFragment dialog = getDialog();
-        if (dialog != null) {
-            dialog.dismissImmediately();
-        }
-        mDialogRef = null;
-    }
-
-    private boolean isDialogShowing() {
-        SettingMenuDialogFragment dialog = getDialog();
-        return dialog != null && dialog.isAdded() && !dialog.isRemoving();
-    }
-
-    @Nullable
-    private SettingMenuDialogFragment getDialog() {
-        return mDialogRef != null ? mDialogRef.get() : null;
-    }
-
-    @Nullable
-    private FragmentManager getFragmentManager() {
-        Context context = getContext();
-        if (context instanceof FragmentActivity) {
-            FragmentActivity activity = (FragmentActivity) context;
-            if (!activity.isFinishing() && !activity.isDestroyed()) {
-                return activity.getSupportFragmentManager();
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public boolean isShow() {
-        return isDialogShowing();
-    }
-
-    @Override
-    public void show() {
-        if (!isDialogShowing()) {
-            showDialog();
-        }
-    }
-
-    @Override
-    public void gone() {
-        dismissDialog();
-    }
-
-    // ---------------------------------------------------------------------
-    // Data
-    // ---------------------------------------------------------------------
+    // ==================== 数据管理 ====================
 
     private void buildItems() {
         mItems.clear();
+        mLandscapeItems.clear();
         for (SettingItem<?> item : SettingConstants.createDefaultItems(this)) {
-            if ((mSceneType == SceneType.LIVE || mSceneType == SceneType.RESTRICTED)
-                    && SettingConstants.KEY_SPEED.equals(item.key)) {
+            if ((mSceneType == SceneType.LIVE || mSceneType == SceneType.RESTRICTED) && SettingConstants.KEY_SPEED.equals(item.key)) {
                 continue;
             }
             if (mSceneType == SceneType.LIVE && SettingConstants.KEY_LOOP.equals(item.key)) {
@@ -236,6 +278,9 @@ public class SettingMenuSlot extends BaseSlot {
                 continue;
             }
             mItems.add(item);
+            if (!LANDSCAPE_EXCLUDED_KEYS.contains(item.key)) {
+                mLandscapeItems.add(item);
+            }
         }
     }
 
@@ -257,10 +302,9 @@ public class SettingMenuSlot extends BaseSlot {
         applyItemValue(SettingConstants.KEY_ROTATE, store.getCurrentRotation());
     }
 
-    private void notifyDialog() {
-        SettingMenuDialogFragment dialog = getDialog();
-        if (dialog != null) {
-            dialog.notifyItemsChanged();
+    private void notifyAdapters() {
+        if (mDialogFragment != null) {
+            mDialogFragment.notifyDataChanged();
         }
     }
 
@@ -275,7 +319,7 @@ public class SettingMenuSlot extends BaseSlot {
 
     private void updateItemValue(@NonNull String key, @Nullable Object newValue) {
         if (applyItemValue(key, newValue)) {
-            notifyDialog();
+            notifyAdapters();
         }
     }
 
@@ -293,7 +337,7 @@ public class SettingMenuSlot extends BaseSlot {
 
     private void updateClarityOptions(@Nullable List<TrackQuality> qualityList) {
         if (applyClarityOptions(qualityList)) {
-            notifyDialog();
+            notifyAdapters();
         }
     }
 
@@ -314,7 +358,7 @@ public class SettingMenuSlot extends BaseSlot {
 
     private void updateSelectedTrack(int trackIndex) {
         if (applySelectedTrack(trackIndex)) {
-            notifyDialog();
+            notifyAdapters();
         }
     }
 
@@ -327,6 +371,14 @@ public class SettingMenuSlot extends BaseSlot {
             }
         }
         return null;
+    }
+
+    private void clearItems() {
+        for (SettingItem<?> item : mItems) {
+            item.listener = null;
+        }
+        mItems.clear();
+        mLandscapeItems.clear();
     }
 
     @Nullable
@@ -349,5 +401,16 @@ public class SettingMenuSlot extends BaseSlot {
             default:
                 return null;
         }
+    }
+
+    // ==================== 工具方法 ====================
+
+    @Nullable
+    private FragmentActivity getFragmentActivity() {
+        Context context = getContext();
+        if (context instanceof FragmentActivity) {
+            return (FragmentActivity) context;
+        }
+        return null;
     }
 }

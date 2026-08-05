@@ -147,8 +147,8 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 |-----|------|------|
 | `videoSource(VideoSource)` | 视频源对象 | 设置视频资源（必填） |
 | `sceneType(int)` | 场景类型 | 设置播放场景类型 |
-| `coverUrl(String)` | 封面图 URL | 设置封面图地址 |
-| `videoTitle(String)` | 视频标题 | 设置视频标题 |
+| `coverUrl(String)` | 封面图 URL | 设置封面图地址（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
+| `videoTitle(String)` | 视频标题 | 设置视频标题（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
 | `autoPlay(boolean)` | 是否自动播放 | 设置是否自动播放 |
 | `traceId(String)` | 跟踪 ID | 设置跟踪标识 |
 | `startTime(long)` | 起播位置 | 设置起播位置（毫秒） |
@@ -538,6 +538,9 @@ PlayerEventBus.getInstance().post(new PlayerCommand.SetSpeed(playerId, 1.5f));
 | `PlayerEvents.SetRotationCompleted` | rotation | 设置旋转完成 |
 | `PlayerEvents.TrackQualityListUpdated` | trackQualityList | 清晰度列表更新 |
 | `PlayerEvents.TrackSelected` | trackIndex | 清晰度选择完成 |
+| `PlayerEvents.CoverUrlReady` | coverUrl | VID 播放时从 MediaInfo 自动提取的封面图 URL 就绪 |
+| `PlayerEvents.VideoTitleReady` | title | VID 播放时从 MediaInfo 自动提取的视频标题就绪 |
+| `PlayerEvents.ThumbnailUrlReady` | thumbnailUrl | VID 播放时从 MediaInfo 自动提取的缩略图 URL 就绪 |
 
 **使用示例**
 

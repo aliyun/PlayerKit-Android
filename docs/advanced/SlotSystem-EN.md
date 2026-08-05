@@ -76,6 +76,7 @@ The Slot System decouples UI components from the player component, allowing cust
 | TOP_BAR | Top Bar, displays back/title/settings, etc. | TopBarSlot |
 | BOTTOM_BAR | Bottom Bar, displays playback controls/progress bar | BottomBarSlot |
 | SETTING_MENU | Settings Menu, displays speed/quality/mirror settings (headless event bridge; actual UI is rendered by SettingMenuDialogFragment) | SettingMenuSlot |
+| SEEK_THUMBNAIL | Seek thumbnail preview | SeekThumbnailSlot |
 | OPTION_PANEL | Option panel, an independent selection panel for speed/quality shown in landscape scenarios | OptionPanelSlot |
 
 ### **3.2 Scene Adaptation**
@@ -768,6 +769,7 @@ The player UI consists of multiple stacked slots; the z-order directly determine
 | PLAY_STATE | 60 | Status layer | Loading/error messages |
 | LOG_PANEL | 70 | Debug layer | Log panel |
 | TOP_BAR | 80 | Control layer | Top Bar |
+| SEEK_THUMBNAIL | 85 | Control layer | Seek thumbnail preview. Displays a video frame thumbnail and timestamp for the target position when dragging the progress bar. Requires AliPlayer SDK ≥ 7.16.0 |
 | BOTTOM_BAR | 90 | Control layer | Bottom Bar |
 | SETTING_MENU | 100 | Menu layer | Settings Menu overlay |
 | OPTION_PANEL | 110 | Menu layer | Option panel (landscape speed/quality) |
