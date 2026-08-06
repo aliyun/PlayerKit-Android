@@ -73,7 +73,7 @@ public final class AiContentConstants {
      * The App Server address configured in the demo settings page (Link Settings) takes
      * precedence over this constant. It is for debugging only and can be ignored for integration.
      */
-    public static final String APP_SERVER_BASE_URL = "http://30.203.164.170:9000";
+    public static final String APP_SERVER_BASE_URL = "https://vodappserver-gwzwacvbyf.cn-shanghai.fcapp.run";
 
     // ==================== Default Values ====================
 
@@ -113,7 +113,7 @@ public final class AiContentConstants {
      * real integration, you should dynamically pass the actual MediaId based on your business
      * scenario.
      */
-    public static final String DEFAULT_MEDIA_ID = "201558617a9e71f1bfb9e6e7e5780102";
+    public static final String DEFAULT_MEDIA_ID = "30158cf1907c71f180176723a78f0102";
 
     // ==================== API Endpoints ====================
 

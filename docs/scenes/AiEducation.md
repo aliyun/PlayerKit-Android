@@ -100,23 +100,49 @@ startActivity(intent)
 
 ## **5. 架构概览**
 
-### **5.1 业务流程**
+AI 教育场景由客户端、App Server、ICE / AI 工作流和 VOD 服务共同组成。
+
+整体链路分为两个阶段：
+
+- **生产阶段**：App Server 触发 AI 分析工作流，ICE 获取媒资并完成章节提取、摘要生成和知识点分析，随后将结构化结果回写至 VOD。
+- **消费阶段**：客户端通过 App Server 获取播放凭证和 AI 分析结果，并由 PlayerKit 完成视频播放、章节跳转和 AI 内容展示。
+
+### **5.1 全局业务流程**
+
+全局业务流程描述 AI 分析结果从生产、存储到客户端消费的完整链路。
+
+其中，VOD 负责媒资及 AI 分析结果的统一存储；ICE / AI 工作流负责内容理解和结构化分析；App Server 对服务端能力进行封装，并向客户端提供统一接口。
+
+![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/ProductArchitecture.png)
+
+### **5.2 客户端交互流程**
+
+客户端交互流程描述用户进入 AI 教育播放页后，客户端、PlayerKit 与 App Server 之间的调用关系。
+
+页面初始化时，客户端并行或依次获取播放凭证和 AI 分析结果；数据加载完成后，用户可以通过章节面板查看章节、摘要和知识点，并跳转到对应的视频位置。
 
 ![CallSequence](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/CallSequence.png)
 
-### **5.2 分层架构**
+当 AI 分析接口请求失败或结果为空时，客户端仍可使用播放凭证完成普通视频播放，但不展示章节和 AI 分析面板。
+
+### **5.3 客户端分层架构**
+
+客户端采用场景层、PlayerKit 能力层和播放器 SDK 分层设计。
+
+场景层负责页面编排、数据加载和 AI 内容展示；PlayerKit 通过 Slot 机制提供播放器控制栏入口及面板扩展能力；底层播放器 SDK 负责媒资播放、进度控制和播放状态回调。
 
 ![LayeredArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/LayeredArchitecture.png)
 
 **组件职责**：
 
-| 组件                         | 说明                                                        |
-| ---------------------------- | ----------------------------------------------------------- |
-| `AiEducationActivity`        | 实现 `AiContentRepository` 接口，编排数据加载与播放器初始化 |
-| `AiContentLoader`            | 后台线程执行网络请求，主线程回调结果                        |
-| `ChapterButtonSlot`          | 播放器控制栏显示「章节」按钮，点击触发面板展开              |
-| `ChapterPanelSlot`           | 面板控制器，管理 `DialogFragment` 的展示与状态同步          |
-| `ChapterPanelDialogFragment` | 实际面板 UI，含章节列表和 AI 分析 Tab 页                    |
+| 组件                         | 说明                                                         |
+| ---------------------------- | ------------------------------------------------------------ |
+| `AiEducationActivity`        | 场景入口，实现 `AiContentRepository` 接口，编排数据加载、播放器初始化和 Slot 注册 |
+| `AiContentLoader`            | 在后台线程请求播放凭证和 AI 分析结果，并在主线程回调处理结果 |
+| `ChapterButtonSlot`          | 在播放器控制栏中展示「章节」按钮，并触发章节面板的展开或关闭 |
+| `ChapterPanelSlot`           | 面板控制器，负责管理 `DialogFragment` 的展示、关闭和状态同步 |
+| `ChapterPanelDialogFragment` | 章节面板 UI，展示章节列表、视频摘要、章节摘要和知识点        |
+| `AliPlayerController`        | 提供视频加载、播放控制、Seek 和播放进度回调等基础能力        |
 
 ---
 

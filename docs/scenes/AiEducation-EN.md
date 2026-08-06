@@ -100,23 +100,49 @@ After the page launches, the video will load automatically. The player displays 
 
 ## **5. Architecture Overview**
 
-### **5.1 Business Flow**
+The AI Education Scene is composed of the client, App Server, ICE / AI workflow, and VOD services.
+
+The overall pipeline is divided into two phases:
+
+- **Production Phase**: The App Server triggers the AI analysis workflow; ICE fetches media assets and completes chapter extraction, summary generation, and knowledge point analysis, then writes the structured results back to VOD.
+- **Consumption Phase**: The client obtains play credentials and AI analysis results through the App Server, and PlayerKit handles video playback, chapter navigation, and AI content display.
+
+### **5.1 Global Business Flow**
+
+The global business flow describes the complete pipeline from production, storage, to client consumption of AI analysis results.
+
+VOD is responsible for unified storage of media assets and AI analysis results; ICE / AI workflow handles content understanding and structured analysis; App Server encapsulates server-side capabilities and provides a unified interface to the client.
+
+![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/ProductArchitecture-EN.png)
+
+### **5.2 Client Interaction Flow**
+
+The client interaction flow describes the calling relationships between the client, PlayerKit, and App Server after the user enters the AI Education playback page.
+
+During page initialization, the client obtains play credentials and AI analysis results in parallel or sequentially; after data loading is complete, users can view chapters, summaries, and knowledge points through the chapter panel, and jump to the corresponding video position.
 
 ![CallSequence](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/CallSequence-EN.png)
 
-### **5.2 Layered Architecture**
+When the AI analysis API request fails or returns empty results, the client can still use the play credentials to complete normal video playback, but will not display the chapter and AI analysis panel.
+
+### **5.3 Client Layered Architecture**
+
+The client adopts a layered design consisting of the Scene Layer, PlayerKit Capability Layer, and Player SDK.
+
+The Scene Layer is responsible for page orchestration, data loading, and AI content display; PlayerKit provides player control bar entry points and panel extension capabilities through the Slot mechanism; the underlying Player SDK handles media playback, progress control, and playback state callbacks.
 
 ![LayeredArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/LayeredArchitecture-EN.png)
 
 **Component Responsibilities**:
 
 | Component | Description |
-| ---------------------------- | ----------------------------------------------------------- |
-| `AiEducationActivity` | Implements `AiContentRepository` interface, orchestrates data loading and player initialization |
-| `AiContentLoader` | Executes network requests on background thread, callbacks results on main thread |
-| `ChapterButtonSlot` | Displays "Chapter" button in the player control bar, triggers panel expansion on click |
-| `ChapterPanelSlot` | Panel controller, manages `DialogFragment` display and state synchronization |
-| `ChapterPanelDialogFragment` | Actual panel UI, containing chapter list and AI analysis tab pages |
+| ---------------------------- | ------------------------------------------------------------ |
+| `AiEducationActivity` | Scene entry point, implements the `AiContentRepository` interface, orchestrates data loading, player initialization, and Slot registration |
+| `AiContentLoader` | Requests play credentials and AI analysis results on a background thread, and callbacks results on the main thread |
+| `ChapterButtonSlot` | Displays the "Chapter" button in the player control bar, and triggers expansion or collapse of the chapter panel |
+| `ChapterPanelSlot` | Panel controller, responsible for managing `DialogFragment` display, dismissal, and state synchronization |
+| `ChapterPanelDialogFragment` | Chapter panel UI, displaying the chapter list, video summary, chapter summary, and knowledge points |
+| `AliPlayerController` | Provides fundamental capabilities including video loading, playback control, seek, and playback progress callbacks |
 
 ---
 
