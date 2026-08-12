@@ -67,7 +67,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ChapterInfo chapter = mChapters.get(position);
         holder.tvTitle.setText(chapter.getTitle());
-        holder.tvTime.setText(FormatUtil.formatTime(chapter.getStartMs()));
+        holder.tvTime.setText(FormatUtil.formatDuration(chapter.getStartMs()));
 
         // Highlight current chapter
         boolean isCurrent = (position == mCurrentIndex);

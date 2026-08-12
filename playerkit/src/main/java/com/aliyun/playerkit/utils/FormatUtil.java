@@ -114,17 +114,4 @@ public class FormatUtil {
     public static String formatCurrentTime() {
         return String.format(Locale.getDefault(), "%tT", System.currentTimeMillis());
     }
-
-    /**
-     * 格式化时间
-     *
-     * @param ms 时间毫秒
-     * @return 格式化后的时间字符串
-     */
-    public static String formatTime(long ms) {
-        long totalSeconds = ms / 1000;
-        long minutes = totalSeconds / 60;
-        long seconds = totalSeconds % 60;
-        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
-    }
 }

@@ -148,7 +148,7 @@ public class SegmentListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private void bindSegment(@NonNull SegmentViewHolder holder, int segmentIndex) {
         AiSegment segment = mSegments.get(segmentIndex);
         holder.tvTitle.setText(segment.getTitle());
-        holder.tvTime.setText(FormatUtil.formatTime(segment.getStartMs()));
+        holder.tvTime.setText(FormatUtil.formatDuration(segment.getStartMs()));
 
         // Highlight state
         boolean isCurrent = (segmentIndex == mCurrentSegmentIndex);
