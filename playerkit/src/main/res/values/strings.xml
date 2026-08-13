@@ -35,6 +35,19 @@
     <string name="setting_item_scale">渲染填充</string>
     <string name="setting_item_rotate">旋转模式</string>
 
+    <!-- 设置菜单：镜像模式选项 -->
+    <string name="setting_option_mirror_none">无</string>
+    <string name="setting_option_mirror_horizontal">水平</string>
+    <string name="setting_option_mirror_vertical">垂直</string>
+
+    <!-- 设置菜单：渲染填充选项 -->
+    <string name="setting_option_scale_fit_xy">拉伸填充</string>
+    <string name="setting_option_scale_fit_center">适应</string>
+    <string name="setting_option_scale_center_crop">裁剪填充</string>
+
+    <!-- 通用文案 -->
+    <string name="common_unknown">未知</string>
+
     <!-- 日志面板插槽 -->
     <string name="log_panel_title_show">调试日志面板（点击显示）</string>
     <string name="log_panel_title_hide">调试日志面板（点击关闭）</string>

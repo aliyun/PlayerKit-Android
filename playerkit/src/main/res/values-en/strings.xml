@@ -35,6 +35,19 @@
     <string name="setting_item_scale">Scale Mode</string>
     <string name="setting_item_rotate">Rotate Mode</string>
 
+    <!-- Settings Menu: Mirror mode options -->
+    <string name="setting_option_mirror_none">None</string>
+    <string name="setting_option_mirror_horizontal">Horizontal</string>
+    <string name="setting_option_mirror_vertical">Vertical</string>
+
+    <!-- Settings Menu: Scale mode options -->
+    <string name="setting_option_scale_fit_xy">Stretch Fill</string>
+    <string name="setting_option_scale_fit_center">Fit</string>
+    <string name="setting_option_scale_center_crop">Crop Fill</string>
+
+    <!-- Common -->
+    <string name="common_unknown">Unknown</string>
+
     <!-- Log panel slot -->
     <string name="log_panel_title_show">Debug Log Panel (Tap to Show)</string>
     <string name="log_panel_title_hide">Debug Log Panel (Tap to Close)</string>

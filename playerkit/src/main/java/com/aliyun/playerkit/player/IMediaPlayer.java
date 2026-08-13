@@ -61,6 +61,21 @@ public interface IMediaPlayer {
          * 等比填充（可能裁剪）
          */
         int CENTER_CROP = 2;
+
+        /**
+         * 默认渲染填充模式
+         * <p>
+         * <b>全局唯一来源</b>：播放状态的初始值与重置值、以及各处读取不到当前填充模式时的兜底分支都引用此常量。
+         * 要变更播放器的默认填充模式，只需改这一处。它是上方三个取值之一的别名，不是新的取值，
+         * 因此不加入 {@code @IntDef} 列表。
+         * </p>
+         * <p>
+         * Default scale type. Single source of truth — referenced by the state store's initial/reset value
+         * and by every fallback branch. It aliases one of the values above rather than adding a new one,
+         * hence it is not listed in {@code @IntDef}.
+         * </p>
+         */
+        int DEFAULT = FIT_CENTER;
     }
 
     /**

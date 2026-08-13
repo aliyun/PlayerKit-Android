@@ -1,5 +1,7 @@
 package com.aliyun.playerkit.utils;
 
+import com.aliyun.playerkit.R;
+import com.aliyun.playerkit.locale.PlayerLocale;
 import com.aliyun.playerkit.player.IMediaPlayer;
 
 import java.util.Locale;
@@ -60,6 +62,9 @@ public class FormatUtil {
 
     /**
      * 格式化渲染填充模式
+     * <p>
+     * 返回当前语言下的展示文案，用于设置面板等 UI 展示。
+     * </p>
      *
      * @param scaleType 渲染填充模式
      * @return 格式化后的字符串
@@ -67,18 +72,21 @@ public class FormatUtil {
     public static String formatScaleType(@IMediaPlayer.ScaleType int scaleType) {
         switch (scaleType) {
             case IMediaPlayer.ScaleType.FIT_XY:
-                return "FIT_XY";
+                return PlayerLocale.get(R.string.setting_option_scale_fit_xy);
             case IMediaPlayer.ScaleType.FIT_CENTER:
-                return "FIT_CENTER";
+                return PlayerLocale.get(R.string.setting_option_scale_fit_center);
             case IMediaPlayer.ScaleType.CENTER_CROP:
-                return "CENTER_CROP";
+                return PlayerLocale.get(R.string.setting_option_scale_center_crop);
             default:
-                return "Unknown";
+                return PlayerLocale.get(R.string.common_unknown);
         }
     }
 
     /**
      * 格式化镜像模式
+     * <p>
+     * 返回当前语言下的展示文案，用于设置面板等 UI 展示。
+     * </p>
      *
      * @param mirrorType 镜像模式
      * @return 格式化后的字符串
@@ -86,13 +94,13 @@ public class FormatUtil {
     public static String formatMirrorType(@IMediaPlayer.MirrorType int mirrorType) {
         switch (mirrorType) {
             case IMediaPlayer.MirrorType.NONE:
-                return "None";
+                return PlayerLocale.get(R.string.setting_option_mirror_none);
             case IMediaPlayer.MirrorType.HORIZONTAL:
-                return "Horizontal";
+                return PlayerLocale.get(R.string.setting_option_mirror_horizontal);
             case IMediaPlayer.MirrorType.VERTICAL:
-                return "Vertical";
+                return PlayerLocale.get(R.string.setting_option_mirror_vertical);
             default:
-                return "Unknown";
+                return PlayerLocale.get(R.string.common_unknown);
         }
     }
 

@@ -38,6 +38,19 @@
     <string name="setting_item_scale">スケールモード</string>
     <string name="setting_item_rotate">回転モード</string>
 
+    <!-- 設定メニュー：ミラーモードの選択肢 -->
+    <string name="setting_option_mirror_none">なし</string>
+    <string name="setting_option_mirror_horizontal">水平</string>
+    <string name="setting_option_mirror_vertical">垂直</string>
+
+    <!-- 設定メニュー：スケールモードの選択肢 -->
+    <string name="setting_option_scale_fit_xy">引き伸ばし</string>
+    <string name="setting_option_scale_fit_center">フィット</string>
+    <string name="setting_option_scale_center_crop">切り抜き</string>
+
+    <!-- 共通 -->
+    <string name="common_unknown">不明</string>
+
     <!-- ログパネルスロット -->
     <string name="log_panel_title_show">デバッグログパネル（タップで表示）</string>
     <string name="log_panel_title_hide">デバッグログパネル（タップで閉じる）</string>

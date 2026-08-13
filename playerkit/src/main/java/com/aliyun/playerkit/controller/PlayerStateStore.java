@@ -88,7 +88,7 @@ public class PlayerStateStore implements IPlayerStateStore {
     /**
      * 画面缩放类型
      */
-    private @IMediaPlayer.ScaleType int currentScaleType = IMediaPlayer.ScaleType.FIT_CENTER;
+    private @IMediaPlayer.ScaleType int currentScaleType = IMediaPlayer.ScaleType.DEFAULT;
 
     /**
      * 画面镜像类型
@@ -555,7 +555,7 @@ public class PlayerStateStore implements IPlayerStateStore {
         isMute = false;
         currentRotation = IMediaPlayer.Rotation.DEGREE_0;
         currentMirrorType = IMediaPlayer.MirrorType.NONE;
-        currentScaleType = IMediaPlayer.ScaleType.FIT_CENTER;
+        currentScaleType = IMediaPlayer.ScaleType.DEFAULT;
 
         trackQualityList = new ArrayList<>();
         currentTrackIndex = -1;
