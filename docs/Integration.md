@@ -182,7 +182,7 @@ git commit -m "feat: integrate AliPlayerKit module (source commit: 2c30d92)"
 
 ## **4. 方案二：场景层集成**
 
-场景层提供针对具体业务场景的播放示例，如中长视频、短视频、直播和列表播放等。每个场景模块都是一个独立的示例，您可以根据业务需求选择参考或直接集成。
+场景层提供针对具体业务场景的播放示例，如中长视频、短视频、直播、列表播放和 AI 教育等。每个场景模块都是一个独立的示例，您可以根据业务需求选择参考或直接集成。
 
 > **前置条件**：场景层依赖组件层能力。在集成场景层之前，请先完成 **组件层集成**。
 
@@ -197,6 +197,7 @@ git commit -m "feat: integrate AliPlayerKit module (source commit: 2c30d92)"
 | `scene-shortvideo` | 短视频场景示例 |
 | `scene-live` | 直播场景示例 |
 | `scene-playlist` | 列表播放场景示例 |
+| `scene-ai-education` | AI 教育场景示例。**额外依赖第三方库 Markwon / OkHttp / Gson / Glide**，用于 Markdown 渲染、网络请求与图片加载 |
 
 ```bash
 # scene-common 包含示例视频常量，如自行实现视频源可省略
@@ -205,6 +206,7 @@ cp -r playerkit-scenes/scene-common /path/to/your/project/
 # 其他场景模块按需选择
 cp -r playerkit-scenes/scene-longvideo /path/to/your/project/
 cp -r playerkit-scenes/scene-live /path/to/your/project/
+cp -r playerkit-scenes/scene-ai-education /path/to/your/project/
 # ...
 ```
 
@@ -223,6 +225,7 @@ cp -r playerkit-scenes/scene-live /path/to/your/project/
 | `scene-live` | `demo-settings`、`scene-common` | 移除 `demo-settings`，`scene-common` 可选 |
 | `scene-shortvideo` | `scene-common` | `scene-common` 可选 |
 | `scene-playlist` | `scene-common` | `scene-common` 可选 |
+| `scene-ai-education` | `scene-common`、Markwon / OkHttp / Gson / Glide | `scene-common` 可选；第三方库需保留（详见 2.4） |
 
 **2.1 移除 demo-settings 依赖**（如适用）
 
@@ -276,6 +279,19 @@ private String getVideoPlayAuth() {
 }
 ```
 
+**2.4 处理 scene-ai-education 的第三方依赖**（如集成该模块）
+
+`scene-ai-education` 模块除 `playerkit` 与 `scene-common` 外，还依赖以下第三方库，均已声明在该模块的 `build.gradle` 中，Gradle 同步时自动拉取：
+
+| 第三方库 | 版本 | 用途 |
+|---------|------|------|
+| Markwon（`core` / `html` / `ext-tables` / `ext-strikethrough` / `image-glide`） | 4.6.2 | 渲染 AI 分析内容的 Markdown 文本 |
+| OkHttp | 4.8.1 | 请求 App Server 的播放凭证与 AI 分析接口 |
+| Gson | 2.8.0 | 解析 App Server 返回的 JSON 数据 |
+| Glide | 4.13.0 | 加载章节缩略图 |
+
+> **说明**：这些依赖仅由 `scene-ai-education` 引入。若不集成 AI 教育场景，即不会引入上述第三方库；`playerkit` 组件层与其他场景模块不受影响。
+
 ### **步骤 3：Gradle 项目配置**
 
 #### **3.1 添加模块引用**
@@ -285,6 +301,8 @@ private String getVideoPlayAuth() {
 ```groovy
 include ':scene-common'
 include ':scene-longvideo'
+// AI 教育场景模块
+include ':scene-ai-education'
 // 按需添加其他场景模块...
 ```
 
@@ -293,6 +311,8 @@ include ':scene-longvideo'
 ```kotlin
 include(":scene-common")
 include(":scene-longvideo")
+// AI 教育场景模块
+include(":scene-ai-education")
 // 按需添加其他场景模块...
 ```
 
@@ -305,6 +325,9 @@ dependencies {
     // AliPlayerKit 播放场景模块：基于 AliPlayerKit 核心组件，提供开箱即用的标准播放场景方案
     // 中长视频场景模块：提供中长视频播放的完整解决方案
     implementation project(':scene-longvideo')
+
+    // AI 教育场景模块：提供章节导航与 AI 内容展示的完整解决方案
+    implementation project(':scene-ai-education')
 }
 ```
 
@@ -315,6 +338,9 @@ dependencies {
     // AliPlayerKit 播放场景模块：基于 AliPlayerKit 核心组件，提供开箱即用的标准播放场景方案
     // 中长视频场景模块：提供中长视频播放的完整解决方案
     implementation(project(":scene-longvideo"))
+
+    // AI 教育场景模块：提供章节导航与 AI 内容展示的完整解决方案
+    implementation(project(":scene-ai-education"))
 }
 ```
 

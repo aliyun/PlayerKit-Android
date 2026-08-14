@@ -24,7 +24,7 @@ import com.aliyun.playerkit.ui.slots.TextureViewSlot;
 import com.aliyun.playerkit.ui.slots.TopBarSlot;
 import com.aliyun.playerkit.ui.slots.LandscapeHintSlot;
 import com.aliyun.playerkit.ui.slots.SeekThumbnailSlot;
-import com.aliyun.playerkit.ui.slots.ChapterContentPanelSlot;
+import com.aliyun.playerkit.ui.slots.ChapterPanelSlot;
 
 /**
  * 默认插槽工厂
@@ -90,8 +90,8 @@ public final class DefaultSlotFactory {
         slotManager.register(SlotType.SETTING_MENU, parent -> new SettingMenuSlot(parent.getContext()));
         // 注册 Seek 缩略图插槽
         slotManager.register(SlotType.SEEK_THUMBNAIL, parent -> new SeekThumbnailSlot(parent.getContext()));
-        // 注册章节内容面板插槽
-        slotManager.register(SlotType.CHAPTER_CONTENT_PANEL, parent -> new ChapterContentPanelSlot(parent.getContext()));
+        // 注册章节面板插槽
+        slotManager.register(SlotType.CHAPTER_PANEL, parent -> new ChapterPanelSlot(parent.getContext()));
     }
 
     /**

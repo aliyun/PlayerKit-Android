@@ -232,7 +232,7 @@ override fun onBackPressed() {
 
 ## **5. Solution 2: Scene-Layer Integration**
 
-The scene layer provides complete playback solutions for specific business scenarios such as long video, short video, and live streaming. The scene layer is built on top of the component layer and is ready to use after integration without additional development.
+The scene layer provides complete playback solutions for specific business scenarios such as long video, short video, live streaming, and AI education. The scene layer is built on top of the component layer and is ready to use after integration without additional development.
 
 > **Prerequisite**: Before integrating the scene layer, complete the scene-layer integration steps in [Integration Preparation](./Integration-EN.md), and complete [Global Initialization](#3-global-initialization).
 
@@ -247,6 +247,7 @@ Scene modules are located under the `playerkit-scenes` directory and currently i
 | `scene-shortvideo` | **Short Video Scene**: a complete solution for short video swipe playback |
 | `scene-live` | **Live Streaming Scene**: a complete solution for live streaming playback |
 | `scene-playlist` | **List Playback Scene**: a complete solution for video list playback |
+| `scene-ai-education` | **AI Education Scene**: adds chapter navigation and AI content display on top of VOD playback; see [AI Education Scene](./scenes/AiEducation-EN.md) |
 
 ### **Step 2: Launch the Scene Page**
 

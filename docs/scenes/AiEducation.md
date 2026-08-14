@@ -44,15 +44,20 @@ AI 教育场景围绕“**快速理解、精准定位和高效回看**”提供�
 
 ## **4. 快速接入**
 
-### **Step 1：场景层集成**
+### **4.1 通用集成**
 
-将 `playerkit` 和 `scene-ai-education` 模块源码拷贝到 Android 工程。
+AI 教育场景基于 PlayerKit 场景层构建。如尚未完成通用集成步骤，请先参阅：
 
-模块拷贝、项目注册和依赖调整方式，请参阅 [集成准备](./docs/Integration.md) 中的“场景层集成”章节。本文不再重复说明通用集成步骤。
+- [集成准备](../Integration.md) — 场景层集成（拷贝 `playerkit` 和 `scene-ai-education` 模块并完成项目注册与依赖调整）
+- [快速开始](../QuickStart.md) — 场景层接入（启动场景页面）
 
-### **Step 2：配置 App Server 和测试视频**
+通用集成完成后，仅需以下额外配置即可体验 AI 教育场景：
+
+### **4.2 配置 App Server 和测试视频**
 
 打开 `AiContentConstants.java`，修改以下配置：
+
+> 💡 可直接使用官方提供的 App Server 地址进行体验，但更建议部署自有服务后使用自己的地址。部署方式请参考 [VodAppServer](https://github.com/MediaBox-Demos/VodAppServer)。
 
 ```java
 public static final String APP_SERVER_BASE_URL = "http://your-server-host:port";
@@ -60,41 +65,16 @@ public static final String APP_SERVER_BASE_URL = "http://your-server-host:port";
 public static final String DEFAULT_MEDIA_ID = "your-media-id";
 ```
 
-### **Step 3：启动 AI 教育场景**
+### **4.3 验证接入**
 
-**方式一：Deep Link（推荐）**
+AI 教育场景对应信息：
 
-* **Java**：
+| 项目 | 值 |
+|------|------|
+| Activity | `AiEducationActivity` |
+| Schema | `playerkit://scenes/aieducation` |
 
-```java
-Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("playerkit://scenes/aieducation"));
-startActivity(intent);
-```
-
-* **Kotlin**：
-
-```kotlin
-val intent = Intent(Intent.ACTION_VIEW, Uri.parse("playerkit://scenes/aieducation"))
-startActivity(intent)
-```
-
-**方式二：显式 Intent**
-
-* **Java**：
-
-```java
-Intent intent = new Intent(context, AiEducationActivity.class);
-startActivity(intent);
-```
-
-* **Kotlin**：
-
-```kotlin
-val intent = Intent(context, AiEducationActivity::class.java)
-startActivity(intent)
-```
-
-页面启动后，视频将自动加载。播放器显示章节入口，点击后可以查看章节列表和 AI 分析内容，说明接入成功。
+页面启动后，视频将自动加载。播放器显示章节入口按钮，点击后可以查看章节列表和 AI 分析内容，说明接入成功。
 
 ---
 
@@ -119,7 +99,7 @@ AI 教育场景由客户端、App Server、ICE / AI 工作流和 VOD 服务共�
 
 客户端交互流程描述用户进入 AI 教育播放页后，客户端、PlayerKit 与 App Server 之间的调用关系。
 
-页面初始化时，客户端并行或依次获取播放凭证和 AI 分析结果；数据加载完成后，用户可以通过章节面板查看章节、摘要和知识点，并跳转到对应的视频位置。
+页面初始化时，客户端并行或依次获取播放凭证和 AI 分析结果；数据加载完成后，用户可以通过章节内容面板查看章节、摘要和知识点，并跳转到对应的视频位置。
 
 ![CallSequence](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/CallSequence.png)
 
@@ -131,24 +111,28 @@ AI 教育场景由客户端、App Server、ICE / AI 工作流和 VOD 服务共�
 
 场景层负责页面编排、数据加载和 AI 内容展示；PlayerKit 通过 Slot 机制提供播放器控制栏入口及面板扩展能力；底层播放器 SDK 负责媒资播放、进度控制和播放状态回调。
 
-![LayeredArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/LayeredArchitecture.png)
+![LayeredArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/LayeredArchitecture-Android.png)
 
 **组件职责**：
 
-| 组件                         | 说明                                                         |
-| ---------------------------- | ------------------------------------------------------------ |
-| `AiEducationActivity`        | 场景入口，实现 `AiContentRepository` 接口，编排数据加载、播放器初始化和 Slot 注册 |
-| `AiContentLoader`            | 在后台线程请求播放凭证和 AI 分析结果，并在主线程回调处理结果 |
-| `ChapterButtonSlot`          | 在播放器控制栏中展示「章节」按钮，并触发章节面板的展开或关闭 |
-| `ChapterPanelSlot`           | 面板控制器，负责管理 `DialogFragment` 的展示、关闭和状态同步 |
-| `ChapterPanelDialogFragment` | 章节面板 UI，展示章节列表、视频摘要、章节摘要和知识点        |
-| `AliPlayerController`        | 提供视频加载、播放控制、Seek 和播放进度回调等基础能力        |
+| 组件                             | 所属层级 | 说明                                                         |
+| ------------------------------ | -------- | ------------------------------------------------------------ |
+| `AiEducationActivity`          | 场景层   | 场景入口（组合根），编排数据加载、播放器初始化、Slot 注册以及 AI 内容推入 |
+| `AiContentLoader`              | 场景层   | 在后台线程请求播放凭证和 AI 分析结果，并在主线程回调处理结果 |
+| `ChapterButtonSlot`            | 场景层   | 通过 `CustomSlotType` 注册的自定义插槽，在播放器控制栏中展示「章节」按钮，并触发章节内容面板的展开或关闭 |
+| `ChapterContentPanelSlot`      | 场景层   | 面板控制器，负责管理 `DialogFragment` 的展示、关闭和状态同步；AI 内容由场景层经 `updateAiContent()` 推入 |
+| `ChapterContentDialogFragment` | 场景层   | AI 内容面板 UI，展示章节列表、视频摘要、章节摘要和知识点     |
+| `MarkdownBinder`               | 场景层   | 将 AI 分析内容的 Markdown 文本渲染为富文本（基于 Markwon）   |
+| `ChapterPanelSlot`             | PlayerKit | 组件层内置的章节面板，全屏下从右侧滑入展示章节列表并支持点击跳转（`SceneType.AI_VOD` 场景，由底部控制栏的章节按钮触发） |
+| `AliPlayerController`          | PlayerKit | 提供视频加载、播放控制、Seek 和播放进度回调等基础能力        |
+
+> 💡 场景层的 `ChapterContentDialogFragment` 承载完整的 AI 内容（章节 + 摘要 + 知识点），是 AI 教育场景的差异化 UI；组件层内置的 `ChapterPanelSlot` 只负责纯章节导航，供未接入 AI 分析内容的 `SceneType.AI_VOD` 播放直接复用。两者互不依赖，可按业务需要择一使用。
 
 ---
 
 ## **6. 服务端接口**
 
-### **接口 1：获取播放凭证**
+### **6.1 获取播放凭证**
 
 | 项目 | 值 |
 |------|---|
@@ -184,7 +168,7 @@ GET http://your-server-host:port/appServer/GetVideoPlayAuth?videoId=201558617a9e
 | `data.videoId` | `String` | 视频 ID |
 | `data.playAuth` | `String` | Base64 编码的播放授权凭证 |
 
-### **接口 2：获取 AI 分析内容**
+### **6.2 获取 AI 分析内容**
 
 | 项目 | 值 |
 |------|---|
@@ -299,17 +283,24 @@ GET http://your-server-host:port/GetMediaAiAnalysisByResultType?MediaId=20155861
 
 ### **8.1 替换数据源**
 
-实现 `AiContentRepository` 接口，在你的 Activity 中提供数据：
+内置的 `AiEducationActivity` 通过 `AiContentLoader` 加载数据。如需使用自己的数据源，可参考 Activity 的实现流程，替换数据加载逻辑：
 
 ```java
-public interface AiContentRepository {
-    AiVideoContent getAiVideoContent();
-}
+// 自定义加载示例
+AiContentLoader loader = new AiContentLoader();
+loader.loadPlayAuth(vid, playAuth -> {
+    // 获取到 playAuth 后继续加载 AI 内容...
+});
+loader.load(vid, aiContent -> {
+    // 获取到 AiVideoContent 后配置播放器，并推入面板...
+});
 ```
+
+> 💡 章节数据（`chapters`）可以随 `AliPlayerModel` 下发；视频摘要和章节分段等 AI 内容无法承载在 `AliPlayerModel` 上，需由场景层调用 `ChapterContentPanelSlot.updateAiContent()` 推入。
 
 ### **8.2 自定义 UI**
 
-- 替换章节面板样式：继承 `ChapterPanelDialogFragment` 覆盖布局
+- 替换章节内容面板样式：继承 `ChapterContentDialogFragment` 覆盖布局
 - 扩展 Slot：通过 `CustomSlotType` 注册自定义插槽
 - 详见 [插槽系统](../advanced/SlotSystem.md)
 
@@ -318,26 +309,43 @@ public interface AiContentRepository {
 如果不想使用内置的 `AiEducationActivity`，可以参考其实现，在自己的 Activity 中：
 
 1. 初始化 `AliPlayerController`
-2. 注册 `ChapterButtonSlot` + `ChapterPanelSlot`
-3. 实现 `AiContentRepository` 接口
-4. 加载数据并配置播放器
+2. 注册 `ChapterButtonSlot` + `ChapterContentPanelSlot`（注册时保存面板插槽实例）
+3. 加载 PlayAuth 和 AI 内容
+4. 配置播放器并挂载，挂载后把 AI 内容推给面板插槽
 
 **示例骨架**：
 
 ```java
-public class MyActivity extends AppCompatActivity implements AiContentRepository {
+public class MyActivity extends AppCompatActivity {
 
-    @Override
-    public AiVideoContent getAiVideoContent() {
-        // 返回你的 AI 内容数据
-        return myAiVideoContent;
+    @Nullable
+    private ChapterContentPanelSlot mChapterContentPanelSlot;
+
+    private void registerSlots() {
+        SlotManager slotManager = playerView.getSlotManager();
+        slotManager.register(ChapterButtonSlot.TYPE, parent -> new ChapterButtonSlot(parent.getContext()));
+        slotManager.register(ChapterContentPanelSlot.TYPE, parent -> {
+            // 保存插槽实例，attach 后推入 AI 内容
+            mChapterContentPanelSlot = new ChapterContentPanelSlot(parent.getContext());
+            return mChapterContentPanelSlot;
+        });
     }
 
-    private void setupPlayer() {
-        // 1. 初始化播放器
-        // 2. 注册 Slot
-        // 3. 配置 SceneType.AI_VOD
-        // 4. 加载 PlayAuth 并开始播放
+    private void configurePlayer(@NonNull String vid, @NonNull String playAuth,
+                                 @Nullable AiVideoContent aiContent) {
+        AliPlayerModel playerModel = new AliPlayerModel.Builder()
+                .videoSource(VideoSourceFactory.createVidAuthSource(vid, playAuth))
+                .sceneType(SceneType.AI_VOD)
+                .chapters(aiContent != null ? aiContent.getChapters() : null)
+                .build();
+
+        playerController.configure(playerModel);
+        playerView.attach(playerController);
+
+        // attach 后由本页面（组合根）把 AI 内容推给面板插槽
+        if (mChapterContentPanelSlot != null) {
+            mChapterContentPanelSlot.updateAiContent(aiContent);
+        }
     }
 }
 ```

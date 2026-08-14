@@ -235,12 +235,12 @@ public enum SlotType {
     OPTION_PANEL(110),
 
     /**
-     * 章节内容面板（从右往左滑入）
+     * 章节面板（从右往左滑入）
      * <p>
-     * Chapter content panel (slide in from right)
+     * Chapter panel (slide in from right)
      * </p>
      */
-    CHAPTER_CONTENT_PANEL(115);
+    CHAPTER_PANEL(115);
 
     // ==================== 层级顺序 ====================
 

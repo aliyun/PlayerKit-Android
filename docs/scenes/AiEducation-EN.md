@@ -44,15 +44,20 @@ After completing the above preparations, configure the App Server address and te
 
 ## **4. Quick Start**
 
-### **Step 1: Scene Layer Integration**
+### **4.1 Common Integration**
 
-Copy the `playerkit` and `scene-ai-education` module source code into your Android project.
+The AI Education Scene is built on the PlayerKit scene layer. If you have not completed the common integration steps yet, start here:
 
-For module copying, project registration, and dependency adjustment, please refer to the "Scene Layer Integration" section in [Integration Guide](./docs/Integration-EN.md). This document will not repeat the common integration steps.
+- [Integration Guide](../Integration-EN.md) — Scene layer integration (copy the `playerkit` and `scene-ai-education` modules, then register them and adjust dependencies)
+- [Quick Start](../QuickStart-EN.md) — Scene layer usage (launching a scene page)
 
-### **Step 2: Configure App Server and Test Video**
+Once common integration is done, only the following extra configuration is needed to experience the AI Education Scene:
+
+### **4.2 Configure App Server and Test Video**
 
 Open `AiContentConstants.java` and modify the following configuration:
+
+> 💡 You can use the official App Server address to try the scene out, but deploying your own service and using your own address is recommended. See [VodAppServer](https://github.com/MediaBox-Demos/VodAppServer) for deployment instructions.
 
 ```java
 public static final String APP_SERVER_BASE_URL = "http://your-server-host:port";
@@ -60,41 +65,16 @@ public static final String APP_SERVER_BASE_URL = "http://your-server-host:port";
 public static final String DEFAULT_MEDIA_ID = "your-media-id";
 ```
 
-### **Step 3: Launch the AI Education Scene**
+### **4.3 Verify the Integration**
 
-**Option 1: Deep Link (Recommended)**
+Entry information for the AI Education Scene:
 
-* **Java**:
+| Item | Value |
+|------|------|
+| Activity | `AiEducationActivity` |
+| Schema | `playerkit://scenes/aieducation` |
 
-```java
-Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("playerkit://scenes/aieducation"));
-startActivity(intent);
-```
-
-* **Kotlin**:
-
-```kotlin
-val intent = Intent(Intent.ACTION_VIEW, Uri.parse("playerkit://scenes/aieducation"))
-startActivity(intent)
-```
-
-**Option 2: Explicit Intent**
-
-* **Java**:
-
-```java
-Intent intent = new Intent(context, AiEducationActivity.class);
-startActivity(intent);
-```
-
-* **Kotlin**:
-
-```kotlin
-val intent = Intent(context, AiEducationActivity::class.java)
-startActivity(intent)
-```
-
-After the page launches, the video will load automatically. The player displays the chapter entry point; tapping it reveals the chapter list and AI analysis content, indicating successful integration.
+After the page launches, the video will load automatically. The player displays the chapter entry button; tapping it reveals the chapter list and AI analysis content, indicating successful integration.
 
 ---
 
@@ -119,7 +99,7 @@ VOD is responsible for unified storage of media assets and AI analysis results; 
 
 The client interaction flow describes the calling relationships between the client, PlayerKit, and App Server after the user enters the AI Education playback page.
 
-During page initialization, the client obtains play credentials and AI analysis results in parallel or sequentially; after data loading is complete, users can view chapters, summaries, and knowledge points through the chapter panel, and jump to the corresponding video position.
+During page initialization, the client obtains play credentials and AI analysis results in parallel or sequentially; after data loading is complete, users can view chapters, summaries, and knowledge points through the chapter content panel, and jump to the corresponding video position.
 
 ![CallSequence](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/CallSequence-EN.png)
 
@@ -131,24 +111,28 @@ The client adopts a layered design consisting of the Scene Layer, PlayerKit Capa
 
 The Scene Layer is responsible for page orchestration, data loading, and AI content display; PlayerKit provides player control bar entry points and panel extension capabilities through the Slot mechanism; the underlying Player SDK handles media playback, progress control, and playback state callbacks.
 
-![LayeredArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/LayeredArchitecture-EN.png)
+![LayeredArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/LayeredArchitecture-Android-EN.png)
 
 **Component Responsibilities**:
 
-| Component | Description |
-| ---------------------------- | ------------------------------------------------------------ |
-| `AiEducationActivity` | Scene entry point, implements the `AiContentRepository` interface, orchestrates data loading, player initialization, and Slot registration |
-| `AiContentLoader` | Requests play credentials and AI analysis results on a background thread, and callbacks results on the main thread |
-| `ChapterButtonSlot` | Displays the "Chapter" button in the player control bar, and triggers expansion or collapse of the chapter panel |
-| `ChapterPanelSlot` | Panel controller, responsible for managing `DialogFragment` display, dismissal, and state synchronization |
-| `ChapterPanelDialogFragment` | Chapter panel UI, displaying the chapter list, video summary, chapter summary, and knowledge points |
-| `AliPlayerController` | Provides fundamental capabilities including video loading, playback control, seek, and playback progress callbacks |
+| Component | Layer | Description |
+| ---------------------------- | ----- | ------------------------------------------------------------ |
+| `AiEducationActivity` | Scene | Scene entry point (composition root), orchestrates data loading, player initialization, Slot registration, and pushing AI content into the panel |
+| `AiContentLoader` | Scene | Requests play credentials and AI analysis results on a background thread, and callbacks results on the main thread |
+| `ChapterButtonSlot` | Scene | Custom slot registered through `CustomSlotType`; displays the "Chapter" button in the player control bar and triggers expansion or collapse of the chapter content panel |
+| `ChapterContentPanelSlot` | Scene | Panel controller, responsible for managing `DialogFragment` display, dismissal, and state synchronization; AI content is pushed in by the scene layer via `updateAiContent()` |
+| `ChapterContentDialogFragment` | Scene | AI content panel UI, displaying the chapter list, video summary, chapter summary, and knowledge points |
+| `MarkdownBinder` | Scene | Renders the Markdown text of AI analysis content into rich text (based on Markwon) |
+| `ChapterPanelSlot` | PlayerKit | Built-in chapter panel of the component layer; slides in from the right in fullscreen to show the chapter list and seek on tap (`SceneType.AI_VOD` scene, triggered by the bottom bar chapter button) |
+| `AliPlayerController` | PlayerKit | Provides fundamental capabilities including video loading, playback control, seek, and playback progress callbacks |
+
+> 💡 The scene-layer `ChapterContentDialogFragment` carries the full AI content (chapters + summaries + knowledge points) and is the differentiating UI of the AI Education Scene, while the component-layer `ChapterPanelSlot` handles pure chapter navigation and can be reused directly by `SceneType.AI_VOD` playback that has no AI analysis content. The two are independent — pick whichever fits your business.
 
 ---
 
 ## **6. Server API**
 
-### **API 1: Get Play Credential**
+### **6.1 Get Play Credential**
 
 | Item | Value |
 |------|---|
@@ -184,7 +168,7 @@ GET http://your-server-host:port/appServer/GetVideoPlayAuth?videoId=201558617a9e
 | `data.videoId` | `String` | Video ID |
 | `data.playAuth` | `String` | Base64-encoded play authorization credential |
 
-### **API 2: Get AI Analysis Content**
+### **6.2 Get AI Analysis Content**
 
 | Item | Value |
 |------|---|
@@ -299,17 +283,24 @@ The final aggregation results in `AiVideoContent`, which contains:
 
 ### **8.1 Replace Data Source**
 
-Implement the `AiContentRepository` interface to provide data in your Activity:
+The built-in `AiEducationActivity` loads data through `AiContentLoader`. To use your own data source, refer to the Activity's implementation flow and replace the data loading logic:
 
 ```java
-public interface AiContentRepository {
-    AiVideoContent getAiVideoContent();
-}
+// Custom loading example
+AiContentLoader loader = new AiContentLoader();
+loader.loadPlayAuth(vid, playAuth -> {
+    // After obtaining playAuth, continue loading AI content...
+});
+loader.load(vid, aiContent -> {
+    // After obtaining AiVideoContent, configure the player and push it into the panel...
+});
 ```
+
+> 💡 Chapter data (`chapters`) can be delivered through `AliPlayerModel`; AI content such as the video summary and chapter segments cannot be carried on `AliPlayerModel`, so the scene layer must push it in via `ChapterContentPanelSlot.updateAiContent()`.
 
 ### **8.2 Customize UI**
 
-- Replace chapter panel style: inherit `ChapterPanelDialogFragment` and override the layout
+- Replace chapter content panel style: inherit `ChapterContentDialogFragment` and override the layout
 - Extend Slots: register custom slots via `CustomSlotType`
 - See [Slot System](../advanced/SlotSystem-EN.md) for details
 
@@ -318,26 +309,43 @@ public interface AiContentRepository {
 If you don't want to use the built-in `AiEducationActivity`, you can refer to its implementation and do the following in your own Activity:
 
 1. Initialize `AliPlayerController`
-2. Register `ChapterButtonSlot` + `ChapterPanelSlot`
-3. Implement `AiContentRepository` interface
-4. Load data and configure the player
+2. Register `ChapterButtonSlot` + `ChapterContentPanelSlot` (keep the panel slot instance when registering)
+3. Load the PlayAuth and the AI content
+4. Configure and attach the player, then push the AI content into the panel slot
 
 **Example Skeleton**:
 
 ```java
-public class MyActivity extends AppCompatActivity implements AiContentRepository {
+public class MyActivity extends AppCompatActivity {
 
-    @Override
-    public AiVideoContent getAiVideoContent() {
-        // Return your AI content data
-        return myAiVideoContent;
+    @Nullable
+    private ChapterContentPanelSlot mChapterContentPanelSlot;
+
+    private void registerSlots() {
+        SlotManager slotManager = playerView.getSlotManager();
+        slotManager.register(ChapterButtonSlot.TYPE, parent -> new ChapterButtonSlot(parent.getContext()));
+        slotManager.register(ChapterContentPanelSlot.TYPE, parent -> {
+            // Keep the slot instance so AI content can be pushed in after attach
+            mChapterContentPanelSlot = new ChapterContentPanelSlot(parent.getContext());
+            return mChapterContentPanelSlot;
+        });
     }
 
-    private void setupPlayer() {
-        // 1. Initialize the player
-        // 2. Register Slots
-        // 3. Configure SceneType.AI_VOD
-        // 4. Load PlayAuth and start playback
+    private void configurePlayer(@NonNull String vid, @NonNull String playAuth,
+                                 @Nullable AiVideoContent aiContent) {
+        AliPlayerModel playerModel = new AliPlayerModel.Builder()
+                .videoSource(VideoSourceFactory.createVidAuthSource(vid, playAuth))
+                .sceneType(SceneType.AI_VOD)
+                .chapters(aiContent != null ? aiContent.getChapters() : null)
+                .build();
+
+        playerController.configure(playerModel);
+        playerView.attach(playerController);
+
+        // After attach, this page (the composition root) pushes AI content into the panel slot
+        if (mChapterContentPanelSlot != null) {
+            mChapterContentPanelSlot.updateAiContent(aiContent);
+        }
     }
 }
 ```

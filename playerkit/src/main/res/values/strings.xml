@@ -80,7 +80,7 @@
     <!-- 横屏提示插槽 -->
     <string name="landscape_hint_fullscreen">全屏观看</string>
 
-    <!-- 章节内容面板 -->
+    <!-- 章节面板 -->
     <string name="chapter_button_format">章节%1$d：%2$s ></string>
     <string name="next_chapter">下一章</string>
     <string name="toast_seek_to_chapter">已定位至%1$s</string>

@@ -8,12 +8,13 @@
 
     <!-- 章节列表 -->
     <dimen name="ai_education_list_item_padding_horizontal">16dp</dimen>
-    <dimen name="ai_education_list_item_padding_vertical">8dp</dimen>
-    <dimen name="ai_education_thumbnail_width">100dp</dimen>
-    <dimen name="ai_education_thumbnail_height">56dp</dimen>
+    <dimen name="ai_education_list_item_padding_vertical">12dp</dimen>
+    <dimen name="ai_education_thumbnail_width">72dp</dimen>
+    <dimen name="ai_education_thumbnail_height">44dp</dimen>
 
     <!-- 文字大小（必须用 sp） -->
-    <dimen name="ai_education_text_size_title">16sp</dimen>
+    <dimen name="ai_education_text_size_title">18sp</dimen>
+
     <dimen name="ai_education_text_size_body">14sp</dimen>
     <dimen name="ai_education_text_size_secondary">12sp</dimen>
     <dimen name="ai_education_text_size_content">13sp</dimen>

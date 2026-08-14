@@ -1,6 +1,5 @@
 package com.aliyun.playerkit.scenes.aieducation.ui.slots;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.view.View;
@@ -10,12 +9,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
-import com.aliyun.playerkit.AliPlayerModel;
 import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.event.PlayerCommand;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
-import com.aliyun.playerkit.scenes.aieducation.data.AiContentRepository;
 import com.aliyun.playerkit.scenes.aieducation.data.AiSegment;
 import com.aliyun.playerkit.scenes.aieducation.data.AiVideoContent;
 import com.aliyun.playerkit.scenes.aieducation.event.ChapterEvents;
@@ -28,11 +25,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 章节面板插槽（控制器角色）。
+ * 章节内容面板插槽（控制器角色）。
  * <p>
  * 继承 {@link BasePanelSlot}，保持统一 API、状态管理和防重入能力。
  * 自身不渲染面板内容，仅作为控制器，将面板的实际渲染委托给
- * {@link ChapterPanelDialogFragment}（拥有独立 Window，从屏幕边界弹出）。
+ * {@link ChapterContentDialogFragment}（拥有独立 Window，从屏幕边界弹出）。
  * </p>
  * <ul>
  *     <li>接收 {@link ChapterEvents.ShowPanel} 展开面板</li>
@@ -40,12 +37,14 @@ import java.util.List;
  *     <li>订阅 {@link PlayerEvents.Info} 实时高亮当前章节</li>
  *     <li>点击章节项发送 {@link PlayerCommand.Seek} 跳转到对应位置</li>
  * </ul>
+ * <p>
+ * 面板展示的 AI 内容由场景层通过 {@link #updateAiContent(AiVideoContent)} 推入
+ * </p>
  *
  * @author keria
  * @date 2026/07/03
  */
-@SuppressLint("ViewConstructor")
-public class ChapterPanelSlot extends BasePanelSlot {
+public class ChapterContentPanelSlot extends BasePanelSlot {
 
     /**
      * 插槽类型定义
@@ -53,9 +52,9 @@ public class ChapterPanelSlot extends BasePanelSlot {
      * order=105：位于 SETTING_MENU 之上，确保面板在最顶层
      * </p>
      */
-    public static final CustomSlotType TYPE = new CustomSlotType("chapter_panel", 105);
+    public static final CustomSlotType TYPE = new CustomSlotType("chapter_content_panel", 105);
 
-    private static final String FRAGMENT_TAG = "ChapterPanelDialog";
+    private static final String FRAGMENT_TAG = "ChapterContentDialog";
 
     /**
      * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
@@ -66,8 +65,6 @@ public class ChapterPanelSlot extends BasePanelSlot {
             PlayerEvents.Info.class
     );
 
-    private final AiContentRepository mRepository;
-
     @Nullable
     private AiVideoContent mContent;
     @Nullable
@@ -75,15 +72,14 @@ public class ChapterPanelSlot extends BasePanelSlot {
 
     // -- DialogFragment --
     @Nullable
-    private ChapterPanelDialogFragment mDialogFragment;
+    private ChapterContentDialogFragment mDialogFragment;
 
     // -- Highlight state --
     private int mCurrentChapterIndex = -1;
     private int mCurrentSegmentIndex = -1;
 
-    public ChapterPanelSlot(@NonNull Context context, @NonNull AiContentRepository repository) {
+    public ChapterContentPanelSlot(@NonNull Context context) {
         super(context);
-        this.mRepository = repository;
         this.mMarkdownBinder = new MarkdownBinder(context.getApplicationContext());
         // 该 Slot 不渲染任何内容，始终不可见
         setVisibility(View.GONE);
@@ -107,7 +103,7 @@ public class ChapterPanelSlot extends BasePanelSlot {
         FragmentManager fm = activity.getSupportFragmentManager();
         if (fm.isStateSaved()) return;
 
-        mDialogFragment = ChapterPanelDialogFragment.newInstance();
+        mDialogFragment = ChapterContentDialogFragment.newInstance();
         mDialogFragment.setContent(mContent);
         mDialogFragment.setMarkdownBinder(mMarkdownBinder);
         mDialogFragment.setOnChapterClickListener(this::onChapterClicked);
@@ -137,7 +133,7 @@ public class ChapterPanelSlot extends BasePanelSlot {
 
     @Override
     protected void onPerformHideAnimation() {
-        ChapterPanelDialogFragment fragment = mDialogFragment;
+        ChapterContentDialogFragment fragment = mDialogFragment;
         mDialogFragment = null;
         if (fragment != null && fragment.isAdded()) {
             fragment.dismissWithAnimation();
@@ -158,12 +154,6 @@ public class ChapterPanelSlot extends BasePanelSlot {
     public void onAttach(@NonNull SlotHost host) {
         super.onAttach(host);
         setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onBindData(@NonNull AliPlayerModel model) {
-        super.onBindData(model);
-        loadContent(model);
     }
 
     @Override
@@ -192,8 +182,26 @@ public class ChapterPanelSlot extends BasePanelSlot {
 
     // ==================== Data binding ====================
 
-    private void loadContent(@NonNull AliPlayerModel model) {
-        mContent = mRepository.load(model);
+    /**
+     * 更新面板展示的 AI 内容
+     * <p>
+     * 由场景层在 AI 内容就绪后推入，面板内容在每次展示时按当前内容一次性构建，
+     * 因此显示期间更换内容会先收起面板，下次打开时按新内容重建。
+     * </p>
+     *
+     * @param content AI 视频内容，为 null 时面板没有内容可展示
+     */
+    public void updateAiContent(@Nullable AiVideoContent content) {
+        if (mContent == content) {
+            return;
+        }
+        mContent = content;
+        mCurrentChapterIndex = -1;
+        mCurrentSegmentIndex = -1;
+        // 面板内容按当前内容一次性构建，显示期间换内容只能先收起，下次打开时重建
+        if (isShowing()) {
+            hidePanel();
+        }
     }
 
     // ==================== Click callbacks ====================

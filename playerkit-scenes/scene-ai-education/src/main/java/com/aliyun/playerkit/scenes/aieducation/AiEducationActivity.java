@@ -16,10 +16,9 @@ import com.aliyun.playerkit.data.VideoSource;
 import com.aliyun.playerkit.data.VideoSourceFactory;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.scenes.aieducation.data.AiContentLoader;
-import com.aliyun.playerkit.scenes.aieducation.data.AiContentRepository;
 import com.aliyun.playerkit.scenes.aieducation.data.AiVideoContent;
 import com.aliyun.playerkit.scenes.aieducation.ui.slots.ChapterButtonSlot;
-import com.aliyun.playerkit.scenes.aieducation.ui.slots.ChapterPanelSlot;
+import com.aliyun.playerkit.scenes.aieducation.ui.slots.ChapterContentPanelSlot;
 import com.aliyun.playerkit.slot.SlotManager;
 import com.aliyun.playerkit.utils.ToastUtils;
 
@@ -29,7 +28,7 @@ import java.util.List;
  * AI 教育场景播放示例 Activity
  * <p>
  * 演示如何在 AI 教育场景下使用 AliPlayerKit 的 AI 章节和摘要功能。
- * 通过自定义插槽（ChapterButtonSlot + ChapterPanelSlot）实现章节导航和 AI 内容解析。
+ * 通过自定义插槽（ChapterButtonSlot + ChapterContentPanelSlot）实现章节导航和 AI 内容解析。
  * </p>
  * <p>
  * 集成FAQ (Integration FAQ)
@@ -37,13 +36,13 @@ import java.util.List;
  * 1. 移除 demo-settings 依赖（仅用于 Demo 演示）
  * 2. 如自行实现视频源，可移除 scene-common 依赖
  * 3. 修改 getVideoVid() 方法和 AiContentLoader 中的 PlayAuth 获取逻辑，替换为您的视频源获取方式
- * 4. 替换 AiContentRepository 实现，对接您的 AI 内容服务
+ * 4. 替换 AiContentLoader 实现，对接您的 AI 内容服务
  * </p>
  *
  * @author keria
  * @date 2026/07/03
  */
-public class AiEducationActivity extends AppCompatActivity implements AiContentRepository {
+public class AiEducationActivity extends AppCompatActivity {
 
     private static final String TAG = "AiEducationActivity";
 
@@ -54,10 +53,10 @@ public class AiEducationActivity extends AppCompatActivity implements AiContentR
     private AliPlayerController playerController;
 
     /**
-     * 缓存已加载的 AI 内容，避免重复请求
+     * 章节内容面板插槽实例，注册时捕获，用于在 AI 内容就绪后推入数据
      */
     @Nullable
-    private AiVideoContent mCachedContent;
+    private ChapterContentPanelSlot mChapterContentPanelSlot;
 
     /**
      * AI 内容加载器，页面销毁时需取消进行中的任务
@@ -121,14 +120,18 @@ public class AiEducationActivity extends AppCompatActivity implements AiContentR
     private void registerAiSlot() {
         SlotManager slotManager = playerView.getSlotManager();
         slotManager.register(ChapterButtonSlot.TYPE, parent -> new ChapterButtonSlot(parent.getContext()));
-        slotManager.register(ChapterPanelSlot.TYPE, parent -> new ChapterPanelSlot(parent.getContext(), this));
+        slotManager.register(ChapterContentPanelSlot.TYPE, parent -> {
+            // 保存插槽实例，attach 后由本页面（组合根）把 AI 内容推入面板
+            mChapterContentPanelSlot = new ChapterContentPanelSlot(parent.getContext());
+            return mChapterContentPanelSlot;
+        });
     }
 
     /**
      * 配置播放器（在 PlayAuth 和 AI 内容加载完成后调用）
      */
     private void configurePlayer(@NonNull String vid, @NonNull String playAuth, @Nullable AiVideoContent aiContent) {
-        mCachedContent = aiContent;
+        // 章节可以随 AliPlayerModel 下发，摘要和分段等 AI 内容则不能
         List<ChapterInfo> chapters = aiContent != null ? aiContent.getChapters() : null;
 
         VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(vid, playAuth);
@@ -138,16 +141,14 @@ public class AiEducationActivity extends AppCompatActivity implements AiContentR
                 .chapters(chapters)
                 .build();
 
+        // 配置播放源并挂载控制器（挂载后插槽才会创建，自动开始播放）
         playerController.configure(playerModel);
         playerView.attach(playerController);
-    }
 
-    // ==================== AiContentRepository ====================
-
-    @Nullable
-    @Override
-    public AiVideoContent load(@NonNull AliPlayerModel model) {
-        return mCachedContent;
+        // attach 后显式把 AI 内容推给面板插槽（本页面作组合根，插槽之间互不感知）
+        if (mChapterContentPanelSlot != null) {
+            mChapterContentPanelSlot.updateAiContent(aiContent);
+        }
     }
 
     // ==================== Lifecycle ====================

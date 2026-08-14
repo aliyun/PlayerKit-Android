@@ -1,6 +1,7 @@
 package com.aliyun.playerkit.scenes.aieducation.ui.slots;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,10 +73,19 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         // Highlight current chapter
         boolean isCurrent = (position == mCurrentIndex);
         Context context = holder.itemView.getContext();
-        int color = ContextCompat.getColor(context, isCurrent
-                ? R.color.ai_education_highlight_red
-                : R.color.ai_education_text_primary);
-        holder.tvTitle.setTextColor(color);
+        int titleColor = ContextCompat.getColor(context, isCurrent
+                ? R.color.ai_education_highlight_white
+                : R.color.ai_education_text_primary_80);
+        holder.tvTitle.setTextColor(titleColor);
+        holder.tvTitle.setTypeface(null, isCurrent ? Typeface.BOLD : Typeface.NORMAL);
+
+        int timeColor = ContextCompat.getColor(context, R.color.ai_education_text_time);
+        holder.tvTime.setTextColor(timeColor);
+
+        int bgColor = ContextCompat.getColor(context, isCurrent
+                ? R.color.ai_education_item_selected_bg
+                : android.R.color.transparent);
+        holder.itemView.setBackgroundColor(bgColor);
 
         // Thumbnail placeholder
         String thumbnailUrl = chapter.getThumbnailUrl();
@@ -87,7 +97,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                     .error(android.R.color.darker_gray)
                     .into(holder.ivThumbnail);
         } else {
-            holder.ivThumbnail.setBackgroundColor(0xFFE0E0E0);
+            Glide.with(holder.ivThumbnail.getContext()).clear(holder.ivThumbnail);
             holder.ivThumbnail.setImageDrawable(null);
         }
 
@@ -110,12 +120,14 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         final ImageView ivThumbnail;
         final TextView tvTitle;
         final TextView tvTime;
+        final ImageView ivChevron;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivThumbnail = itemView.findViewById(R.id.iv_thumbnail);
             tvTitle = itemView.findViewById(R.id.tv_chapter_title);
             tvTime = itemView.findViewById(R.id.tv_chapter_time);
+            ivChevron = itemView.findViewById(R.id.iv_chevron_right);
         }
     }
 }

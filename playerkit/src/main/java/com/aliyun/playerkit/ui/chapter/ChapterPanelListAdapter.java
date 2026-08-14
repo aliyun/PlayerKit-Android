@@ -1,5 +1,7 @@
 package com.aliyun.playerkit.ui.chapter;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,15 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 章节内容面板列表适配器
+ * 章节面板列表适配器
  * <p>
- * Adapter for chapter content panel list
+ * Adapter for chapter panel list
  * </p>
  *
  * @author keria
  * @date 2026/07/13
  */
-public class ChapterContentListAdapter extends RecyclerView.Adapter<ChapterContentListAdapter.ViewHolder> {
+public class ChapterPanelListAdapter extends RecyclerView.Adapter<ChapterPanelListAdapter.ViewHolder> {
 
     private final List<ChapterInfo> mChapters = new ArrayList<>();
     private int mCurrentIndex = -1;
@@ -85,7 +87,7 @@ public class ChapterContentListAdapter extends RecyclerView.Adapter<ChapterConte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_chapter_content, parent, false);
+                .inflate(R.layout.item_chapter_panel, parent, false);
         return new ViewHolder(view);
     }
 
@@ -93,17 +95,25 @@ public class ChapterContentListAdapter extends RecyclerView.Adapter<ChapterConte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ChapterInfo chapter = mChapters.get(position);
         boolean isCurrent = position == mCurrentIndex;
+        Context context = holder.itemView.getContext();
 
         // 标题
         holder.tvTitle.setText(chapter.getTitle());
-        holder.tvTitle.setTextColor(ContextCompat.getColor(holder.itemView.getContext(),
-                isCurrent ? R.color.chapter_highlight_text : R.color.common_text_white));
+        holder.tvTitle.setTextColor(ContextCompat.getColor(context,
+                isCurrent ? R.color.common_text_white : R.color.chapter_title_unselected));
 
         // 时间
         holder.tvTime.setText(FormatUtil.formatDuration(chapter.getStartMs()));
+        holder.tvTime.setTextColor(ContextCompat.getColor(context,
+                isCurrent ? R.color.chapter_time_selected : R.color.chapter_secondary_text));
 
-        // 播放指示器
-        holder.ivPlayingIndicator.setVisibility(isCurrent ? View.VISIBLE : View.GONE);
+        // 选中态背景
+        holder.itemView.setBackgroundColor(isCurrent
+                ? ContextCompat.getColor(context, R.color.chapter_item_selected_bg)
+                : Color.TRANSPARENT);
+
+        // 箭头透明度
+        holder.ivPlayingIndicator.setAlpha(isCurrent ? 1.0f : 0.5f);
 
         // 缩略图
         String thumbnailUrl = chapter.getThumbnailUrl();

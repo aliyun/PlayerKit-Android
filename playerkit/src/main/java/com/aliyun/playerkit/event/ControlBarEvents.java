@@ -159,9 +159,9 @@ public final class ControlBarEvents {
     }
 
     /**
-     * 显示章节内容面板
+     * 显示章节面板
      * <p>
-     * Show chapter content panel
+     * Show chapter panel
      * </p>
      */
     public static final class ShowChapterPanel extends PlayerEvent {

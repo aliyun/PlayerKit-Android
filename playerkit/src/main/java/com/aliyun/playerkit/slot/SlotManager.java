@@ -439,7 +439,10 @@ public class SlotManager {
      * @param sceneType 新的场景类型
      */
     public void updateSceneType(@SceneType int sceneType) {
-        host.updateSlotsIncremental(sceneType);
+        // 必须委托给 host.updateSceneType()，而不是直接调用 updateSlotsIncremental()：
+        // 后者只更新视图、不会写入 host.sceneType，会让 getSceneType() 返回旧场景，
+        // 且此后任何一次 rebuildSlots() 都会按旧场景把插槽重建回去。
+        host.updateSceneType(sceneType);
     }
 
     // ==================== 包级方法（供 SlotHostLayout 使用）====================

@@ -149,6 +149,8 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `sceneType(int)` | 场景类型 | 设置播放场景类型 |
 | `coverUrl(String)` | 封面图 URL | 设置封面图地址（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
 | `videoTitle(String)` | 视频标题 | 设置视频标题（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
+| `thumbnailUrl(String)` | 缩略图 URL | 设置 Seek 缩略图地址（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
+| `chapters(List<ChapterInfo>)` | 章节列表 | 设置视频章节数据（可选），用于 `SceneType.AI_VOD` 场景的视频拆条能力 |
 | `autoPlay(boolean)` | 是否自动播放 | 设置是否自动播放 |
 | `traceId(String)` | 跟踪 ID | 设置跟踪标识 |
 | `startTime(long)` | 起播位置 | 设置起播位置（毫秒） |
@@ -165,11 +167,43 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `getSceneType()` | int | 获取播放场景类型 |
 | `getCoverUrl()` | String | 获取封面图地址 |
 | `getVideoTitle()` | String | 获取视频标题 |
+| `getThumbnailUrl()` | String | 获取 Seek 缩略图地址 |
+| `getChapters()` | List\<ChapterInfo\> | 获取视频章节列表（不可变列表，未设置时返回 null） |
 | `isAutoPlay()` | boolean | 获取是否自动播放 |
 | `getTraceId()` | String | 获取跟踪 ID |
 | `getStartTime()` | long | 获取起播位置 |
 | `isHardWareDecode()` | boolean | 获取是否硬件解码 |
 | `isAllowedScreenSleep()` | boolean | 获取是否允许屏幕休眠 |
+
+### **1.5 ChapterInfo（章节信息）**
+
+`ChapterInfo` 描述单个视频章节（视频拆条）的时间区间与展示信息，通过 `AliPlayerModel.Builder.chapters()` 传入。
+
+**构造方法**
+
+| 方法 | 说明 |
+|-----|------|
+| `ChapterInfo(long startMs, long endMs, String title)` | 创建章节（起止时间 + 标题） |
+| `ChapterInfo(long startMs, long endMs, String title, String thumbnailUrl)` | 创建章节，并指定章节缩略图 |
+| `ChapterInfo(String id, long startMs, long endMs, String title, String thumbnailUrl)` | 创建章节，并指定章节 ID |
+
+**属性获取方法**
+
+| 方法 | 返回值 | 说明 |
+|-----|-------|------|
+| `getId()` | String | 获取章节 ID（可为 null） |
+| `getStartMs()` | long | 获取章节起始时间（毫秒） |
+| `getEndMs()` | long | 获取章节结束时间（毫秒） |
+| `getTitle()` | String | 获取章节标题 |
+| `getThumbnailUrl()` | String | 获取章节缩略图地址（可为 null） |
+
+**静态方法**
+
+| 方法 | 返回值 | 说明 |
+|-----|-------|------|
+| `findIndexByPosition(List<ChapterInfo>, long positionMs)` | int | 根据播放位置二分查找所属章节索引，未命中返回 -1 |
+
+详见 [视频拆条](./CoreFeatures.md#39-视频拆条)。
 
 ---
 
@@ -238,9 +272,11 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `SlotType.PLAY_STATE` | 播放状态插槽：用于显示播放状态（如错误提示、加载中等） |
 | `SlotType.LOG_PANEL` | 日志面板插槽：用于显示播放器日志信息，便于调试 |
 | `SlotType.TOP_BAR` | 顶部控制栏插槽：显示返回按钮、标题、设置等 |
+| `SlotType.SEEK_THUMBNAIL` | Seek 缩略图插槽：拖动进度条时展示对应位置的缩略图预览 |
 | `SlotType.BOTTOM_BAR` | 底部控制栏插槽：显示播放控制、进度条等 |
 | `SlotType.SETTING_MENU` | 设置菜单插槽：用于显示设置菜单（如倍速、清晰度、镜像、旋转等） |
 | `SlotType.OPTION_PANEL` | 选项面板插槽：用于横屏场景下显示倍速/清晰度等选项的独立选择面板 |
+| `SlotType.CHAPTER_PANEL` | 章节面板插槽：全屏下从右侧滑入展示章节列表，支持点击跳转（`SceneType.AI_VOD` 场景） |
 
 ### **2.4 SceneType（播放场景）**
 
@@ -251,6 +287,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `SceneType.VIDEO_LIST` | 2 | 列表播放场景：视频列表中的播放器，禁用垂直手势 |
 | `SceneType.RESTRICTED` | 3 | 受限播放场景：限制时间轴操作，适用于教育培训等 |
 | `SceneType.MINIMAL` | 4 | 最小化播放场景：仅播放视图，无任何 UI |
+| `SceneType.AI_VOD` | 5 | AI 增强点播场景：在点播基础上增加章节导航与 AI 内容展示 |
 
 ### **2.5 PlayerViewType（播放器视图类型）**
 

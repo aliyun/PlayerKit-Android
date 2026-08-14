@@ -43,7 +43,7 @@
                 android:layout_centerVertical="true"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+                android:src="@drawable/ic_panel_close" />
 
         </RelativeLayout>
 
@@ -52,11 +52,16 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/ai_education_tab_height"
+            android:background="@android:color/transparent"
+            app:tabIndicatorHeight="2dp"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorGravity="bottom"
+            app:tabRippleColor="@android:color/transparent"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@color/ai_education_highlight_red"
+            app:tabIndicatorColor="@color/ai_education_highlight_white"
             app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/ai_education_highlight_red"
-            app:tabTextColor="@color/ai_education_text_secondary" />
+            app:tabSelectedTextColor="@color/ai_education_highlight_white"
+            app:tabTextColor="@color/ai_education_text_time" />
 
         <!-- Content area (switched by tab) -->
         <FrameLayout

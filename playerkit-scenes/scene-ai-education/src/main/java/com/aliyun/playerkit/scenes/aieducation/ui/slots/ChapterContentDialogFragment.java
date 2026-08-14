@@ -24,7 +24,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.List;
 
 /**
- * 章节面板弹窗 Fragment。
+ * 章节内容面板弹窗 Fragment。
  * <p>
  * 继承 {@link BasePanelDialogFragment}，复用全屏防护、入退场动画、蒙层等通用逻辑。
  * 面板从屏幕边界弹出（竖屏底部，横屏右侧）。
@@ -33,12 +33,12 @@ import java.util.List;
  * @author keria
  * @date 2026/07/03
  */
-public class ChapterPanelDialogFragment extends BasePanelDialogFragment {
+public class ChapterContentDialogFragment extends BasePanelDialogFragment {
 
     /**
      * 横屏面板宽度（dp）
      */
-    private static final float PANEL_WIDTH_DP = 345f;
+    private static final float PANEL_WIDTH_DP = 390f;
 
     /**
      * 竖屏面板高度的回退值（dp），在首帧 layout 尚未完成时用于动画位移计算。
@@ -80,8 +80,8 @@ public class ChapterPanelDialogFragment extends BasePanelDialogFragment {
     @Nullable
     private SegmentListAdapter.OnSegmentClickListener mSegmentClickListener;
 
-    public static ChapterPanelDialogFragment newInstance() {
-        return new ChapterPanelDialogFragment();
+    public static ChapterContentDialogFragment newInstance() {
+        return new ChapterContentDialogFragment();
     }
 
     // ==================== 配置 API（show 之前调用） ====================
@@ -112,7 +112,7 @@ public class ChapterPanelDialogFragment extends BasePanelDialogFragment {
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.layout_chapter_panel_dialog;
+        return R.layout.layout_chapter_content_dialog;
     }
 
     @Nullable
@@ -333,10 +333,12 @@ public class ChapterPanelDialogFragment extends BasePanelDialogFragment {
             lp.width = DensityUtil.dip2px(requireContext(), PANEL_WIDTH_DP);
             lp.height = FrameLayout.LayoutParams.MATCH_PARENT;
             lp.gravity = Gravity.END;
+            mPanelContainer.setBackgroundResource(R.drawable.bg_panel_round_all);
         } else {
             lp.width = FrameLayout.LayoutParams.MATCH_PARENT;
             lp.height = FrameLayout.LayoutParams.WRAP_CONTENT;
             lp.gravity = Gravity.BOTTOM;
+            mPanelContainer.setBackgroundResource(R.drawable.bg_panel_round_top);
         }
         mPanelContainer.setLayoutParams(lp);
     }

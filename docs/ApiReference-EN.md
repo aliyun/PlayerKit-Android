@@ -149,6 +149,8 @@ AliPlayerKit provides a rich set of API interfaces to enable developers to direc
 | `sceneType(int)` | Scene type | Set the playback scene type |
 | `coverUrl(String)` | Cover image URL | Set cover image URL (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
 | `videoTitle(String)` | Video title | Set video title (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
+| `thumbnailUrl(String)` | Thumbnail URL | Set the seek thumbnail URL (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
+| `chapters(List<ChapterInfo>)` | Chapter list | Set video chapter data (optional), used by the video chaptering capability of the `SceneType.AI_VOD` scene |
 | `autoPlay(boolean)` | Whether to auto play | Set whether to auto play |
 | `traceId(String)` | Trace ID | Set the trace identifier |
 | `startTime(long)` | Start position | Set the start position (milliseconds) |
@@ -165,11 +167,43 @@ AliPlayerKit provides a rich set of API interfaces to enable developers to direc
 | `getSceneType()` | int | Get the playback scene type |
 | `getCoverUrl()` | String | Get the cover image address |
 | `getVideoTitle()` | String | Get the video title |
+| `getThumbnailUrl()` | String | Get the seek thumbnail address |
+| `getChapters()` | List\<ChapterInfo\> | Get the video chapter list (immutable list, returns null when not set) |
 | `isAutoPlay()` | boolean | Get whether auto play is enabled |
 | `getTraceId()` | String | Get the trace ID |
 | `getStartTime()` | long | Get the start position |
 | `isHardWareDecode()` | boolean | Get whether hardware decoding is enabled |
 | `isAllowedScreenSleep()` | boolean | Get whether screen sleep is allowed |
+
+### **1.5 ChapterInfo**
+
+`ChapterInfo` describes the time range and display information of a single video chapter (video chaptering). Pass chapters in through `AliPlayerModel.Builder.chapters()`.
+
+**Constructors**
+
+| Method | Description |
+|-----|------|
+| `ChapterInfo(long startMs, long endMs, String title)` | Create a chapter (time range + title) |
+| `ChapterInfo(long startMs, long endMs, String title, String thumbnailUrl)` | Create a chapter with a chapter thumbnail |
+| `ChapterInfo(String id, long startMs, long endMs, String title, String thumbnailUrl)` | Create a chapter with a chapter ID |
+
+**Property Getter Methods**
+
+| Method | Return | Description |
+|-----|-------|------|
+| `getId()` | String | Get the chapter ID (nullable) |
+| `getStartMs()` | long | Get the chapter start time (milliseconds) |
+| `getEndMs()` | long | Get the chapter end time (milliseconds) |
+| `getTitle()` | String | Get the chapter title |
+| `getThumbnailUrl()` | String | Get the chapter thumbnail address (nullable) |
+
+**Static Methods**
+
+| Method | Return | Description |
+|-----|-------|------|
+| `findIndexByPosition(List<ChapterInfo>, long positionMs)` | int | Binary-search the index of the chapter containing the given position; returns -1 when no chapter matches |
+
+See [Video Chaptering](./CoreFeatures-EN.md#39-video-chaptering).
 
 ---
 
@@ -238,9 +272,11 @@ Custom slots need to implement the `ISlot` interface, which defines the slot lif
 | `SlotType.PLAY_STATE` | Playback State Slot: Displays playback state (such as error messages, loading, etc.) |
 | `SlotType.LOG_PANEL` | Log Panel Slot: Displays player log information for debugging |
 | `SlotType.TOP_BAR` | Top Control Bar Slot: Displays back button, title, settings, etc. |
+| `SlotType.SEEK_THUMBNAIL` | Seek Thumbnail Slot: Shows a thumbnail preview of the target position while dragging the progress bar |
 | `SlotType.BOTTOM_BAR` | Bottom Control Bar Slot: Displays playback controls, progress bar, etc. |
 | `SlotType.SETTING_MENU` | Settings Menu Slot: Displays settings menu (such as speed, resolution, mirror, rotation, etc.) |
 | `SlotType.OPTION_PANEL` | Option Panel Slot: Independent selection panel for speed/resolution shown in landscape scenarios |
+| `SlotType.CHAPTER_PANEL` | Chapter Panel Slot: Slides in from the right in fullscreen to show the chapter list, tap to seek (`SceneType.AI_VOD` scene) |
 
 ### **2.4 SceneType**
 
@@ -251,6 +287,7 @@ Custom slots need to implement the `ISlot` interface, which defines the slot lif
 | `SceneType.VIDEO_LIST` | 2 | Video list playback scene: Player in a video list, with vertical gestures disabled |
 | `SceneType.RESTRICTED` | 3 | Restricted playback scene: Restricts timeline operations, suitable for education and training |
 | `SceneType.MINIMAL` | 4 | Minimal playback scene: Only the playback view, without any UI |
+| `SceneType.AI_VOD` | 5 | AI-enhanced VOD scene: Adds chapter navigation and AI content display on top of the VOD scene |
 
 ### **2.5 PlayerViewType**
 

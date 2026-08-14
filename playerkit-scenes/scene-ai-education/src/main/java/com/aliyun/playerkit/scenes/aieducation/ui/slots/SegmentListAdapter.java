@@ -152,7 +152,7 @@ public class SegmentListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         // Highlight state
         boolean isCurrent = (segmentIndex == mCurrentSegmentIndex);
-        int highlightColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.ai_education_highlight_red);
+        int highlightColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.ai_education_highlight_white);
         int normalColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.ai_education_text_secondary);
         holder.tvTime.setTextColor(isCurrent ? highlightColor : normalColor);
 

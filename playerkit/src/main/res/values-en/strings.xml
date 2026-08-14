@@ -80,7 +80,7 @@
     <!-- Landscape Hint Slot -->
     <string name="landscape_hint_fullscreen">Fullscreen View</string>
 
-    <!-- Chapter Content Panel -->
+    <!-- Chapter Panel -->
     <string name="chapter_button_format">Chapter %1$d: %2$s ></string>
     <string name="next_chapter">Next Chapter</string>
     <string name="toast_seek_to_chapter">Seeked to %1$s</string>

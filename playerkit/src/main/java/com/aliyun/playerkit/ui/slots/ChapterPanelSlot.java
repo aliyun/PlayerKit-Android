@@ -19,27 +19,27 @@ import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
 import com.aliyun.playerkit.slot.BasePanelSlot;
 import com.aliyun.playerkit.slot.SlotHost;
-import com.aliyun.playerkit.ui.chapter.ChapterContentListAdapter;
+import com.aliyun.playerkit.ui.chapter.ChapterPanelListAdapter;
 import com.aliyun.playerkit.utils.StringUtil;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * 章节内容面板插槽
+ * 章节面板插槽
  * <p>
- * 从右往左滑入的章节内容面板，展示所有章节列表，支持点击跳转。
+ * 从右往左滑入的章节面板，展示所有章节列表，支持点击跳转。
  * 使用 translationX 动画 + 蒙层实现。
  * </p>
  * <p>
- * Chapter content panel slot.
+ * Chapter panel slot.
  * Slides in from right, displays all chapters with thumbnails.
  * </p>
  *
  * @author keria
  * @date 2026/07/13
  */
-public class ChapterContentPanelSlot extends BasePanelSlot {
+public class ChapterPanelSlot extends BasePanelSlot {
 
     private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
             ControlBarEvents.ShowChapterPanel.class,
@@ -57,15 +57,15 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
     private View mPanelContainer;
     private TextView mTvChapterCount;
     private RecyclerView mRvChapterList;
-    private ChapterContentListAdapter mAdapter;
+    private ChapterPanelListAdapter mAdapter;
 
-    public ChapterContentPanelSlot(@NonNull Context context) {
+    public ChapterPanelSlot(@NonNull Context context) {
         super(context);
     }
 
     @Override
     protected int getLayoutId() {
-        return R.layout.layout_chapter_content_panel_slot;
+        return R.layout.layout_chapter_panel_slot;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
         }
 
         // 初始化列表
-        mAdapter = new ChapterContentListAdapter();
+        mAdapter = new ChapterPanelListAdapter();
         if (mRvChapterList != null) {
             mRvChapterList.setLayoutManager(new LinearLayoutManager(getContext()));
             mRvChapterList.setHasFixedSize(true);
@@ -141,7 +141,7 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
         }
 
         if (event instanceof ControlBarEvents.ShowChapterPanel) {
-            showChapterContentPanel();
+            showChapterPanel();
         } else if (event instanceof ControlBarEvents.Show) {
             hidePanel();
         } else if (event instanceof PlayerEvents.Info) {
@@ -149,7 +149,7 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
         }
     }
 
-    private void showChapterContentPanel() {
+    private void showChapterPanel() {
         if (mChapters == null || mChapters.isEmpty()) return;
 
         // 更新头部
@@ -196,7 +196,7 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
             animateOverlayIn(mOverlay);
         }
         if (mPanelContainer != null) {
-            float panelWidth = getContext().getResources().getDimension(R.dimen.chapter_content_panel_width);
+            float panelWidth = getContext().getResources().getDimension(R.dimen.chapter_panel_width);
             animateTranslationXIn(mPanelContainer, panelWidth, this::onPanelShown);
         } else {
             onPanelShown();
@@ -209,7 +209,7 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
             animateOverlayOut(mOverlay);
         }
         if (mPanelContainer != null) {
-            float panelWidth = getContext().getResources().getDimension(R.dimen.chapter_content_panel_width);
+            float panelWidth = getContext().getResources().getDimension(R.dimen.chapter_panel_width);
             animateTranslationXOut(mPanelContainer, panelWidth, () -> {
                 setVisibility(View.GONE);
                 onPanelHidden();

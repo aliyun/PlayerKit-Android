@@ -7,7 +7,7 @@ import com.aliyun.playerkit.event.PlayerEvent;
 /**
  * 章节相关事件定义
  * <p>
- * 用于 ChapterButtonSlot 和 ChapterPanelSlot 之间的通信。
+ * 用于 ChapterButtonSlot 和 ChapterContentPanelSlot 之间的通信。
  * </p>
  *
  * @author keria
@@ -22,7 +22,7 @@ public final class ChapterEvents {
     /**
      * 显示章节面板事件
      * <p>
-     * 由 ChapterButtonSlot 发送，通知 ChapterPanelSlot 展开底部面板。
+     * 由 ChapterButtonSlot 发送，通知 ChapterContentPanelSlot 展开底部面板。
      * </p>
      */
     public static final class ShowPanel extends PlayerEvent {

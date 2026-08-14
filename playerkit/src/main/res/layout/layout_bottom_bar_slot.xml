@@ -14,11 +14,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_chapter_chips"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/chapter_chip_height"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
+            android:paddingStart="@dimen/bottom_bar_portrait_padding_horizontal"
+            android:paddingEnd="@dimen/bottom_bar_portrait_padding_horizontal"
+            android:layout_marginBottom="@dimen/bottom_bar_portrait_padding_vertical"
             android:visibility="gone" />
 
         <LinearLayout

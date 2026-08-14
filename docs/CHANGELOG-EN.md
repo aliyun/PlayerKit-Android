@@ -12,6 +12,7 @@ Language: [中文简体](CHANGELOG.md) | English
 ### Added
 
 - **VID All-in-One Playback**: Through the integration of AliPlayerKit with ApsaraVideo VOD, applications only need to pass a video VID to automatically retrieve the playback resources and associated media information, including the video title, cover image, and thumbnails. This reduces the need to obtain playback URLs, transfer media information, and configure client-side parameters, simplifying playback integration.
+- **Video Chapter Splitting**: Intelligently segments long videos into multiple chapter clips by content structure, with progress bar markers and a chapter panel to help users quickly locate key content
 - **Seek Thumbnails**: Displays video thumbnails while the user drags the progress bar. When playing a video by VID, thumbnails are retrieved automatically. Manually supplied thumbnail data is also supported.
 - **AI-Powered Education Scenarios**:
   - Introduces an AI-powered video solution for online education, knowledge-based courses, and similar scenarios. It provides intelligent chapters, content summaries, key knowledge points, and illustrated explanations, helping users quickly locate important content and improve learning and content comprehension.

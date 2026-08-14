@@ -6,6 +6,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.aliyun.playerkit.event.ControlBarEvents;
+import com.aliyun.playerkit.event.FullscreenEvents;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.slot.BaseSlot;
 import com.aliyun.playerkit.slot.CustomSlotType;
@@ -20,7 +22,7 @@ import java.util.List;
  * 章节按钮插槽
  * <p>
  * 自定义插槽，在播放器右上角区域显示"章节"按钮。
- * 点击按钮通过事件总线通知 {@link ChapterPanelSlot} 展开/收起面板。
+ * 点击按钮通过事件总线通知 {@link ChapterContentPanelSlot} 展开/收起面板。
  * </p>
  *
  * @author keria
@@ -41,7 +43,10 @@ public class ChapterButtonSlot extends BaseSlot {
      */
     private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
             ChapterEvents.ShowPanel.class,
-            ChapterEvents.HidePanel.class
+            ChapterEvents.HidePanel.class,
+            ControlBarEvents.Show.class,
+            ControlBarEvents.Hide.class,
+            FullscreenEvents.FullScreenChanged.class
     );
 
     @Nullable
@@ -51,6 +56,11 @@ public class ChapterButtonSlot extends BaseSlot {
      * 章节面板是否正在显示
      */
     private boolean mIsPanelShowing = false;
+
+    /**
+     * 当前是否处于全屏（横屏）状态
+     */
+    private boolean mIsFullscreen = false;
 
     public ChapterButtonSlot(@NonNull Context context) {
         super(context);
@@ -69,6 +79,7 @@ public class ChapterButtonSlot extends BaseSlot {
         if (mBtnChapter != null) {
             mBtnChapter.setOnClickListener(v -> onChapterButtonClicked());
         }
+        setVisibility(View.GONE);
     }
 
     @Nullable
@@ -85,6 +96,13 @@ public class ChapterButtonSlot extends BaseSlot {
         } else if (event instanceof ChapterEvents.HidePanel) {
             mIsPanelShowing = false;
             updateButtonState();
+        } else if (event instanceof FullscreenEvents.FullScreenChanged) {
+            mIsFullscreen = ((FullscreenEvents.FullScreenChanged) event).isFullscreen;
+            updateButtonVisibility();
+        } else if (event instanceof ControlBarEvents.Show) {
+            setVisibility(View.VISIBLE);
+        } else if (event instanceof ControlBarEvents.Hide) {
+            setVisibility(View.GONE);
         }
     }
 
@@ -105,6 +123,18 @@ public class ChapterButtonSlot extends BaseSlot {
     private void updateButtonState() {
         if (mBtnChapter != null) {
             mBtnChapter.setSelected(mIsPanelShowing);
+        }
+    }
+
+    /**
+     * 根据全屏状态更新按钮显隐
+     * <p>
+     * 竖屏（非全屏）时显示，横屏（全屏）时隐藏。
+     * </p>
+     */
+    private void updateButtonVisibility() {
+        if (mBtnChapter != null) {
+            mBtnChapter.setVisibility(mIsFullscreen ? View.GONE : View.VISIBLE);
         }
     }
 

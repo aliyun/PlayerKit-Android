@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
@@ -16,7 +17,8 @@
         android:id="@+id/iv_thumbnail"
         android:layout_width="@dimen/ai_education_thumbnail_width"
         android:layout_height="@dimen/ai_education_thumbnail_height"
-        android:background="@color/ai_education_thumbnail_bg"
+        android:background="@drawable/bg_chapter_thumbnail"
+        android:clipToOutline="true"
         android:scaleType="centerCrop" />
 
     <!-- Title + timestamp -->
@@ -33,7 +35,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textColor="@color/ai_education_text_primary"
+            android:textColor="@color/ai_education_text_primary_80"
             android:textSize="@dimen/ai_education_text_size_body" />
 
         <TextView
@@ -41,9 +43,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="@color/ai_education_text_secondary"
+            android:textColor="@color/ai_education_text_time"
             android:textSize="@dimen/ai_education_text_size_secondary" />
 
     </LinearLayout>
+
+    <!-- Chevron -->
+    <ImageView
+        android:id="@+id/iv_chevron_right"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/ai_education_text_primary_80" />
 
 </LinearLayout>

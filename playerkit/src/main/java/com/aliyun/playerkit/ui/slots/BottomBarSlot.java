@@ -872,9 +872,9 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
     }
 
     /**
-     * 显示章节内容面板
+     * 显示章节面板
      * <p>
-     * Show chapter content panel
+     * Show chapter panel
      * </p>
      */
     private void showChapterPanel() {

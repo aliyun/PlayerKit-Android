@@ -21,7 +21,7 @@ AliPlayerKit is not just designed as a set of player UI components — it is pos
 | Design Goal | Description |
 |---------|------|
 | **Low-code Integration** | Integrate complete playback scenarios with minimal code |
-| **Multi-scenario Coverage** | Cover diverse playback scenarios including VOD, live streaming, and short video |
+| **Multi-scenario Coverage** | Cover diverse playback scenarios including VOD, live streaming, short video, and AI education |
 | **Reusable Architecture** | Avoid duplicate development of player capabilities across business lines through the slot + strategy architecture |
 | **Unified Foundation** | Serve as the unified foundation for all player solutions and scenario-based solutions |
 
@@ -34,7 +34,7 @@ In terms of architecture, **AliPlayerKit sits on top of the player core**, provi
 | Layer | Positioning | Module Location | Responsibilities |
 | ---------- | -------------- | ------------------- | ------------------------------------------------------------ |
 | **Component Layer** | Player UI Components | `playerkit/` | Provides out-of-the-box, configurable player UI components covering basic playback and common interactions. |
-| **Scene Layer** | Scenario-based Solutions | `playerkit-scenes/` | Provides standardized integration examples for typical scenarios such as short drama, medium/long video, and live streaming, helping clients rapidly build complete playback capabilities with minimal code. |
+| **Scene Layer** | Scenario-based Solutions | `playerkit-scenes/` | Provides standardized integration examples for typical scenarios such as short drama, medium/long video, live streaming, and AI education, helping clients rapidly build complete playback capabilities with minimal code. |
 
 > 📌 **Scenario Solution Example**: [AI Education Scene](./scenes/AiEducation-EN.md) — For courses and knowledge videos, providing AI chapter segmentation, summaries, knowledge point analysis, and other enhanced playback experiences.
 
@@ -346,6 +346,35 @@ After the player enters the `prepared` state, AliPlayerKit automatically extract
 **Priority rule:** Values manually configured through `AliPlayerModel.Builder` take precedence over values automatically retrieved from `MediaInfo`. Values from `MediaInfo` are used only when the corresponding fields have not been manually configured.
 
 > 💡 This feature requires Alibaba Cloud Player SDK 7.16.0 or later.
+
+### **3.9 Video Chaptering**
+
+Long videos are intelligently split into multiple chapter segments based on content structure, helping users quickly locate key content and improving learning and comprehension efficiency. Chapter data is produced by the AI content understanding service after analyzing the video, and is injected through `AliPlayerModel.Builder.chapters()`.
+
+| Component | Capability |
+|------|------|
+| `ChapterInfo` data model | Describes the time range (`[startMs, endMs)`) and display information (title, thumbnail) of a chapter segment |
+| `BottomBarSlot` chapter markers | Visualizes the content structure split points on the progress bar; combined with the chapter chip list, taps seek to the target segment. In landscape, an extra "Chapters" entry and "Next chapter" button are provided |
+| `ChapterPanelSlot` | Slides a structured content navigation panel in from the right in fullscreen; tap to jump to the target segment |
+
+**Scene restriction:** Effective only in the `SceneType.AI_VOD` scene with at least 2 chapters.
+
+**Integration Example**
+
+```java
+List<ChapterInfo> chapters = new ArrayList<>();
+chapters.add(new ChapterInfo(0, 65_000, "Course introduction"));
+chapters.add(new ChapterInfo(65_000, 210_000, "Core concepts"));
+chapters.add(new ChapterInfo(210_000, 320_000, "Worked examples"));
+
+AliPlayerModel model = new AliPlayerModel.Builder()
+        .videoSource(videoSource)
+        .sceneType(SceneType.AI_VOD)
+        .chapters(chapters)
+        .build();
+```
+
+See [AI Education Scene](./scenes/AiEducation-EN.md).
 
 ---
 
