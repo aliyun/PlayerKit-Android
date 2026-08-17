@@ -15,8 +15,9 @@ import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.data.VideoSource;
 import com.aliyun.playerkit.data.VideoSourceFactory;
 import com.aliyun.playerkit.logging.LogHub;
+import com.aliyun.playerkit.scenes.aieducation.data.AiAnalysisResponse;
+import com.aliyun.playerkit.scenes.aieducation.data.AiContentAssembler;
 import com.aliyun.playerkit.scenes.aieducation.data.AiContentLoader;
-import com.aliyun.playerkit.scenes.aieducation.data.AiVideoContent;
 import com.aliyun.playerkit.scenes.aieducation.ui.slots.ChapterButtonSlot;
 import com.aliyun.playerkit.scenes.aieducation.ui.slots.ChapterContentPanelSlot;
 import com.aliyun.playerkit.slot.SlotManager;
@@ -53,10 +54,16 @@ public class AiEducationActivity extends AppCompatActivity {
     private AliPlayerController playerController;
 
     /**
-     * 章节内容面板插槽实例，注册时捕获，用于在 AI 内容就绪后推入数据
+     * 章节内容面板插槽实例，注册时捕获，用于在 AI 内容就绪后传入数据
      */
     @Nullable
     private ChapterContentPanelSlot mChapterContentPanelSlot;
+
+    /**
+     * 章节按钮插槽实例，注册时捕获，用于根据 AI 内容可用性控制按钮显隐
+     */
+    @Nullable
+    private ChapterButtonSlot mChapterButtonSlot;
 
     /**
      * AI 内容加载器，页面销毁时需取消进行中的任务
@@ -101,15 +108,15 @@ public class AiEducationActivity extends AppCompatActivity {
                 finish();
                 return;
             }
-            mContentLoader.load(vid, aiContent -> {
+            mContentLoader.loadAiAnalysis(vid, response -> {
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }
-                if (aiContent == null) {
+                if (response == null) {
                     // AI 内容加载失败不影响播放，仅提示用户知情
                     ToastUtils.showToast(R.string.ai_education_error_ai_content_load_failed);
                 }
-                configurePlayer(vid, playAuth, aiContent);
+                configurePlayer(vid, playAuth, response);
             });
         });
     }
@@ -119,9 +126,13 @@ public class AiEducationActivity extends AppCompatActivity {
      */
     private void registerAiSlot() {
         SlotManager slotManager = playerView.getSlotManager();
-        slotManager.register(ChapterButtonSlot.TYPE, parent -> new ChapterButtonSlot(parent.getContext()));
+        slotManager.register(ChapterButtonSlot.TYPE, parent -> {
+            // 保存插槽实例，attach 后由本页面根据 AI 内容可用性控制按钮显隐
+            mChapterButtonSlot = new ChapterButtonSlot(parent.getContext());
+            return mChapterButtonSlot;
+        });
         slotManager.register(ChapterContentPanelSlot.TYPE, parent -> {
-            // 保存插槽实例，attach 后由本页面（组合根）把 AI 内容推入面板
+            // 保存插槽实例，attach 后由本页面把 AI 内容传入面板
             mChapterContentPanelSlot = new ChapterContentPanelSlot(parent.getContext());
             return mChapterContentPanelSlot;
         });
@@ -130,24 +141,34 @@ public class AiEducationActivity extends AppCompatActivity {
     /**
      * 配置播放器（在 PlayAuth 和 AI 内容加载完成后调用）
      */
-    private void configurePlayer(@NonNull String vid, @NonNull String playAuth, @Nullable AiVideoContent aiContent) {
-        // 章节可以随 AliPlayerModel 下发，摘要和分段等 AI 内容则不能
-        List<ChapterInfo> chapters = aiContent != null ? aiContent.getChapters() : null;
+    private void configurePlayer(@NonNull String vid, @NonNull String playAuth, @Nullable AiAnalysisResponse response) {
+        // 消费侧显式调用 Assembler 构建章节列表
+        List<ChapterInfo> chapters = response != null ? AiContentAssembler.buildChapters(response) : null;
+        // 仅当章节非空且非空列表时才下发章节数据
+        boolean hasChapters = chapters != null && !chapters.isEmpty();
 
         VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(vid, playAuth);
-        AliPlayerModel playerModel = new AliPlayerModel.Builder()
+        AliPlayerModel.Builder builder = new AliPlayerModel.Builder()
                 .videoSource(videoSource)
-                .sceneType(SceneType.AI_VOD)
-                .chapters(chapters)
-                .build();
+                .sceneType(SceneType.AI_VOD);
+        if (hasChapters) {
+            builder.chapters(chapters);
+        }
+        AliPlayerModel playerModel = builder.build();
 
         // 配置播放源并挂载控制器（挂载后插槽才会创建，自动开始播放）
         playerController.configure(playerModel);
         playerView.attach(playerController);
 
-        // attach 后显式把 AI 内容推给面板插槽（本页面作组合根，插槽之间互不感知）
+        // attach 后显式把 AI DTO 推给面板插槽（插槽之间互不感知）
         if (mChapterContentPanelSlot != null) {
-            mChapterContentPanelSlot.updateAiContent(aiContent);
+            mChapterContentPanelSlot.updateAiContent(response);
+        }
+
+        // 根据 Chapter/Summary 结果是否存在控制章节按钮显隐
+        boolean chapterAvailable = AiContentAssembler.hasAnyContent(response);
+        if (mChapterButtonSlot != null) {
+            mChapterButtonSlot.updateChapterAvailable(chapterAvailable);
         }
     }
 

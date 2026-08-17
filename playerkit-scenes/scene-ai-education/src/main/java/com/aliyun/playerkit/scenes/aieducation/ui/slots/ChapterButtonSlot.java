@@ -62,6 +62,16 @@ public class ChapterButtonSlot extends BaseSlot {
      */
     private boolean mIsFullscreen = false;
 
+    /**
+     * 章节内容是否可用，默认不可用
+     */
+    private boolean mChapterAvailable = false;
+
+    /**
+     * 控制栏当前是否可见，默认可见
+     */
+    private boolean mControlBarVisible = true;
+
     public ChapterButtonSlot(@NonNull Context context) {
         super(context);
     }
@@ -79,7 +89,8 @@ public class ChapterButtonSlot extends BaseSlot {
         if (mBtnChapter != null) {
             mBtnChapter.setOnClickListener(v -> onChapterButtonClicked());
         }
-        setVisibility(View.GONE);
+        // 初始按钮显隐：此时 mChapterAvailable=false，按钮隐藏
+        updateButtonVisibility();
     }
 
     @Nullable
@@ -100,9 +111,11 @@ public class ChapterButtonSlot extends BaseSlot {
             mIsFullscreen = ((FullscreenEvents.FullScreenChanged) event).isFullscreen;
             updateButtonVisibility();
         } else if (event instanceof ControlBarEvents.Show) {
-            setVisibility(View.VISIBLE);
+            mControlBarVisible = true;
+            updateButtonVisibility();
         } else if (event instanceof ControlBarEvents.Hide) {
-            setVisibility(View.GONE);
+            mControlBarVisible = false;
+            updateButtonVisibility();
         }
     }
 
@@ -127,14 +140,29 @@ public class ChapterButtonSlot extends BaseSlot {
     }
 
     /**
-     * 根据全屏状态更新按钮显隐
+     * 更新章节内容可用状态
      * <p>
-     * 竖屏（非全屏）时显示，横屏（全屏）时隐藏。
+     * 仅当章节/摘要数据可用时按钮才有机会显示。
+     * </p>
+     *
+     * @param available 章节内容是否可用
+     */
+    public void updateChapterAvailable(boolean available) {
+        mChapterAvailable = available;
+        updateButtonVisibility();
+    }
+
+    /**
+     * 更新按钮显隐
+     * <p>
+     * 仅当章节内容可用（mChapterAvailable）、
+     * 控制栏可见（mControlBarVisible）且非全屏（!mIsFullscreen）时才显示按钮。
      * </p>
      */
     private void updateButtonVisibility() {
         if (mBtnChapter != null) {
-            mBtnChapter.setVisibility(mIsFullscreen ? View.GONE : View.VISIBLE);
+            boolean shouldShow = !mIsFullscreen && mControlBarVisible && mChapterAvailable;
+            mBtnChapter.setVisibility(shouldShow ? View.VISIBLE : View.GONE);
         }
     }
 

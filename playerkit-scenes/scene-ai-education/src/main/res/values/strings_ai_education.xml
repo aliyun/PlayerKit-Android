@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ai_education_chapter">章节</string>
-    <string name="ai_education_ai_analysis">AI解析</string>
+    <string name="ai_education_ai_analysis">AI 解析</string>
     <string name="ai_education_chapter_count">章节 共%d段</string>
     <string name="ai_education_summary">摘要</string>
     <string name="ai_education_scene_title">AI 教育场景</string>

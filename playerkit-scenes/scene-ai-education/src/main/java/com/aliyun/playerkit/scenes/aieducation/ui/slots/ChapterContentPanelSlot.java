@@ -13,8 +13,10 @@ import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.event.PlayerCommand;
 import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
-import com.aliyun.playerkit.scenes.aieducation.data.AiSegment;
-import com.aliyun.playerkit.scenes.aieducation.data.AiVideoContent;
+import com.aliyun.playerkit.scenes.aieducation.data.AiAnalysisResponse;
+import com.aliyun.playerkit.scenes.aieducation.data.AiContentAssembler;
+import com.aliyun.playerkit.scenes.aieducation.data.AiContentViewModel;
+import com.aliyun.playerkit.scenes.aieducation.data.KnowledgeInfo;
 import com.aliyun.playerkit.scenes.aieducation.event.ChapterEvents;
 import com.aliyun.playerkit.scenes.aieducation.ui.MarkdownBinder;
 import com.aliyun.playerkit.slot.BasePanelSlot;
@@ -38,7 +40,7 @@ import java.util.List;
  *     <li>点击章节项发送 {@link PlayerCommand.Seek} 跳转到对应位置</li>
  * </ul>
  * <p>
- * 面板展示的 AI 内容由场景层通过 {@link #updateAiContent(AiVideoContent)} 推入
+ * 面板展示的 AI 内容由场景层通过 {@link #updateAiContent(AiAnalysisResponse)} 传入（DTO 形式）。
  * </p>
  *
  * @author keria
@@ -66,7 +68,9 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
     );
 
     @Nullable
-    private AiVideoContent mContent;
+    private AiAnalysisResponse mAiResponse;
+    @Nullable
+    private AiContentViewModel mCurrentViewModel;
     @Nullable
     private MarkdownBinder mMarkdownBinder;
 
@@ -103,8 +107,17 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
         FragmentManager fm = activity.getSupportFragmentManager();
         if (fm.isStateSaved()) return;
 
+        // 按需构建 VM
+        mCurrentViewModel = mAiResponse != null ? AiContentAssembler.buildViewModel(mAiResponse) : null;
+        if (mCurrentViewModel == null || (!mCurrentViewModel.hasChapterData() && !mCurrentViewModel.hasSummaryData())) {
+            // 无有效内容可展示，不弹面板
+            mCurrentViewModel = null;
+            hidePanel();
+            return;
+        }
+
         mDialogFragment = ChapterContentDialogFragment.newInstance();
-        mDialogFragment.setContent(mContent);
+        mDialogFragment.setContent(mCurrentViewModel);
         mDialogFragment.setMarkdownBinder(mMarkdownBinder);
         mDialogFragment.setOnChapterClickListener(this::onChapterClicked);
         mDialogFragment.setOnSegmentClickListener(this::onSegmentClicked);
@@ -135,6 +148,8 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
     protected void onPerformHideAnimation() {
         ChapterContentDialogFragment fragment = mDialogFragment;
         mDialogFragment = null;
+        // VM 生命周期与面板展示期绑定，隐藏时释放
+        mCurrentViewModel = null;
         if (fragment != null && fragment.isAdded()) {
             fragment.dismissWithAnimation();
         }
@@ -161,7 +176,8 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
         if (isShowing()) {
             hidePanel();
         }
-        mContent = null;
+        mAiResponse = null;
+        mCurrentViewModel = null;
         mCurrentChapterIndex = -1;
         mCurrentSegmentIndex = -1;
         super.onUnbindData();
@@ -175,7 +191,8 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
         }
         mCurrentChapterIndex = -1;
         mCurrentSegmentIndex = -1;
-        mContent = null;
+        mAiResponse = null;
+        mCurrentViewModel = null;
         mMarkdownBinder = null;
         super.onDetach();
     }
@@ -183,19 +200,19 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
     // ==================== Data binding ====================
 
     /**
-     * 更新面板展示的 AI 内容
+     * 更新面板展示的 AI 内容（DTO 形式）
      * <p>
-     * 由场景层在 AI 内容就绪后推入，面板内容在每次展示时按当前内容一次性构建，
+     * 由场景层在 AI 内容就绪后传入。Slot 存储 DTO，展示时惰性构建 ViewModel，
      * 因此显示期间更换内容会先收起面板，下次打开时按新内容重建。
      * </p>
      *
-     * @param content AI 视频内容，为 null 时面板没有内容可展示
+     * @param response 服务端 DTO，为 null 时面板没有内容可展示
      */
-    public void updateAiContent(@Nullable AiVideoContent content) {
-        if (mContent == content) {
+    public void updateAiContent(@Nullable AiAnalysisResponse response) {
+        if (mAiResponse == response) {
             return;
         }
-        mContent = content;
+        mAiResponse = response;
         mCurrentChapterIndex = -1;
         mCurrentSegmentIndex = -1;
         // 面板内容按当前内容一次性构建，显示期间换内容只能先收起，下次打开时重建
@@ -206,14 +223,14 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
 
     // ==================== Click callbacks ====================
 
-    private void onSegmentClicked(@NonNull AiSegment segment) {
+    private void onSegmentClicked(@NonNull KnowledgeInfo knowledge) {
         SlotHost host = getHost();
         if (host == null) return;
 
         String playerId = host.getPlayerId();
         if (playerId == null) return;
 
-        postEvent(new PlayerCommand.Seek(playerId, segment.getStartMs()));
+        postEvent(new PlayerCommand.Seek(playerId, knowledge.getStartMs()));
     }
 
     private void onChapterClicked(@NonNull ChapterInfo chapter) {
@@ -247,10 +264,12 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
     }
 
     private void onPlaybackInfo(@NonNull PlayerEvents.Info info) {
-        if (mContent == null) return;
+        // 只在面板展示期（mCurrentViewModel != null）才执行高亮更新，
+        // 避免无 VM 时循环调用 Assembler（对齐 iOS updateCurrentPosition: 只在 panelContentView 存在时回调）
+        if (mCurrentViewModel == null) return;
 
         // Update chapter highlight
-        int newChapterIndex = ChapterInfo.findIndexByPosition(mContent.getChapters(), info.currentPosition);
+        int newChapterIndex = ChapterInfo.findIndexByPosition(mCurrentViewModel.getChapters(), info.currentPosition);
         if (newChapterIndex != mCurrentChapterIndex) {
             int oldIndex = mCurrentChapterIndex;
             mCurrentChapterIndex = newChapterIndex;
@@ -260,7 +279,7 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
         }
 
         // Update segment highlight
-        int newSegmentIndex = mContent.findSegmentIndexByPosition(info.currentPosition);
+        int newSegmentIndex = KnowledgeInfo.findIndexByPosition(mCurrentViewModel.getKnowledgeItems(), info.currentPosition);
         if (newSegmentIndex != mCurrentSegmentIndex) {
             int oldIndex = mCurrentSegmentIndex;
             mCurrentSegmentIndex = newSegmentIndex;

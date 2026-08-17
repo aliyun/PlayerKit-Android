@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * AI 内容类型
  * <p>
- * 定义 AI 分析的展示模式，决定面板如何渲染内容。
+ * 每个 TAB 关联一个 AiContentType，由类型决定该 TAB 的渲染样式
  * </p>
  *
  * @author keria
@@ -18,17 +18,17 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.SOURCE)
 public @interface AiContentType {
     /**
-     * 仅展示章节列表
+     * 章节列表：缩略图 + 标题 + 时间。
      */
     int CHAPTERS_ONLY = 0;
 
     /**
-     * 文字解析模式：摘要 + 分段文字总结
+     * 文字解析：知识点格式化列表或 Summary markdown。
      */
     int TEXT_ANALYSIS = 1;
 
     /**
-     * 图解解析模式：摘要 + 分段 Markdown 图解
+     * 图解分析：ParagraphSummary + Tags 徽章 + MarkdownContent。
      */
     int GRAPHIC_ANALYSIS = 2;
 }

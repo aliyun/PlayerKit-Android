@@ -7,14 +7,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.scenes.aieducation.R;
 import com.aliyun.playerkit.scenes.aieducation.data.AiContentType;
-import com.aliyun.playerkit.scenes.aieducation.data.AiSummary;
-import com.aliyun.playerkit.scenes.aieducation.data.AiVideoContent;
+import com.aliyun.playerkit.scenes.aieducation.data.AiContentViewModel;
+import com.aliyun.playerkit.scenes.aieducation.data.KnowledgeInfo;
 import com.aliyun.playerkit.scenes.aieducation.ui.MarkdownBinder;
 import com.aliyun.playerkit.ui.dialog.BasePanelDialogFragment;
 import com.aliyun.playerkit.utils.DensityUtil;
@@ -45,8 +46,14 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
      */
     private static final float FALLBACK_PANEL_HEIGHT_DP = 600f;
 
-    private static final int TAB_CHAPTERS = 0;
-    private static final int TAB_AI_ANALYSIS = 1;
+    // 每个 TAB 关联一个 AiContentType，由类型决定该 TAB 的渲染样式。
+    // 约定 tab0 -> mRvChapters，tab1 -> mRvAiAnalysis（仅命名习惯，实际 Adapter 由类型装配）。
+    @AiContentType
+    private int mTab0Type = AiContentType.CHAPTERS_ONLY;
+    @AiContentType
+    private int mTab1Type = AiContentType.GRAPHIC_ANALYSIS;
+
+    private boolean mShowTabs = true;
 
     // -- Views --
     private View mDialogRoot;
@@ -70,7 +77,7 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
 
     // -- Data (set before show) --
     @Nullable
-    private AiVideoContent mContent;
+    private AiContentViewModel mContent;
     @Nullable
     private MarkdownBinder mMarkdownBinder;
 
@@ -89,7 +96,7 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
     /**
      * 设置数据内容。必须在 show() 之前调用。
      */
-    public void setContent(@Nullable AiVideoContent content) {
+    public void setContent(@Nullable AiContentViewModel content) {
         mContent = content;
     }
 
@@ -144,10 +151,10 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
 
         // Setup RecyclerViews
         if (mRvChapters != null) {
-            mRvChapters.setLayoutManager(new LinearLayoutManager(requireContext()));
+            mRvChapters.setLayoutManager(new LinearLayoutManager(getContext()));
         }
         if (mRvAiAnalysis != null) {
-            mRvAiAnalysis.setLayoutManager(new LinearLayoutManager(requireContext()));
+            mRvAiAnalysis.setLayoutManager(new LinearLayoutManager(getContext()));
         }
 
         // Setup tabs
@@ -214,9 +221,7 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
     private void setupTabs() {
         if (mTabLayout == null) return;
 
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.ai_education_chapter));
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.ai_education_ai_analysis));
-
+        // Tab 结构在 bindContent -> configureTabs 中根据数据动态构建，此处仅注册切换监听
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -234,93 +239,148 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
     }
 
     private void switchTab(int tabIndex) {
+        // tab0 承载于 mRvChapters，tab1 承载于 mRvAiAnalysis（Adapter 已按类型装配）。
         if (mRvChapters != null) {
-            mRvChapters.setVisibility(tabIndex == TAB_CHAPTERS ? View.VISIBLE : View.GONE);
+            mRvChapters.setVisibility(tabIndex == 0 ? View.VISIBLE : View.GONE);
         }
         if (mRvAiAnalysis != null) {
-            mRvAiAnalysis.setVisibility(tabIndex == TAB_AI_ANALYSIS ? View.VISIBLE : View.GONE);
+            mRvAiAnalysis.setVisibility(tabIndex == 1 ? View.VISIBLE : View.GONE);
         }
     }
 
     private void bindContent() {
         if (mContent == null) return;
 
-        int type = mContent.getType();
-        List<ChapterInfo> chapters = mContent.getChapters();
-        boolean hasChapters = chapters != null && !chapters.isEmpty();
-        boolean hasAiAnalysis = (type == AiContentType.TEXT_ANALYSIS || type == AiContentType.GRAPHIC_ANALYSIS);
+        // 1. 推导 tab 类型，以及是否显示 TAB
+        deriveTabTypes();
 
-        // Update panel title
+        boolean hasChapters = mContent.hasChapterData();
+
+        // 2. 面板标题：有章节显示"共 N 集"，否则显示 AI 解析
         if (mTvPanelTitle != null) {
             if (hasChapters) {
-                String title = requireContext().getString(
-                        R.string.ai_education_chapter_count, chapters.size());
+                List<ChapterInfo> chapters = mContent.getChapters();
+                String title = getString(R.string.ai_education_chapter_count, chapters.size());
                 mTvPanelTitle.setText(title);
             } else {
                 mTvPanelTitle.setText(R.string.ai_education_ai_analysis);
             }
         }
 
-        // Setup chapter list
-        if (hasChapters) {
-            mChapterAdapter = new ChapterListAdapter(chapters, chapter -> {
-                if (mChapterClickListener != null) {
-                    mChapterClickListener.onChapterClick(chapter);
-                }
-            });
-            if (mRvChapters != null) {
-                mRvChapters.setAdapter(mChapterAdapter);
-            }
+        // 3. 按 tab 类型装配 Adapter：tab0 -> mRvChapters，tab1 -> mRvAiAnalysis
+        applyAdapterForTab(mTab0Type, mRvChapters);
+        if (mShowTabs) {
+            applyAdapterForTab(mTab1Type, mRvAiAnalysis);
         }
 
-        // Setup AI analysis RecyclerView (summary header + segments)
-        if (hasAiAnalysis) {
-            AiSummary summary = mContent.getSummary();
-            mSegmentAdapter = new SegmentListAdapter(summary, mContent.getSegments(), type,
-                    mMarkdownBinder, segment -> {
-                if (mSegmentClickListener != null) {
-                    mSegmentClickListener.onSegmentClick(segment);
-                }
-            });
-            if (mRvAiAnalysis != null) {
-                mRvAiAnalysis.setAdapter(mSegmentAdapter);
-            }
-        }
-
-        // Tab visibility logic
-        configureTabVisibility(type, hasChapters, hasAiAnalysis);
+        // 4. 配置 TAB 结构与可见性
+        configureTabs();
     }
 
-    private void configureTabVisibility(@AiContentType int type, boolean hasChapters, boolean hasAiAnalysis) {
+    /**
+     * 推导 tab0/tab1 类型与是否显示 TAB。
+     * <p>
+     * <ul>
+     *     <li>章节 + 摘要 → tab0=CHAPTERS_ONLY, tab1=GRAPHIC_ANALYSIS, 显示 TAB</li>
+     *     <li>仅章节 → tab0=CHAPTERS_ONLY, tab1=TEXT_ANALYSIS, 显示 TAB</li>
+     *     <li>仅摘要 → tab0=GRAPHIC_ANALYSIS, 不显示 TAB</li>
+     * </ul>
+     */
+    private void deriveTabTypes() {
+        boolean hasChapter = mContent != null && mContent.hasChapterData();
+        boolean hasSummary = mContent != null && mContent.hasSummaryData();
+
+        if (hasChapter && hasSummary) {
+            mTab0Type = AiContentType.CHAPTERS_ONLY;
+            mTab1Type = AiContentType.GRAPHIC_ANALYSIS;
+            mShowTabs = true;
+        } else if (hasChapter) {
+            mTab0Type = AiContentType.CHAPTERS_ONLY;
+            mTab1Type = AiContentType.TEXT_ANALYSIS;
+            mShowTabs = true;
+        } else {
+            mTab0Type = AiContentType.GRAPHIC_ANALYSIS;
+            mTab1Type = AiContentType.GRAPHIC_ANALYSIS; // unused
+            mShowTabs = false;
+        }
+    }
+
+    /**
+     * 根据 AiContentType 为指定 RecyclerView 装配对应的 Adapter。
+     *
+     * @param type 该 TAB 的内容类型
+     * @param rv   承载该 TAB 内容的列表
+     */
+    private void applyAdapterForTab(@AiContentType int type, @Nullable RecyclerView rv) {
+        if (rv == null || mContent == null) return;
+        switch (type) {
+            case AiContentType.CHAPTERS_ONLY:
+                mChapterAdapter = new ChapterListAdapter(mContent.getChapters(), chapter -> {
+                    if (mChapterClickListener != null) {
+                        mChapterClickListener.onChapterClick(chapter);
+                    }
+                });
+                rv.setAdapter(mChapterAdapter);
+                break;
+            case AiContentType.TEXT_ANALYSIS:
+                mSegmentAdapter = SegmentListAdapter.forTextAnalysis(mContent.getKnowledgeItems(), mMarkdownBinder, knowledge -> {
+                    if (mSegmentClickListener != null) {
+                        mSegmentClickListener.onSegmentClick(knowledge);
+                    }
+                });
+                rv.setAdapter(mSegmentAdapter);
+                break;
+            case AiContentType.GRAPHIC_ANALYSIS:
+                mSegmentAdapter = SegmentListAdapter.forGraphicAnalysis(mContent.getSummaryInfo(), mMarkdownBinder);
+                rv.setAdapter(mSegmentAdapter);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 配置 TAB 结构。
+     * <p>
+     * TAB 规则（三种情况）：
+     * <ul>
+     *     <li>仅有章节（无 summary）→ 双 TAB："章节"(CHAPTERS_ONLY) + "AI解析"(TEXT_ANALYSIS)</li>
+     *     <li>仅有摘要（无 chapters）→ 无 TAB，直接渲染 GRAPHIC_ANALYSIS</li>
+     *     <li>两者都有 → 双 TAB："章节"(CHAPTERS_ONLY) + "图解"(GRAPHIC_ANALYSIS)</li>
+     * </ul>
+     */
+    private void configureTabs() {
         if (mTabLayout == null) return;
 
-        if (type == AiContentType.CHAPTERS_ONLY) {
+        if (!mShowTabs) {
             mTabLayout.setVisibility(View.GONE);
-            showOnlyChapters();
-        } else if (hasAiAnalysis && !hasChapters) {
-            mTabLayout.setVisibility(View.GONE);
-            showOnlyAiAnalysis();
-        } else {
-            mTabLayout.setVisibility(View.VISIBLE);
-            switchTab(TAB_CHAPTERS);
+            // 无 TAB 情形（仅 summary）：tab0 的 Adapter 始终装配在 mRvChapters，
+            // 故与 bindContent 装配约定保持一致——显示 mRvChapters、隐藏 mRvAiAnalysis。
+            switchTab(0);
+            return;
         }
+
+        mTabLayout.setVisibility(View.VISIBLE);
+        mTabLayout.removeAllTabs();
+        mTabLayout.addTab(mTabLayout.newTab().setText(titleForType(mTab0Type)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(titleForType(mTab1Type)));
+        switchTab(0); // 默认选 tab0
     }
 
-    private void showOnlyChapters() {
-        if (mRvChapters != null) {
-            mRvChapters.setVisibility(View.VISIBLE);
-        }
-        if (mRvAiAnalysis != null) {
-            mRvAiAnalysis.setVisibility(View.GONE);
-        }
-    }
-
-    private void showOnlyAiAnalysis() {
-        if (mRvChapters != null) {
-            mRvChapters.setVisibility(View.GONE);
-        }
-        if (mRvAiAnalysis != null) {
-            mRvAiAnalysis.setVisibility(View.VISIBLE);
+    /**
+     * 返回指定内容类型对应的 TAB 标题资源。
+     */
+    @StringRes
+    private int titleForType(@AiContentType int type) {
+        switch (type) {
+            case AiContentType.CHAPTERS_ONLY:
+                return R.string.ai_education_chapter;
+            case AiContentType.TEXT_ANALYSIS:
+                return R.string.ai_education_ai_analysis;
+            case AiContentType.GRAPHIC_ANALYSIS:
+                return R.string.ai_education_ai_analysis;
+            default:
+                return R.string.ai_education_ai_analysis;
         }
     }
 

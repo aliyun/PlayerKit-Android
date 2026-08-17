@@ -2,20 +2,14 @@ package com.aliyun.playerkit.scenes.aieducation.data;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.scenes.aieducation.AiContentConstants;
 import com.google.gson.Gson;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -31,7 +25,7 @@ import okhttp3.Response;
  * AI 内容加载器
  * <p>
  * 封装 App Server HTTP 请求和 JSON 响应解析逻辑，
- * 将 App Server 返回的 AI 分析数据转换为 {@link AiVideoContent} 业务模型。
+ * 将 App Server 返回的 AI 分析数据以 DTO ({@link AiAnalysisResponse}) 形式回调给消费侧。
  * 采用异步回调模式，在后台线程执行网络请求，通过主线程回调返回结果。
  * </p>
  *
@@ -79,13 +73,13 @@ public class AiContentLoader {
     /**
      * 加载结果回调
      */
-    public interface Callback {
+    public interface AiAnalysisCallback {
         /**
          * 加载完成（主线程回调）
          *
-         * @param content 加载结果，失败时为 null
+         * @param response 服务端 DTO，失败或无有效内容时为 null
          */
-        void onLoaded(@Nullable AiVideoContent content);
+        void onLoaded(@Nullable AiAnalysisResponse response);
     }
 
     /**
@@ -106,9 +100,9 @@ public class AiContentLoader {
      * @param mediaId  媒体 ID（即视频 Vid）
      * @param callback 加载结果回调
      */
-    public void load(@NonNull String mediaId, @NonNull Callback callback) {
+    public void loadAiAnalysis(@NonNull String mediaId, @NonNull AiAnalysisCallback callback) {
         mExecutor.execute(() -> {
-            AiVideoContent result = doLoadSync(mediaId);
+            AiAnalysisResponse result = doLoadAiAnalysisSync(mediaId);
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (!mCanceled) {
                     callback.onLoaded(result);
@@ -140,8 +134,8 @@ public class AiContentLoader {
      * 调用后：
      * <ul>
      *     <li>已提交但未完成的任务将被中断，进行中的 HTTP 请求会被取消；</li>
-     *     <li>所有回调（{@link Callback} / {@link PlayAuthCallback}）不再触发；</li>
-     *     <li>本实例不可复用，后续调用 {@link #load} / {@link #loadPlayAuth} 将不会执行。</li>
+     *     <li>所有回调（{@link AiAnalysisCallback} / {@link PlayAuthCallback}）不再触发；</li>
+     *     <li>本实例不可复用，后续调用 {@link #loadAiAnalysis} / {@link #loadPlayAuth} 将不会执行。</li>
      * </ul>
      * 通常在页面销毁（如 Activity#onDestroy）时调用，避免内存泄漏和无效回调。
      */
@@ -183,13 +177,13 @@ public class AiContentLoader {
     }
 
     /**
-     * 同步执行 HTTP 请求 + JSON 解析 + 模型转换
+     * 同步执行 HTTP 请求 + JSON 解析
      *
      * @param mediaId 媒体 ID（即视频 Vid）
-     * @return AI 内容数据，加载失败返回 null
+     * @return 服务端 DTO，加载失败或无有效内容时返回 null
      */
     @Nullable
-    private AiVideoContent doLoadSync(@NonNull String mediaId) {
+    private AiAnalysisResponse doLoadAiAnalysisSync(@NonNull String mediaId) {
         try {
             // 构建请求 URL（不传 ResultType，默认返回所有类型数据）
             String url = AiContentConstants.buildApiUrl(mediaId, null);
@@ -205,108 +199,18 @@ public class AiContentLoader {
                 String json = response.body().string();
                 LogHub.i(TAG, "App Server response: " + json);
                 AiAnalysisResponse apiResponse = new Gson().fromJson(json, AiAnalysisResponse.class);
-                return convertToAiVideoContent(mediaId, apiResponse);
+                if (apiResponse == null || apiResponse.getAiAnalysisResult() == null) {
+                    return null;
+                }
+                // 空结果兜底：Chapter 与 Summary 都为 null 时视为无有效内容，让上层走加载失败提示
+                if (!AiContentAssembler.hasAnyContent(apiResponse)) {
+                    return null;
+                }
+                return apiResponse;
             }
         } catch (Exception e) {
             LogHub.w(TAG, "load failed", e);
             return null;
         }
-    }
-
-    /**
-     * 将 App Server 响应转换为业务模型
-     *
-     * @param mediaId  媒体 ID（即视频 Vid）
-     * @param response App Server 响应 DTO
-     * @return 业务模型，转换失败返回 null
-     */
-    @Nullable
-    private AiVideoContent convertToAiVideoContent(@NonNull String mediaId, @Nullable AiAnalysisResponse response) {
-        if (response == null || response.aiAnalysisResult == null) {
-            return null;
-        }
-
-        // 分别查找 Chapter 和 Summary 结果项
-        AiAnalysisResponse.ResultItem chapterResult = null;
-        AiAnalysisResponse.ResultItem summaryResult = null;
-        for (AiAnalysisResponse.ResultItem item : response.aiAnalysisResult) {
-            if (item == null) {
-                continue;
-            }
-            if (AiContentConstants.RESULT_TYPE_CHAPTER.equals(item.resultType)) {
-                chapterResult = item;
-            } else if (AiContentConstants.RESULT_TYPE_SUMMARY.equals(item.resultType)) {
-                summaryResult = item;
-            }
-        }
-        // 至少需要有一种结果
-        if (chapterResult == null && summaryResult == null) {
-            return null;
-        }
-
-        // 构建章节列表和分段列表（chapterResult 可能为 null）
-        List<ChapterInfo> chapters = new ArrayList<>();
-        List<AiSegment> segments = new ArrayList<>();
-        boolean hasAnalysis = false;
-
-        if (chapterResult != null && chapterResult.chapterContentItems != null) {
-            for (AiAnalysisResponse.ChapterContentItem contentItem : chapterResult.chapterContentItems) {
-                if (contentItem == null) {
-                    continue;
-                }
-                long startTime = contentItem.startTime != null ? contentItem.startTime : 0;
-                long endTime = contentItem.endTime != null ? contentItem.endTime : 0;
-                String chapterTitle = contentItem.chapterTitle != null ? contentItem.chapterTitle : "";
-                String chapterId = contentItem.chapterId != null ? String.valueOf(contentItem.chapterId) : "0";
-
-                // 构建 ChapterInfo
-                chapters.add(new ChapterInfo(chapterId, startTime, endTime, chapterTitle, contentItem.thumbnailUrl));
-
-                // 构建 markdown（由 KnowledgePoints 拼接）
-                StringBuilder markdown = new StringBuilder();
-                if (contentItem.knowledgePoints != null && !contentItem.knowledgePoints.isEmpty()) {
-                    hasAnalysis = true;
-                    for (AiAnalysisResponse.KnowledgePointItem kp : contentItem.knowledgePoints) {
-                        if (kp == null) {
-                            continue;
-                        }
-                        String point = kp.point != null ? kp.point : "";
-                        String description = kp.description != null ? kp.description : "";
-                        markdown.append("- **").append(point).append("**: ").append(description).append("\n");
-                    }
-                }
-
-                // 检查是否有摘要
-                if (contentItem.summary != null && !contentItem.summary.isEmpty()) {
-                    hasAnalysis = true;
-                }
-
-                // 构建 AiSegment
-                String mdContent = markdown.length() > 0 ? markdown.toString() : null;
-                segments.add(new AiSegment(chapterId, startTime, endTime, chapterTitle, contentItem.summary, mdContent));
-            }
-        }
-
-        // 构建 AiSummary（优先从 Summary 结果的 summaryContent 获取，降级到 Chapter 结果的 Extra）
-        AiSummary summary = null;
-        if (summaryResult != null && summaryResult.summaryContent != null
-                && summaryResult.summaryContent.paragraphSummary != null) {
-            summary = new AiSummary(summaryResult.title, summaryResult.summaryContent.paragraphSummary, null);
-        } else if (chapterResult != null && chapterResult.extra != null && !chapterResult.extra.isEmpty()) {
-            try {
-                JSONObject extraJson = new JSONObject(chapterResult.extra);
-                String extraSummary = extraJson.optString("Summary");
-                if (!TextUtils.isEmpty(extraSummary)) {
-                    summary = new AiSummary(chapterResult.title, extraSummary, null);
-                }
-            } catch (Exception e) {
-                LogHub.w(TAG, "parse extra failed", e);
-            }
-        }
-
-        // 确定 AiContentType
-        @AiContentType int type = hasAnalysis ? AiContentType.TEXT_ANALYSIS : AiContentType.CHAPTERS_ONLY;
-
-        return new AiVideoContent(mediaId, type, summary, chapters, segments);
     }
 }
