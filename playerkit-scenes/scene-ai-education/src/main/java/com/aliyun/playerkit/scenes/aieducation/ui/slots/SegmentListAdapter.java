@@ -290,11 +290,8 @@ public class SegmentListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView tvTag = new TextView(parent.getContext());
         tvTag.setText(text);
         tvTag.setTextSize(11);
-        tvTag.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.ai_education_tag_text));
+        tvTag.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.common_text_white));
         tvTag.setBackgroundResource(R.drawable.bg_tag);
-        int paddingH = DensityUtil.dip2px(parent.getContext(), 8);
-        int paddingV = DensityUtil.dip2px(parent.getContext(), 4);
-        tvTag.setPadding(paddingH, paddingV, paddingH, paddingV);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);

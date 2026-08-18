@@ -34,7 +34,7 @@ Before starting integration, please complete the following preparations:
 
 | Item | Requirement |
 | ---------- | ------------------------------------------------------------ |
-| Alibaba Cloud Services | [ApsaraVideo VOD](https://www.alibabacloud.com/en/product/apsaravideo-for-vod) and [Intelligent Media Services (IMS)](Intelligent Media Services) have been activated |
+| Alibaba Cloud Services | [ApsaraVideo VOD](https://www.alibabacloud.com/en/product/apsaravideo-for-vod) and [Intelligent Media Services (IMS)](https://www.alibabacloud.com/en/product/ims) have been activated |
 | Media Resources | Test videos have been prepared and AI content analysis has been completed |
 | App Server | Deployment has been completed and can properly provide play credentials and AI analysis data; refer to the open-source project [VodAppServer](https://github.com/MediaBox-Demos/VodAppServer) |
 
@@ -112,21 +112,6 @@ The client adopts a layered design consisting of the Scene Layer, PlayerKit Capa
 The Scene Layer is responsible for page orchestration, data loading, and AI content display; PlayerKit provides player control bar entry points and panel extension capabilities through the Slot mechanism; the underlying Player SDK handles media playback, progress control, and playback state callbacks.
 
 ![LayeredArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/LayeredArchitecture-Android-EN.png)
-
-**Component Responsibilities**:
-
-| Component | Layer | Description |
-| ---------------------------- | ----- | ------------------------------------------------------------ |
-| `AiEducationActivity` | Scene | Scene entry point (composition root), orchestrates data loading, player initialization, Slot registration, and pushing AI content into the panel |
-| `AiContentLoader` | Scene | Requests play credentials and AI analysis results on a background thread, and callbacks results on the main thread |
-| `ChapterButtonSlot` | Scene | Custom slot registered through `CustomSlotType`; displays the "Chapter" button in the player control bar and triggers expansion or collapse of the chapter content panel |
-| `ChapterContentPanelSlot` | Scene | Panel controller, responsible for managing `DialogFragment` display, dismissal, and state synchronization; AI content is pushed in by the scene layer via `updateAiContent()` |
-| `ChapterContentDialogFragment` | Scene | AI content panel UI, displaying the chapter list, video summary, chapter summary, and knowledge points |
-| `MarkdownBinder` | Scene | Renders the Markdown text of AI analysis content into rich text (based on Markwon) |
-| `ChapterPanelSlot` | PlayerKit | Built-in chapter panel of the component layer; slides in from the right in fullscreen to show the chapter list and seek on tap (`SceneType.AI_VOD` scene, triggered by the bottom bar chapter button) |
-| `AliPlayerController` | PlayerKit | Provides fundamental capabilities including video loading, playback control, seek, and playback progress callbacks |
-
-> 💡 The scene-layer `ChapterContentDialogFragment` carries the full AI content (chapters + summaries + knowledge points) and is the differentiating UI of the AI Education Scene, while the component-layer `ChapterPanelSlot` handles pure chapter navigation and can be reused directly by `SceneType.AI_VOD` playback that has no AI analysis content. The two are independent — pick whichever fits your business.
 
 ---
 
@@ -210,6 +195,9 @@ GET http://your-server-host:port/GetMediaAiAnalysisByResultType?MediaId=20155861
       "Title": "Video Summary",
       "summaryContent": {
         "ParagraphSummary": "This video mainly covers...",
+        "MindMapSummary": [
+          { "Title": "Core Concept", "Topics": [...] }
+        ],
         "MarkdownContent": "# Course Summary\n\n..."
       }
     }
@@ -238,6 +226,7 @@ GET http://your-server-host:port/GetMediaAiAnalysisByResultType?MediaId=20155861
 | Field | Type | Description |
 |------|------|------|
 | `ParagraphSummary` | `String` | Paragraph summary text |
+| `MindMapSummary` | `Array` | Mind map summary list (recursive structure, each item contains `Title` and `Topics`) |
 | `MarkdownContent` | `String` | Markdown-formatted content |
 
 **API Protocol**:
@@ -252,7 +241,7 @@ GET http://your-server-host:port/GetMediaAiAnalysisByResultType?MediaId=20155861
 
 ## **7. Data Model & Mapping**
 
-### **7.1 Three-Layer Mapping**
+### **7.1 Data Mapping**
 
 | Server JSON Field | Client DTO | Business Model | Description |
 |-----------------|-----------|---------|------|
@@ -261,21 +250,59 @@ GET http://your-server-host:port/GetMediaAiAnalysisByResultType?MediaId=20155861
 | `EndTime` | `ChapterContentItem.endTime` | `ChapterInfo.endMs` | Milliseconds |
 | `ChapterTitle` | `ChapterContentItem.chapterTitle` | `ChapterInfo.title` | |
 | `ThumbnailUrl` | `ChapterContentItem.thumbnailUrl` | `ChapterInfo.thumbnailUrl` | |
-| `Summary` | `ChapterContentItem.summary` | `AiSegment.summary` | Chapter summary |
-| `KnowledgePoints[]` | `ChapterContentItem.knowledgePoints` | `AiSegment.markdown` | Concatenated as Markdown |
-| `ParagraphSummary` | `SummaryContent.paragraphSummary` | `AiSummary.description` | Video-level summary |
+| `Summary` | `ChapterContentItem.summary` | `KnowledgeInfo.contentMarkdown` | Generated via three-level fallback |
+| `KnowledgePoints[]` | `ChapterContentItem.knowledgePoints` | `KnowledgeInfo.contentMarkdown` | Concatenated as Markdown (higher priority than Summary) |
+| `ParagraphSummary` | `SummaryContent.paragraphSummary` | `SummaryInfo.paragraphSummary` | Video-level summary |
+| `MindMapSummary` | `SummaryContent.mindMapSummary` | `SummaryInfo.mindMapTitles` | Extracts top-level Title list |
+| `MarkdownContent` | `SummaryContent.markdownContent` | `SummaryInfo.markdownContent` | Markdown-formatted content |
 
-### **7.2 Aggregation Model**
+### **7.2 Presentation Model**
 
-The final aggregation results in `AiVideoContent`, which contains:
+The final assembly produces `AiContentViewModel`, generated once by `AiContentAssembler.buildViewModel(AiAnalysisResponse)`, serving as the panel's sole data entry:
 
-| Field | Type | Description |
+| Field / Method | Type | Description |
 |------|------|------|
-| `videoId` | `String` | Video ID |
-| `type` | `@AiContentType int` | Content type (determines panel rendering mode) |
-| `summary` | `AiSummary` | Video-level summary (nullable) |
-| `chapters` | `List<ChapterInfo>` | Chapter directory list |
-| `segments` | `List<AiSegment>` | Segment analysis list |
+| `chapters` | `List<ChapterInfo>` | Chapter list (empty list means no chapter data) |
+| `knowledgeItems` | `List<KnowledgeInfo>` | Knowledge point item list |
+| `summaryInfo` | `SummaryInfo` | Video summary info (nullable) |
+| `hasChapterData()` | `boolean` | Whether chapter data is present |
+| `hasSummaryData()` | `boolean` | Whether summary data is present |
+
+`@AiContentType` is no longer an aggregation model field, but a TAB-level rendering style enum (`CHAPTERS_ONLY` / `TEXT_ANALYSIS` / `GRAPHIC_ANALYSIS`), derived internally by `ChapterContentDialogFragment` via `mTab0Type` / `mTab1Type`.
+
+### **7.3 Client Data Architecture**
+
+The client adopts a layered design with clear separation between data assembly and UI rendering responsibilities. The server response lands as a pure DTO, then the assembler converts it into a presentation model before handing it off to the UI layer.
+
+**Data Flow:**
+
+```
+Server JSON → AiAnalysisResponse (DTO) → AiContentAssembler → AiContentViewModel → ChapterContentDialogFragment (UI)
+```
+
+**Client Model Descriptions:**
+
+| Class | Responsibility |
+|------|------|
+| `AiContentAssembler` | Pure static stateless assembler; converts DTO to presentation models; public methods: `buildViewModel(AiAnalysisResponse)` / `buildChapters` / `buildKnowledgeItems` / `buildSummaryInfo` / `hasAnyContent` |
+| `AiContentViewModel` | Panel presentation-layer ViewModel; fields: `chapters`, `knowledgeItems`, `summaryInfo`; methods: `hasChapterData()` / `hasSummaryData()` |
+| `KnowledgeInfo` | Knowledge point info; fields: `title`, `startMs`, `endMs`, `contentMarkdown` (pre-formatted: `- **{Point}**：{Description}`) |
+| `SummaryInfo` | Video summary info; fields: `paragraphSummary`, `mindMapTitles` (`List<String>`), `markdownContent` |
+
+**Design Principles:**
+
+- **Single Responsibility**: DTO handles only JSON mapping, Assembler handles only data conversion, UI handles only rendering
+- **Lazy Construction**: ViewModel is built only when the panel shows, released on hide, avoiding memory waste
+- **Stateless Assembly**: Assembler uses pure static methods with no instance state, callable any number of times
+- **Three-Level Fallback**: KnowledgeInfo.contentMarkdown generation rule — KnowledgePoints first → Summary second → null if both empty
+
+**TAB Combination Rules:**
+
+| Data Scenario | TAB Structure | tab0 Type | tab1 Type |
+|---------|---------|---------|----------|
+| Chapters only (no summary) | Dual TAB | `CHAPTERS_ONLY` | `TEXT_ANALYSIS` |
+| Summary only (no chapters) | No TAB | `GRAPHIC_ANALYSIS` | — |
+| Both present | Dual TAB | `CHAPTERS_ONLY` | `GRAPHIC_ANALYSIS` |
 
 ---
 
@@ -291,12 +318,12 @@ AiContentLoader loader = new AiContentLoader();
 loader.loadPlayAuth(vid, playAuth -> {
     // After obtaining playAuth, continue loading AI content...
 });
-loader.load(vid, aiContent -> {
-    // After obtaining AiVideoContent, configure the player and push it into the panel...
+loader.loadAiAnalysis(vid, response -> {
+    // After obtaining AiAnalysisResponse (pure DTO), the consumer must explicitly call AiContentAssembler to assemble...
 });
 ```
 
-> 💡 Chapter data (`chapters`) can be delivered through `AliPlayerModel`; AI content such as the video summary and chapter segments cannot be carried on `AliPlayerModel`, so the scene layer must push it in via `ChapterContentPanelSlot.updateAiContent()`.
+> 💡 Chapter data is assembled from the DTO by `AiContentAssembler.buildChapters()` and passed to `AliPlayerModel` only when non-empty; AI content such as the video summary and chapter segments cannot be carried on `AliPlayerModel`, so the scene layer must pass it in via `ChapterContentPanelSlot.updateAiContent()`.
 
 ### **8.2 Customize UI**
 
@@ -309,9 +336,9 @@ loader.load(vid, aiContent -> {
 If you don't want to use the built-in `AiEducationActivity`, you can refer to its implementation and do the following in your own Activity:
 
 1. Initialize `AliPlayerController`
-2. Register `ChapterButtonSlot` + `ChapterContentPanelSlot` (keep the panel slot instance when registering)
+2. Register `ChapterButtonSlot` + `ChapterContentPanelSlot` (keep instance references when registering)
 3. Load the PlayAuth and the AI content
-4. Configure and attach the player, then push the AI content into the panel slot
+4. Configure and attach the player, then pass the AI content into the panel slot
 
 **Example Skeleton**:
 
@@ -320,31 +347,48 @@ public class MyActivity extends AppCompatActivity {
 
     @Nullable
     private ChapterContentPanelSlot mChapterContentPanelSlot;
+    @Nullable
+    private ChapterButtonSlot mChapterButtonSlot;
 
     private void registerSlots() {
         SlotManager slotManager = playerView.getSlotManager();
-        slotManager.register(ChapterButtonSlot.TYPE, parent -> new ChapterButtonSlot(parent.getContext()));
+        slotManager.register(ChapterButtonSlot.TYPE, parent -> {
+            mChapterButtonSlot = new ChapterButtonSlot(parent.getContext());
+            return mChapterButtonSlot;
+        });
         slotManager.register(ChapterContentPanelSlot.TYPE, parent -> {
-            // Keep the slot instance so AI content can be pushed in after attach
+            // Keep the slot instance so AI content can be passed in after attach
             mChapterContentPanelSlot = new ChapterContentPanelSlot(parent.getContext());
             return mChapterContentPanelSlot;
         });
     }
 
     private void configurePlayer(@NonNull String vid, @NonNull String playAuth,
-                                 @Nullable AiVideoContent aiContent) {
-        AliPlayerModel playerModel = new AliPlayerModel.Builder()
+                                 @Nullable AiAnalysisResponse response) {
+        // Consumer explicitly calls Assembler to build chapters
+        List<ChapterInfo> chapters = response != null ? AiContentAssembler.buildChapters(response) : null;
+        boolean hasChapters = chapters != null && !chapters.isEmpty();
+
+        AliPlayerModel.Builder builder = new AliPlayerModel.Builder()
                 .videoSource(VideoSourceFactory.createVidAuthSource(vid, playAuth))
-                .sceneType(SceneType.AI_VOD)
-                .chapters(aiContent != null ? aiContent.getChapters() : null)
-                .build();
+                .sceneType(SceneType.AI_VOD);
+        if (hasChapters) {
+            builder.chapters(chapters);
+        }
+        AliPlayerModel playerModel = builder.build();
 
         playerController.configure(playerModel);
         playerView.attach(playerController);
 
-        // After attach, this page (the composition root) pushes AI content into the panel slot
+        // After attach, explicitly pass the AI DTO into the panel slot
         if (mChapterContentPanelSlot != null) {
-            mChapterContentPanelSlot.updateAiContent(aiContent);
+            mChapterContentPanelSlot.updateAiContent(response);
+        }
+
+        // Control chapter button visibility based on AI content availability
+        boolean chapterAvailable = AiContentAssembler.hasAnyContent(response);
+        if (mChapterButtonSlot != null) {
+            mChapterButtonSlot.updateChapterAvailable(chapterAvailable);
         }
     }
 }

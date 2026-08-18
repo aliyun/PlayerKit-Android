@@ -52,7 +52,7 @@ AliPlayerKit 提供两种集成方案，您可以根据业务需求选择：
 ### **2.2 License 准备**
 
 - 您已获取音视频终端 SDK 的播放器 License 授权证书和 License Key
-- 获取详细步骤请参见 [管理 License](https://help.aliyun.com/zh/vod/developer-reference/license-authorization-and-management)
+- 获取详细步骤请参见 [获取播放器SDK License](https://help.aliyun.com/zh/vod/developer-reference/obtain-the-player-sdk-license)
 
 > **注意**：如未正确配置 License，播放器将无法正常工作，并可能抛出授权异常。
 
@@ -132,30 +132,9 @@ dependencies {
 
 ### **步骤 3：配置 License**
 
-#### **3.1 添加 License 证书文件**
+播放器 SDK 需要有效的 License 授权才能正常工作。请参阅 [接入 License](https://help.aliyun.com/zh/vod/developer-reference/access-to-license) 完成 License 的配置。
 
-将准备好的 License 证书文件（如 `license.crt`）放置到 app 模块的 `src/main/assets/cert/` 目录下。
-
-#### **3.2 添加 License 配置**
-
-在 app 模块的 `AndroidManifest.xml` 中添加以下配置：
-
-```xml
-<!--    配置license    -->
-<!--    接入 License：https://help.aliyun.com/zh/vod/developer-reference/access-to-license     -->
-<meta-data
-    android:name="com.aliyun.alivc_license.licensekey"
-    android:value="您的 License Key" />
-<meta-data
-    android:name="com.aliyun.alivc_license.licensefile"
-    android:value="assets/cert/license.crt" />
-```
-
-> **注意**：
->
-> - 确保 `<meta-data>` 节点处于 `<application>` 元素下面，且 `name` 属性正确
-> - 若播放器 SDK 服务环境为海外，请参考 [Android 端接入 License](https://help.aliyun.com/zh/vod/developer-reference/access-to-license) 完成配置
-> - 完整配置示例可参考 `demo-app` 模块
+> **注意**：未正确配置 License 将导致播放器无法正常工作，播放时出现黑屏等异常。
 
 ### **步骤 4：验证集成**
 
@@ -423,6 +402,8 @@ AliPlayerKit 内部依赖以下 SDK：
 **问题**：播放器报 License 错误
 
 **解决方案**：
+
+请确认 License 已正确获取与配置，详见 [License相关常见问题](https://help.aliyun.com/zh/vod/developer-reference/faqs-for-sdk-license)。
 
 1. 确认已正确配置 License 证书和 Key
 2. 检查 License 是否已过期

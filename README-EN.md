@@ -123,7 +123,7 @@ Before running the project, ensure the following requirements are met:
 | Android Studio | Latest version |
 | Android SDK | Minimum API 21 (Android 5.0), recommended compileSdkVersion 31+ |
 | Gradle | Version 7.0 or higher |
-| License | Player License certificate and License Key obtained. See [License Authorization and Management](https://www.alibabacloud.com/help/en/apsara-video-sdk/) for details |
+| License | Player License certificate and License Key obtained. See [Obtain an ApsaraVideo Player SDK license](https://www.alibabacloud.com/help/en/vod/developer-reference/obtain-the-player-sdk-license) for details |
 
 #### **Running Steps**
 
@@ -144,7 +144,11 @@ Add the following inside the `<application>` element of `demo-app/src/main/Andro
     android:value="assets/cert/license.crt" />
 ```
 
-**Step 3: Run the Project**
+**Step 3: Configure License**
+
+The player SDK requires a valid License to function properly. See [Integrate a license](https://www.alibabacloud.com/help/en/vod/developer-reference/access-to-license) for License acquisition and configuration.
+
+**Step 4: Run the Project**
 
 Open the project in Android Studio and run the `demo-app` module.
 
@@ -156,7 +160,7 @@ Open the project in Android Studio and run the `demo-app` module.
 2. Update `applicationId` in `demo-app/build.gradle`
 3. Update the `package` attribute in `demo-app/src/main/AndroidManifest.xml`
 
-> **Note**: Without proper License configuration, the player will not work and may throw authorization exceptions.
+> **Note**: Without proper License configuration, the player will not work and may throw authorization exceptions. See [License FAQ](https://www.alibabacloud.com/help/en/vod/developer-reference/faqs-for-sdk-license) for details.
 
 ### **7.2 Demo App**
 

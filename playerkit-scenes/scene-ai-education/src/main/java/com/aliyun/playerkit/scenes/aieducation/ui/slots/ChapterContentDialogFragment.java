@@ -1,7 +1,12 @@
 package com.aliyun.playerkit.scenes.aieducation.ui.slots;
 
+import android.app.Dialog;
+import android.os.Build;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -177,6 +182,23 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
     @Override
     protected float getFallbackPanelWidth() {
         return DensityUtil.dip2px(requireContext(), PANEL_WIDTH_DP);
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        // API 31+ 启用窗口背景模糊，低版本保持半透明背景
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+                WindowManager.LayoutParams attributes = window.getAttributes();
+                attributes.setBlurBehindRadius(20);
+                window.setAttributes(attributes);
+            }
+        }
+        return dialog;
     }
 
     @Override

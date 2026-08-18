@@ -70,7 +70,7 @@ public class ChapterButtonSlot extends BaseSlot {
     /**
      * 控制栏当前是否可见，默认可见
      */
-    private boolean mControlBarVisible = true;
+    private boolean mControlBarVisible = false;
 
     public ChapterButtonSlot(@NonNull Context context) {
         super(context);

@@ -123,7 +123,7 @@ AliPlayerKit 采用 **分层架构设计**，提供两种接入方式，您可�
 | Android Studio | 最新版本 |
 | Android SDK | 最低 API 21（Android 5.0），建议 compileSdkVersion 31+ |
 | Gradle | 版本不低于 7.0 |
-| License | 已获取播放器 License 授权证书和 License Key，详见 [管理 License](https://help.aliyun.com/zh/vod/developer-reference/license-authorization-and-management) |
+| License | 已获取播放器 License 授权证书和 License Key，详见 [获取播放器SDK License](https://help.aliyun.com/zh/vod/developer-reference/obtain-the-player-sdk-license) |
 
 #### **运行步骤**
 
@@ -144,7 +144,11 @@ AliPlayerKit 采用 **分层架构设计**，提供两种接入方式，您可�
     android:value="assets/cert/license.crt" />
 ```
 
-**步骤 3：运行项目**
+**步骤 3：配置 License**
+
+播放器 SDK 需要有效的 License 授权才能正常工作。请参阅 [接入 License](https://help.aliyun.com/zh/vod/developer-reference/access-to-license) 完成 License 的配置。
+
+**步骤 4：运行项目**
 
 使用 Android Studio 打开项目，运行 `demo-app` 模块。
 
@@ -156,7 +160,7 @@ AliPlayerKit 采用 **分层架构设计**，提供两种接入方式，您可�
 2. 更新 `demo-app/build.gradle` 中的 `applicationId`
 3. 更新 `demo-app/src/main/AndroidManifest.xml` 中的 `package` 属性
 
-> **注意**：如未正确配置 License，播放器将无法正常工作，并可能抛出授权异常。
+> **注意**：如未正确配置 License，播放器将无法正常工作，并可能抛出授权异常。详见 [License相关常见问题](https://help.aliyun.com/zh/vod/developer-reference/faqs-for-sdk-license)。
 
 ### **7.2 演示应用**
 

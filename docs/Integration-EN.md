@@ -52,7 +52,7 @@ Before using **AliPlayerKit**, please ensure your development environment meets 
 ### **2.2 License Preparation**
 
 - You have obtained the Player License authorization certificate and License Key for the Audio & Video Terminal SDK
-- For detailed steps, please refer to [Manage License](https://www.alibabacloud.com/help/en/vod/developer-reference/license-authorization-and-management)
+- For detailed steps, please refer to [Obtain an ApsaraVideo Player SDK license](https://www.alibabacloud.com/help/en/vod/developer-reference/obtain-the-player-sdk-license)
 
 > **Note**: If the License is not configured correctly, the player will not work properly and may throw an authorization exception.
 
@@ -130,32 +130,11 @@ dependencies {
 }
 ```
 
-### **Step 3: Configure the License**
+### **Step 3: Configure License**
 
-#### **3.1 Add the License Certificate File**
+The Player SDK requires a valid License to function properly. Please refer to [Integrate a license](https://www.alibabacloud.com/help/en/vod/developer-reference/access-to-license) to configure the License.
 
-Place the prepared License certificate file (such as `license.crt`) into the `src/main/assets/cert/` directory of the app module.
-
-#### **3.2 Add License Configuration**
-
-Add the following configuration to `AndroidManifest.xml` of the app module:
-
-```xml
-<!--    Configure license    -->
-<!--    Access License: https://www.alibabacloud.com/help/en/vod/developer-reference/access-to-license     -->
-<meta-data
-    android:name="com.aliyun.alivc_license.licensekey"
-    android:value="Your License Key" />
-<meta-data
-    android:name="com.aliyun.alivc_license.licensefile"
-    android:value="assets/cert/license.crt" />
-```
-
-> **Note**:
->
-> - Make sure the `<meta-data>` nodes are placed under the `<application>` element and the `name` attribute is correct
-> - If the player SDK service environment is overseas, please refer to [Access License on Android](https://www.alibabacloud.com/help/en/vod/developer-reference/access-to-license) to complete the configuration
-> - For a complete configuration example, refer to the `demo-app` module
+> **Note**: Failure to properly configure the License will cause the player to malfunction, resulting in issues such as black screen during playback.
 
 ### **Step 4: Verify Integration**
 
@@ -419,6 +398,8 @@ You can view the latest versions and documentation of the related SDKs through t
 **Issue**: The player reports a License error
 
 **Solution**:
+
+Confirm that the License has been properly obtained and configured. See [License FAQ](https://www.alibabacloud.com/help/en/vod/developer-reference/faqs-for-sdk-license) for details.
 
 1. Verify that the License certificate and Key are correctly configured
 2. Check whether the License has expired

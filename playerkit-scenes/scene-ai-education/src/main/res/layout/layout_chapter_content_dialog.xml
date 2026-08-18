@@ -4,7 +4,6 @@
     android:id="@+id/fl_dialog_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/ai_education_dialog_overlay"
     android:clickable="true"
     android:focusable="true">
 
@@ -15,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@drawable/bg_panel_round_top"
+        android:elevation="8dp"
         android:orientation="vertical"
         android:paddingBottom="@dimen/ai_education_panel_padding_bottom">
 

@@ -242,6 +242,9 @@ public class ChapterContentPanelSlot extends BasePanelSlot {
 
         // Seek to chapter start
         postEvent(new PlayerCommand.Seek(playerId, chapter.getStartMs()));
+
+        // hide the Panel
+        hidePanel();
     }
 
     // ==================== Event handling ====================
