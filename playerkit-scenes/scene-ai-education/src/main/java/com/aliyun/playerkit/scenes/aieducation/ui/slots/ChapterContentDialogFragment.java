@@ -20,7 +20,6 @@ import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.scenes.aieducation.R;
 import com.aliyun.playerkit.scenes.aieducation.data.AiContentType;
 import com.aliyun.playerkit.scenes.aieducation.data.AiContentViewModel;
-import com.aliyun.playerkit.scenes.aieducation.data.KnowledgeInfo;
 import com.aliyun.playerkit.scenes.aieducation.ui.MarkdownBinder;
 import com.aliyun.playerkit.ui.dialog.BasePanelDialogFragment;
 import com.aliyun.playerkit.utils.DensityUtil;
@@ -50,6 +49,11 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
      * 竖屏面板高度的回退值（dp），在首帧 layout 尚未完成时用于动画位移计算。
      */
     private static final float FALLBACK_PANEL_HEIGHT_DP = 600f;
+
+    /**
+     * Android 31 时 使用 Android 提供的模糊路径进行渲染
+     */
+    private static final int BLUR_RADIUS = 20;
 
     // 每个 TAB 关联一个 AiContentType，由类型决定该 TAB 的渲染样式。
     // 约定 tab0 -> mRvChapters，tab1 -> mRvAiAnalysis（仅命名习惯，实际 Adapter 由类型装配）。
@@ -189,12 +193,12 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         // API 31+ 启用窗口背景模糊，低版本保持半透明背景
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (!isShowBgGlass()) {
             Window window = dialog.getWindow();
             if (window != null) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
                 WindowManager.LayoutParams attributes = window.getAttributes();
-                attributes.setBlurBehindRadius(20);
+                attributes.setBlurBehindRadius(BLUR_RADIUS);
                 window.setAttributes(attributes);
             }
         }
@@ -411,17 +415,27 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
     private void updatePanelLayoutForOrientation() {
         if (mPanelContainer == null) return;
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mPanelContainer.getLayoutParams();
+        boolean useGlass = isShowBgGlass();
         if (isLandscape()) {
             lp.width = DensityUtil.dip2px(requireContext(), PANEL_WIDTH_DP);
             lp.height = FrameLayout.LayoutParams.MATCH_PARENT;
             lp.gravity = Gravity.END;
-            mPanelContainer.setBackgroundResource(R.drawable.bg_panel_round_all);
+            mPanelContainer.setBackgroundResource(useGlass ? R.drawable.bg_panel_round_all_glass : R.drawable.bg_panel_round_all);
         } else {
             lp.width = FrameLayout.LayoutParams.MATCH_PARENT;
             lp.height = FrameLayout.LayoutParams.WRAP_CONTENT;
             lp.gravity = Gravity.BOTTOM;
-            mPanelContainer.setBackgroundResource(R.drawable.bg_panel_round_top);
+            mPanelContainer.setBackgroundResource(useGlass ? R.drawable.bg_panel_round_top_glass : R.drawable.bg_panel_round_top);
         }
         mPanelContainer.setLayoutParams(lp);
+    }
+
+
+    /**
+     * 根据系统等级是否使用降级方案
+     * @return isShowBgGlass
+     */
+    private boolean isShowBgGlass() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.S;
     }
 }

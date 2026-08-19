@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 底层：半透明黑色基底 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/ai_education_panel_glass_bg" />
+            <corners
+                android:topLeftRadius="16dp"
+                android:bottomLeftRadius="16dp" />
+        </shape>
+    </item>
+    <!-- 顶层：微弱白色渐变，模拟玻璃顶部反光 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:endColor="#00FFFFFF"
+                android:startColor="#1AFFFFFF"
+                android:type="linear" />
+            <corners
+                android:topLeftRadius="16dp"
+                android:bottomLeftRadius="16dp" />
+        </shape>
+    </item>
+</layer-list>
