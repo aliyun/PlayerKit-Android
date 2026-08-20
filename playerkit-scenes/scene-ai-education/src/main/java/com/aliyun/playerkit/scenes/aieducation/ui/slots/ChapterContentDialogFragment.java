@@ -192,8 +192,8 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
-        // API 31+ 启用窗口背景模糊，低版本保持半透明背景
-        if (!isShowBgGlass()) {
+        // API 31+ 启用原生窗口背景模糊，作为毛玻璃效果的增强
+        if (isBlurBehindSupported()) {
             Window window = dialog.getWindow();
             if (window != null) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
@@ -203,6 +203,13 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
             }
         }
         return dialog;
+    }
+
+    /**
+     * 当前设备是否支持窗口背景模糊（API 31+）。
+     */
+    private boolean isBlurBehindSupported() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
     }
 
     @Override
@@ -415,27 +422,18 @@ public class ChapterContentDialogFragment extends BasePanelDialogFragment {
     private void updatePanelLayoutForOrientation() {
         if (mPanelContainer == null) return;
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mPanelContainer.getLayoutParams();
-        boolean useGlass = isShowBgGlass();
+        // 所有版本统一使用毛玻璃模拟背景，API 31+ 额外启用原生模糊增强
         if (isLandscape()) {
             lp.width = DensityUtil.dip2px(requireContext(), PANEL_WIDTH_DP);
             lp.height = FrameLayout.LayoutParams.MATCH_PARENT;
             lp.gravity = Gravity.END;
-            mPanelContainer.setBackgroundResource(useGlass ? R.drawable.bg_panel_round_all_glass : R.drawable.bg_panel_round_all);
+            mPanelContainer.setBackgroundResource(R.drawable.bg_panel_round_all_glass);
         } else {
             lp.width = FrameLayout.LayoutParams.MATCH_PARENT;
             lp.height = FrameLayout.LayoutParams.WRAP_CONTENT;
             lp.gravity = Gravity.BOTTOM;
-            mPanelContainer.setBackgroundResource(useGlass ? R.drawable.bg_panel_round_top_glass : R.drawable.bg_panel_round_top);
+            mPanelContainer.setBackgroundResource(R.drawable.bg_panel_round_top_glass);
         }
         mPanelContainer.setLayoutParams(lp);
-    }
-
-
-    /**
-     * 根据系统等级是否使用降级方案
-     * @return isShowBgGlass
-     */
-    private boolean isShowBgGlass() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.S;
     }
 }
