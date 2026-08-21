@@ -66,4 +66,30 @@
     <!-- ==================== 播放状态卡片颜色 ==================== -->
     <!-- 播放状态卡片背景色（80%透明深灰色） -->
     <color name="play_state_background">#cc1C1D22</color>
+
+    <!-- ==================== 章节导航 Chip 颜色 ==================== -->
+    <!-- Chip 默认背景色（80% 透明度深灰色） -->
+    <color name="chapter_chip_bg_normal">#CC222222</color>
+    <!-- Chip 选中背景色（90% 透明度白色） -->
+    <color name="chapter_chip_bg_selected">#333333</color>
+    <!-- Chip 默认文字颜色（白色） -->
+    <color name="chapter_chip_text_normal">#FFFFFF</color>
+    <!-- Chip 选中文字颜色（深灰色） -->
+    <color name="chapter_chip_text_selected">#FFFFFF</color>
+
+    <!-- ==================== 章节标记颜色 ==================== -->
+    <!-- 章节标记线颜色（半透明白） -->
+    <color name="chapter_marker_color">#C8FFFFFF</color>
+
+    <!-- ==================== 章节面板 ==================== -->
+    <!-- 章节高亮文字颜色 -->
+    <color name="chapter_highlight_text">#FF4444</color>
+    <!-- 章节次要文字颜色（时间、徽章等） -->
+    <color name="chapter_secondary_text">#737777</color>
+    <!-- 章节列表未选中标题颜色 -->
+    <color name="chapter_title_unselected">#B3FFFFFF</color>
+    <!-- 章节列表选中项时间颜色 -->
+    <color name="chapter_time_selected">#B3FFFFFF</color>
+    <!-- 章节列表选中项背景颜色 -->
+    <color name="chapter_item_selected_bg">#1AFFFFFF</color>
 </resources>

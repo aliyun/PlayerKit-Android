@@ -104,6 +104,11 @@
     <!-- 进度条滑块手柄内缩距离 (扩大触摸热区，视觉大小不变) -->
     <dimen name="video_slider_thumb_inset">12dp</dimen>
 
+    <!-- ==================== 章节标记 ==================== -->
+
+    <!-- 章节标记线宽度 -->
+    <dimen name="chapter_marker_width">2.5dp</dimen>
+
     <!-- ==================== 通用滑块控件 (UniversalSliderView) ==================== -->
     <!-- 注意：这是自定义组合控件的整体尺寸，非内部 SeekBar 的尺寸 -->
 
@@ -209,4 +214,69 @@
     <dimen name="fullscreen_button_radius">18dp</dimen>
     <!-- 全屏观看背景边框size -->
     <dimen name="fullscreen_button_border">1dp</dimen>
+    <!-- 章节标记点触摸热区半径（左右各扩大） -->
+    <dimen name="chapter_marker_touch_radius">12dp</dimen>
+
+    <!-- ==================== 章节面板 ==================== -->
+
+    <!-- 章节面板宽度 -->
+    <dimen name="chapter_panel_width">390dp</dimen>
+    <!-- 章节缩略图宽度 -->
+    <dimen name="chapter_thumbnail_width">80dp</dimen>
+    <!-- 章节缩略图高度 -->
+    <dimen name="chapter_thumbnail_height">48dp</dimen>
+    <!-- 章节面板头部水平内边距 -->
+    <dimen name="chapter_panel_header_padding_horizontal">16dp</dimen>
+    <!-- 章节面板头部顶部内边距 -->
+    <dimen name="chapter_panel_header_padding_top">16dp</dimen>
+    <!-- 章节面板头部底部内边距 -->
+    <dimen name="chapter_panel_header_padding_bottom">12dp</dimen>
+    <!-- 章节面板徽章右外边距 -->
+    <dimen name="chapter_panel_badge_margin_end">12dp</dimen>
+    <!-- 章节面板徽章水平内边距 -->
+    <dimen name="chapter_panel_badge_padding_horizontal">6dp</dimen>
+    <!-- 章节面板徽章垂直内边距 -->
+    <dimen name="chapter_panel_badge_padding_vertical">2dp</dimen>
+    <!-- 章节面板徽章字体大小 -->
+    <dimen name="chapter_panel_badge_text_size">11sp</dimen>
+    <!-- 章节面板关闭图标尺寸 -->
+    <dimen name="chapter_panel_close_icon_size">24dp</dimen>
+    <!-- 章节项高度 -->
+    <dimen name="chapter_item_height">68dp</dimen>
+    <!-- 章节项水平内边距 -->
+    <dimen name="chapter_item_padding_horizontal">20dp</dimen>
+    <!-- 章节项垂直内边距 -->
+    <dimen name="chapter_item_padding_vertical">12dp</dimen>
+    <!-- 章节项文本左外边距 -->
+    <dimen name="chapter_item_text_margin_start">12dp</dimen>
+    <!-- 章节项时间顶部外边距 -->
+    <dimen name="chapter_item_time_margin_top">4dp</dimen>
+    <!-- 章节项播放指示图标尺寸 -->
+    <dimen name="chapter_item_icon_size">16dp</dimen>
+    <!-- 章节项播放指示图标左外边距 -->
+    <dimen name="chapter_item_icon_margin_start">8dp</dimen>
+
+    <!-- ==================== Seek 缩略图 ==================== -->
+
+    <!-- Seek 缩略图底部外边距 -->
+    <dimen name="seek_thumbnail_margin_bottom">80dp</dimen>
+    <!-- Seek 缩略图长边上限 -->
+    <dimen name="seek_thumbnail_max_size">200dp</dimen>
+    <!-- Seek 缩略图短边下限/占位 -->
+    <dimen name="seek_thumbnail_min_size">112dp</dimen>
+    <!-- Seek 缩略图时间文字大小 -->
+    <dimen name="seek_thumbnail_text_size">16sp</dimen>
+    <!-- Seek 缩略图时间顶部外边距 -->
+    <dimen name="seek_thumbnail_time_margin_top">8dp</dimen>
+
+    <!-- ==================== 章节导航 Chip ==================== -->
+
+    <!-- 章节 Chip 高度 -->
+    <dimen name="chapter_chip_height">32dp</dimen>
+    <!-- 章节 Chip 最大宽度 -->
+    <dimen name="chapter_chip_max_width">160dp</dimen>
+    <!-- 章节 Chip 水平内边距 -->
+    <dimen name="chapter_chip_padding_horizontal">16dp</dimen>
+    <!-- 章节 Chip 右外边距 -->
+    <dimen name="chapter_chip_margin_end">8dp</dimen>
 </resources>

@@ -44,6 +44,11 @@ import java.util.List;
  */
 public class TopBarSlot extends BaseControlBarSlot {
 
+    /**
+     * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(GestureEvents.SingleTapEvent.class, ControlBarEvents.Show.class, ControlBarEvents.Hide.class, ControlBarEvents.ResetTimer.class, PlayerEvents.SnapshotCompleted.class, PlayerEvents.VideoTitleReady.class);
+
     // ==================== UI 组件 ====================
 
     /**
@@ -61,6 +66,9 @@ public class TopBarSlot extends BaseControlBarSlot {
      * </p>
      */
     private ImageView mIvBack;
+
+    // Video title from MediaInfo
+    private String mVideoMediaInfoTitle = null;
 
     /**
      * 下载按钮
@@ -167,12 +175,7 @@ public class TopBarSlot extends BaseControlBarSlot {
     @Override
     public void onBindData(@NonNull AliPlayerModel model) {
         super.onBindData(model);
-
-        // 设置视频标题
-        String title = model.getVideoTitle();
-        if (StringUtil.isNotEmpty(title)) {
-            mTvTitle.setText(title);
-        }
+        updateTitle();
     }
 
     // ==================== 事件处理 ====================
@@ -180,13 +183,7 @@ public class TopBarSlot extends BaseControlBarSlot {
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        return Arrays.asList(
-                GestureEvents.SingleTapEvent.class,
-                ControlBarEvents.Show.class,
-                ControlBarEvents.Hide.class,
-                ControlBarEvents.ResetTimer.class,
-                PlayerEvents.SnapshotCompleted.class
-        );
+        return OBSERVED_EVENTS;
     }
 
     @Override
@@ -195,6 +192,8 @@ public class TopBarSlot extends BaseControlBarSlot {
 
         if (event instanceof GestureEvents.SingleTapEvent) {
             onSingleTap((GestureEvents.SingleTapEvent) event);
+        } else if (event instanceof PlayerEvents.VideoTitleReady) {
+            onVideoTitleReady((PlayerEvents.VideoTitleReady) event);
         }
     }
 
@@ -218,6 +217,39 @@ public class TopBarSlot extends BaseControlBarSlot {
     }
 
     /**
+     * Handle video title ready event from MediaInfo.
+     * <p>
+     * Only takes effect when no external video title is configured.
+     * </p>
+     */
+    private void onVideoTitleReady(@NonNull PlayerEvents.VideoTitleReady event) {
+        mVideoMediaInfoTitle = event.title;
+        updateTitle();
+    }
+
+    /**
+     * 更新标题显示。
+     * <p>
+     * 优先使用外部传入的标题（AliPlayerModel.getVideoTitle()），
+     * 为空时回退到 MediaInfo 返回的标题。
+     * </p>
+     * <p>
+     * 通过 post 确保在主线程执行，并兼容 view 尚未 attach 的异步场景。
+     * </p>
+     */
+    private void updateTitle() {
+        if (mTvTitle == null) {
+            return;
+        }
+        mTvTitle.post(() -> {
+            String title = getVideoTitle();
+            if (StringUtil.isNotEmpty(title)) {
+                mTvTitle.setText(title);
+            }
+        });
+    }
+
+    /**
      * 处理返回事件
      * <p>
      * 当点击返回按钮时调用，根据当前播放器状态决定如何处理返回事件。
@@ -234,5 +266,20 @@ public class TopBarSlot extends BaseControlBarSlot {
                 activity.finish();
             }
         }
+    }
+
+    private String getVideoTitle() {
+        String result = null;
+
+        SlotHost host = getHost();
+        if (host != null && host.getModel() != null) {
+            result = host.getModel().getVideoTitle();
+        }
+
+        if (StringUtil.isEmpty(result) && StringUtil.isNotEmpty(mVideoMediaInfoTitle)) {
+            result = mVideoMediaInfoTitle;
+        }
+
+        return result;
     }
 }

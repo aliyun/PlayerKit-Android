@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 蒙层 -->
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dialog_overlay_background"
+        android:visibility="gone" />
+
+    <!-- 面板容器（右侧滑入） -->
+    <LinearLayout
+        android:id="@+id/panel_container"
+        android:layout_width="@dimen/chapter_panel_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@drawable/bg_chapter_panel"
+        android:orientation="vertical">
+
+        <!-- 头部 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/chapter_panel_header_padding_horizontal"
+            android:paddingTop="@dimen/chapter_panel_header_padding_top"
+            android:paddingEnd="@dimen/chapter_panel_header_padding_horizontal"
+            android:paddingBottom="@dimen/chapter_panel_header_padding_bottom">
+
+            <TextView
+                android:id="@+id/tv_chapter_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/common_text_white"
+                android:textSize="@dimen/common_text_18"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_ai_badge"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/chapter_panel_badge_margin_end"
+                android:paddingStart="@dimen/chapter_panel_badge_padding_horizontal"
+                android:paddingTop="@dimen/chapter_panel_badge_padding_vertical"
+                android:paddingEnd="@dimen/chapter_panel_badge_padding_horizontal"
+                android:paddingBottom="@dimen/chapter_panel_badge_padding_vertical"
+                android:text="@string/chapter_panel_ai_badge"
+                android:gravity="start|bottom"
+                android:textColor="@color/chapter_secondary_text"
+                android:textSize="@dimen/chapter_panel_badge_text_size" />
+
+            <ImageView
+                android:id="@+id/iv_close"
+                android:layout_width="@dimen/chapter_panel_close_icon_size"
+                android:layout_height="@dimen/chapter_panel_close_icon_size"
+                android:src="@drawable/ic_close"
+                android:layout_gravity="end"
+                android:contentDescription="@null" />
+
+        </LinearLayout>
+
+        <!-- 章节列表 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_chapter_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingTop="8dp"
+            android:paddingBottom="20dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

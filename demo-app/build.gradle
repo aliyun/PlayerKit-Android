@@ -74,6 +74,7 @@ dependencies {
     implementation project(':playerkit-scenes:scene-live')
     implementation project(':playerkit-scenes:scene-playlist')
     implementation project(':playerkit-scenes:scene-shortvideo')
+    implementation project(':playerkit-scenes:scene-ai-education')
 
     // AliPlayerKit 使用示例模块：演示 AliPlayerKit 各子系统/能力怎么用
     // 适合需要深入理解架构、进行定制开发或能力扩展的开发者参考使用

@@ -96,6 +96,13 @@ AliPlayerKit 中的事件分为两大类：
 | `SetRotationCompleted` | 旋转设置完成 | `rotation` |
 | `TrackQualityListUpdated` | 清晰度列表更新 | `trackQualityList` |
 | `TrackSelected` | 清晰度选择完成 | `trackIndex` |
+| `TrackSwitchCompleted` | 清晰度切换完成 | `quality` 目标清晰度 |
+| `TrackSwitchFailed` | 清晰度切换失败 | `quality` 目标清晰度, `errorInfo` 错误信息 |
+| `CoverUrlReady` | 封面图 URL 就绪（从云端 MediaInfo 中提取） | `coverUrl` 封面图 URL |
+| `VideoTitleReady` | 视频标题就绪（从云端 MediaInfo 中提取） | `title` 视频标题 |
+| `ThumbnailUrlReady` | 缩略图 URL 就绪（从云端 MediaInfo 中提取） | `thumbnailUrl` 缩略图 URL |
+
+> 💡 `CoverUrlReady` / `VideoTitleReady` / `ThumbnailUrlReady` 属于 VID All-in-One 播放体验，在播放器 `prepared` 后自动分发，需要阿里云播放器 SDK ≥ 7.16.0。详见 [VID All-in-One 播放体验](../CoreFeatures.md#38-vid-all-in-one-播放体验)。
 
 ### **3.2 播放命令 (PlayerCommand)**
 
@@ -140,22 +147,29 @@ AliPlayerKit 中的事件分为两大类：
 
 ### **3.4 控制栏事件 (ControlBarEvents)**
 
-控制栏显示状态同步事件。
+控制栏显示状态同步事件，以及由控制栏触发的浮层展示事件。
 
-| 事件 | 说明 |
-|-----|------|
-| `Show` | 显示控制栏 |
-| `Hide` | 隐藏控制栏 |
-| `ResetTimer` | 重置自动隐藏计时器 |
-| `ShowSettings` | 显示设置界面 |
+| 事件 | 说明 | 携带数据 |
+|-----|------|---------|
+| `Show` | 显示控制栏 | - |
+| `Hide` | 隐藏控制栏 | - |
+| `ResetTimer` | 重置自动隐藏计时器 | - |
+| `ShowSettings` | 显示设置界面 | - |
+| `ShowSpeedPanel` | 显示倍速选择面板（横屏场景） | - |
+| `ShowQualityPanel` | 显示清晰度选择面板（横屏场景） | - |
+| `ShowSeekThumbnail` | 开始拖动进度条，显示 Seek 缩略图浮层 | - |
+| `UpdateSeekThumbnail` | 拖动进度条过程中更新缩略图、章节高亮与时间显示 | `positionMs`, `durationMs` |
+| `HideSeekThumbnail` | 停止拖动进度条，隐藏 Seek 缩略图浮层 | - |
+| `ShowChapterPanel` | 显示章节面板（AI_VOD 场景，由底部栏章节按钮触发） | - |
 
 ### **3.5 全屏事件 (FullscreenEvents)**
 
 全屏模式切换事件。
 
-| 事件 | 说明 |
-|-----|------|
-| `Toggle` | 切换全屏状态 |
+| 事件 | 说明 | 携带数据 |
+|-----|------|---------|
+| `Toggle` | 切换全屏状态 | - |
+| `FullScreenChanged` | 全屏状态变更完成 | `isFullscreen` 是否全屏 |
 
 ### **3.6 生命周期事件 (PlayerLifecycleEvents)**
 

@@ -40,6 +40,18 @@ import java.util.List;
  */
 public class CenterDisplaySlot extends BaseSlot {
 
+    /**
+     * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
+            GestureEvents.LongPressEvent.class,
+            GestureEvents.LongPressEndEvent.class,
+            GestureEvents.LeftVerticalDragUpdateEvent.class,
+            GestureEvents.LeftVerticalDragEndEvent.class,
+            GestureEvents.RightVerticalDragUpdateEvent.class,
+            GestureEvents.RightVerticalDragEndEvent.class
+    );
+
     // ==================== UI 组件 ====================
 
     /**
@@ -138,14 +150,7 @@ public class CenterDisplaySlot extends BaseSlot {
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        return Arrays.asList(
-                GestureEvents.LongPressEvent.class,
-                GestureEvents.LongPressEndEvent.class,
-                GestureEvents.LeftVerticalDragUpdateEvent.class,
-                GestureEvents.LeftVerticalDragEndEvent.class,
-                GestureEvents.RightVerticalDragUpdateEvent.class,
-                GestureEvents.RightVerticalDragEndEvent.class
-        );
+        return OBSERVED_EVENTS;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.aliyun.playerkit.converter;
 
+import android.widget.ImageView;
+
 import com.aliyun.player.IPlayer;
 import com.aliyun.playerkit.player.IMediaPlayer;
 
@@ -30,27 +32,6 @@ public final class PlayerTypeConverter {
     }
 
     /**
-     * 默认渲染填充模式
-     * <p>
-     * Default scale mode
-     */
-    private static final IPlayer.ScaleMode DEFAULT_SCALE_MODE = IPlayer.ScaleMode.SCALE_ASPECT_FIT;
-
-    /**
-     * 默认镜像模式
-     * <p>
-     * Default mirror mode
-     */
-    private static final IPlayer.MirrorMode DEFAULT_MIRROR_MODE = IPlayer.MirrorMode.MIRROR_MODE_NONE;
-
-    /**
-     * 默认旋转角度
-     * <p>
-     * Default rotate mode
-     */
-    private static final IPlayer.RotateMode DEFAULT_ROTATE_MODE = IPlayer.RotateMode.ROTATE_0;
-
-    /**
      * 转换渲染填充模式。
      * <p>
      * 将 {@link IMediaPlayer.ScaleType} 转换为 {@link IPlayer.ScaleMode}。
@@ -72,7 +53,43 @@ public final class PlayerTypeConverter {
             case IMediaPlayer.ScaleType.CENTER_CROP:
                 return IPlayer.ScaleMode.SCALE_ASPECT_FILL;
             default:
-                return DEFAULT_SCALE_MODE;
+                // 非法入参退回 IMediaPlayer.ScaleType.DEFAULT 的映射结果。
+                // @IntDef int 不是枚举，编译器无法证明穷尽，语法上必须保留 default 分支；
+                // 这里不硬编码兜底值，而是递归到 DEFAULT —— 默认值改动时兜底自动跟随，
+                // 不需要人工同步。DEFAULT 是上面三个取值之一的别名，递归必然命中具体 case，不会再落回本分支
+                return convertScaleType(IMediaPlayer.ScaleType.DEFAULT);
+        }
+    }
+
+    /**
+     * 转换渲染填充模式（Android ImageView 侧）。
+     * <p>
+     * 将 {@link IMediaPlayer.ScaleType} 转换为 {@link ImageView.ScaleType}，供封面图等覆盖在渲染视图之上的
+     * 图片层与播放器画面保持几何一致。在图片宽高比等于视频宽高比的前提下，
+     * {@link ImageView.ScaleType} 算出的矩形与 SDK 渲染矩形逐像素重合，无需任何手工计算。
+     * </p>
+     *
+     * <p>
+     * Converts {@link IMediaPlayer.ScaleType} to {@link ImageView.ScaleType}, so image layers drawn on top of
+     * the rendering view (e.g. the cover image) stay geometrically aligned with the video frame.
+     * </p>
+     *
+     * @param scaleType 填充模式 / Scale mode
+     * @return ImageView 缩放模式 / ImageView scale type
+     */
+    public static ImageView.ScaleType convertToImageScaleType(@IMediaPlayer.ScaleType int scaleType) {
+        switch (scaleType) {
+            case IMediaPlayer.ScaleType.FIT_XY:
+                return ImageView.ScaleType.FIT_XY;
+            case IMediaPlayer.ScaleType.FIT_CENTER:
+                // 不用 CENTER_INSIDE：图片小于视图时 FIT_CENTER 会等比放大到贴边，
+                // 与 SDK 的 SCALE_ASPECT_FIT 行为一致，CENTER_INSIDE 不放大会对不齐
+                return ImageView.ScaleType.FIT_CENTER;
+            case IMediaPlayer.ScaleType.CENTER_CROP:
+                return ImageView.ScaleType.CENTER_CROP;
+            default:
+                // 兜底方式同 convertScaleType（见该方法注释）
+                return convertToImageScaleType(IMediaPlayer.ScaleType.DEFAULT);
         }
     }
 
@@ -91,14 +108,14 @@ public final class PlayerTypeConverter {
      */
     public static IPlayer.MirrorMode convertMirrorType(@IMediaPlayer.MirrorType int mirrorType) {
         switch (mirrorType) {
-            case IMediaPlayer.MirrorType.NONE:
-                return IPlayer.MirrorMode.MIRROR_MODE_NONE;
             case IMediaPlayer.MirrorType.HORIZONTAL:
                 return IPlayer.MirrorMode.MIRROR_MODE_HORIZONTAL;
             case IMediaPlayer.MirrorType.VERTICAL:
                 return IPlayer.MirrorMode.MIRROR_MODE_VERTICAL;
+            case IMediaPlayer.MirrorType.NONE:
             default:
-                return DEFAULT_MIRROR_MODE;
+                // 非法入参退回不镜像
+                return IPlayer.MirrorMode.MIRROR_MODE_NONE;
         }
     }
 
@@ -117,16 +134,16 @@ public final class PlayerTypeConverter {
      */
     public static IPlayer.RotateMode convertRotation(@IMediaPlayer.Rotation int rotation) {
         switch (rotation) {
-            case IMediaPlayer.Rotation.DEGREE_0:
-                return IPlayer.RotateMode.ROTATE_0;
             case IMediaPlayer.Rotation.DEGREE_90:
                 return IPlayer.RotateMode.ROTATE_90;
             case IMediaPlayer.Rotation.DEGREE_180:
                 return IPlayer.RotateMode.ROTATE_180;
             case IMediaPlayer.Rotation.DEGREE_270:
                 return IPlayer.RotateMode.ROTATE_270;
+            case IMediaPlayer.Rotation.DEGREE_0:
             default:
-                return DEFAULT_ROTATE_MODE;
+                // 非法入参退回不旋转
+                return IPlayer.RotateMode.ROTATE_0;
         }
     }
 }

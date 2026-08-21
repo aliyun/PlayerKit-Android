@@ -35,6 +35,19 @@
     <string name="setting_item_scale">渲染填充</string>
     <string name="setting_item_rotate">旋转模式</string>
 
+    <!-- 设置菜单：镜像模式选项 -->
+    <string name="setting_option_mirror_none">无</string>
+    <string name="setting_option_mirror_horizontal">水平</string>
+    <string name="setting_option_mirror_vertical">垂直</string>
+
+    <!-- 设置菜单：渲染填充选项 -->
+    <string name="setting_option_scale_fit_xy">拉伸填充</string>
+    <string name="setting_option_scale_fit_center">适应</string>
+    <string name="setting_option_scale_center_crop">裁剪填充</string>
+
+    <!-- 通用文案 -->
+    <string name="common_unknown">未知</string>
+
     <!-- 日志面板插槽 -->
     <string name="log_panel_title_show">调试日志面板（点击显示）</string>
     <string name="log_panel_title_hide">调试日志面板（点击关闭）</string>
@@ -67,6 +80,18 @@
     <!-- 横屏提示插槽 -->
     <string name="landscape_hint_fullscreen">全屏观看</string>
 
+    <!-- 章节面板 -->
+    <string name="chapter_button_format">章节%1$d：%2$s ></string>
+    <string name="next_chapter">下一章</string>
+    <string name="toast_seek_to_chapter">已定位至%1$s</string>
+    <string name="toast_last_chapter">已定位至最后章节</string>
+    <string name="chapter_panel_title_format">章节 共%1$d段</string>
+    <string name="chapter_panel_ai_badge">内容由AI生成</string>
+
+    <!-- Seek 缩略图时间格式 -->
+    <string name="seek_thumbnail_time_format">%1$s / %2$s</string>
+    <!-- 章节 Chip 文本格式 -->
+    <string name="chapter_chip_text_format">%1$s %2$s</string>
 
     <!-- 通用滑块控件默认进度值 -->
     <string name="universal_slider_default_progress">50</string>

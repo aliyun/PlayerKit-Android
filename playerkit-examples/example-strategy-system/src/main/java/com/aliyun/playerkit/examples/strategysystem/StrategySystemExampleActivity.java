@@ -82,7 +82,6 @@ public class StrategySystemExampleActivity extends AppCompatActivity {
 
         AliPlayerModel model = new AliPlayerModel.Builder()
                 .videoSource(videoSource)
-                .videoTitle("Strategy Demo Video")
                 .startTime(startTime) // 使用记忆播放位置作为起播时间
                 .build();
 

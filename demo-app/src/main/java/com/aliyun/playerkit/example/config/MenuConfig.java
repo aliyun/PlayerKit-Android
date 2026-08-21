@@ -47,6 +47,11 @@ public final class MenuConfig {
         String shortVideoSchema = context.getString(R.string.short_video_page_schema);
         items.add(new MenuItem(R.drawable.ic_short_video, shortVideoTitle, shortVideoSchema));
 
+        // AI 教育场景页面
+        String aiEducationTitle = context.getString(R.string.ai_education_page_title);
+        String aiEducationSchema = context.getString(R.string.ai_education_page_schema);
+        items.add(new MenuItem(R.drawable.ic_ai_education, aiEducationTitle, aiEducationSchema));
+
         // 视频源使用示例页面
         String videoSourceTitle = context.getString(R.string.video_source_example_page_title);
         String videoSourceSchema = context.getString(R.string.video_source_example_page_schema);

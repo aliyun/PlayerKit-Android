@@ -117,6 +117,8 @@ public final class LinkConstants {
      */
     public static List<LinkItem> buildDefaultItems() {
         List<LinkItem> items = new ArrayList<>();
+
+        // 1. Video link settings
         items.add(new LinkItem(R.string.setting_link_video_url, KEY_VIDEO_URL));
         items.add(new LinkItem(R.string.setting_link_video_vid, KEY_VIDEO_VID));
         items.add(new LinkItem(R.string.setting_link_video_play_auth, KEY_VIDEO_PLAY_AUTH));
@@ -126,6 +128,10 @@ public final class LinkConstants {
         items.add(new LinkItem(R.string.setting_link_video_vid_sts_access_key_secret, KEY_VIDEO_VID_STS_ACCESS_KEY_SECRET));
         items.add(new LinkItem(R.string.setting_link_video_vid_sts_security_token, KEY_VIDEO_VID_STS_SECURITY_TOKEN));
         items.add(new LinkItem(R.string.setting_link_video_vid_sts_region, KEY_VIDEO_VID_STS_REGION));
+
+        // 2. separated by divider
+        items.add(LinkItem.divider());
+
         return items;
     }
 }

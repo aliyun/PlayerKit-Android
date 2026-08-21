@@ -696,4 +696,117 @@ public final class PlayerEvents {
             return "LoadingEnd{" + "playerId='" + playerId + '\'' + '}';
         }
     }
+
+    /**
+     * 缩略图 URL 就绪事件
+     * <p>
+     * 当通过 Vid 方式播放时，SDK 自动从 MediaInfo 中提取缩略图 URL 后触发。
+     * 用于在未设置外部 thumbnailUrl 时，自动初始化缩略图能力。
+     * </p>
+     * <p>
+     * SDK 版本要求：通过 {@code MediaInfo.getThumbnailList()} 获取缩略图 URL
+     * 需要阿里云播放器 SDK 版本 ≥ 7.16.0。
+     * </p>
+     * <p>
+     * Thumbnail URL Ready Event
+     * <p>
+     * Triggered when the SDK automatically extracts thumbnail URL from MediaInfo during Vid playback.
+     * Used to auto-initialize thumbnail capability when no external thumbnailUrl is set.
+     * </p>
+     */
+    public static final class ThumbnailUrlReady extends PlayerEvent {
+        /**
+         * 缩略图 URL
+         * <p>
+         * Thumbnail URL
+         */
+        @NonNull
+        public final String thumbnailUrl;
+
+        public ThumbnailUrlReady(@NonNull String playerId, @NonNull String thumbnailUrl) {
+            super(playerId);
+            this.thumbnailUrl = thumbnailUrl;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "ThumbnailUrlReady{" +
+                    "thumbnailUrl='" + thumbnailUrl + '\'' +
+                    ", playerId='" + playerId + '\'' +
+                    '}';
+        }
+    }
+
+    /**
+     * 封面 URL 就绪事件
+     * <p>
+     * 当通过 Vid 方式播放时，SDK 自动从 MediaInfo 中提取封面 URL 后触发。
+     * 用于在未设置外部 coverUrl 时，自动初始化封面能力。
+     * </p>
+     * <p>
+     * SDK 版本要求：通过 {@code MediaInfo.getCoverUrl()} 获取封面 URL
+     * 需要阿里云播放器 SDK 版本 ≥ 7.16.0。
+     * </p>
+     * <p>
+     * Cover URL Ready Event
+     * <p>
+     * Triggered when the SDK automatically extracts cover URL from MediaInfo during Vid playback.
+     * Used to auto-initialize cover capability when no external coverUrl is set.
+     * </p>
+     */
+    public static final class CoverUrlReady extends PlayerEvent {
+        @NonNull
+        public final String coverUrl;
+
+        public CoverUrlReady(@NonNull String playerId, @NonNull String coverUrl) {
+            super(playerId);
+            this.coverUrl = coverUrl;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "CoverUrlReady{" +
+                    "coverUrl='" + coverUrl + '\'' +
+                    ", playerId='" + playerId + '\'' +
+                    '}';
+        }
+    }
+
+    /**
+     * 视频标题就绪事件
+     * <p>
+     * 当通过 Vid 方式播放时，SDK 自动从 MediaInfo 中提取视频标题后触发。
+     * 用于在未设置外部标题时，自动初始化标题能力。
+     * </p>
+     * <p>
+     * SDK 版本要求：通过 {@code MediaInfo.getTitle()} 获取视频标题
+     * 需要阿里云播放器 SDK 版本 ≥ 7.16.0。
+     * </p>
+     * <p>
+     * Video Title Ready Event
+     * <p>
+     * Triggered when the SDK automatically extracts video title from MediaInfo during Vid playback.
+     * Used to auto-initialize title capability when no external title is set.
+     * </p>
+     */
+    public static final class VideoTitleReady extends PlayerEvent {
+        @NonNull
+        public final String title;
+
+        public VideoTitleReady(@NonNull String playerId, @NonNull String title) {
+            super(playerId);
+            this.title = title;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "VideoTitleReady{" +
+                    "title='" + title + '\'' +
+                    ", playerId='" + playerId + '\'' +
+                    '}';
+        }
+    }
 }

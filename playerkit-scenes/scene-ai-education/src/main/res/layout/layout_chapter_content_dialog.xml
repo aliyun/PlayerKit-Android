@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fl_dialog_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ai_education_panel_bg"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Bottom panel container (portrait: bottom, landscape: end) -->
+    <LinearLayout
+        android:id="@+id/panel_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_panel_round_top_glass"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/ai_education_panel_padding_bottom">
+
+        <!-- Panel header: title + close button -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ai_education_panel_header_height"
+            android:paddingStart="@dimen/ai_education_panel_padding_horizontal"
+            android:paddingEnd="@dimen/ai_education_panel_padding_horizontal">
+
+            <TextView
+                android:id="@+id/tv_panel_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/ai_education_chapter"
+                android:textColor="@color/ai_education_text_primary"
+                android:textSize="@dimen/ai_education_text_size_title"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/iv_panel_close"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/ic_panel_close" />
+
+        </RelativeLayout>
+
+        <!-- Tab layout: 章节 / AI解析 -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ai_education_tab_height"
+            android:background="@android:color/transparent"
+            app:tabIndicatorHeight="2dp"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorGravity="bottom"
+            app:tabRippleColor="@android:color/transparent"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/ai_education_highlight_white"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/ai_education_highlight_white"
+            app:tabTextColor="@color/ai_education_text_time" />
+
+        <!-- Content area (switched by tab) -->
+        <FrameLayout
+            android:id="@+id/content_container"
+            android:layout_width="match_parent"
+            android:layout_height="360dp">
+
+            <!-- Chapter list (Tab 0) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_chapters"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+
+            <!-- AI analysis content (Tab 1) - single RecyclerView with header -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_ai_analysis"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

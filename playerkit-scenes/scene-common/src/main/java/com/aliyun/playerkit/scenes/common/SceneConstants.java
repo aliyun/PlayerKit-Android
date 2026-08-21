@@ -42,7 +42,7 @@ public final class SceneConstants {
      * Sample landscape video id (Vid) used to fetch playback URL (demo only).
      * </p>
      */
-    public static final String LANDSCAPE_SAMPLE_VID = "004fc90fd71d71f0bf184531958c0402";
+    public static final String LANDSCAPE_SAMPLE_VID = "e07a81377f5b71f1ac554531958c0402";
 
     /**
      * 横屏示例播放凭证（PlayAuth / JWTPlayAuth）
@@ -59,7 +59,7 @@ public final class SceneConstants {
      * JWTPlayAuth requires player SDK version >= 7.10.0.
      * </p>
      */
-    public static final String LANDSCAPE_SAMPLE_PLAY_AUTH = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImFwcC0xMDAwMDAwIiwidmlkZW9JZCI6IjAwNGZjOTBmZDcxZDcxZjBiZjE4NDUzMTk1OGMwNDAyIiwiY3VycmVudFRpbWVTdGFtcCI6MTc2NjEzMTE5MTYxMywiZXhwaXJlVGltZVN0YW1wIjoxOTIzODExMTkxNjEzLCJyZWdpb25JZCI6ImNuLXNoYW5naGFpIiwicGxheUNvbnRlbnRJbmZvIjp7ImZvcm1hdHMiOiJtM3U4Iiwic3RyZWFtVHlwZSI6InZpZGVvIiwiYXV0aFRpbWVvdXQiOjE4MDB9fQ.CjqZA-6okJb2PxOZr0Jjai9gWwvaNdG-bk3LWBMzhdc";
+    public static final String LANDSCAPE_SAMPLE_PLAY_AUTH = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImFwcC0xMDAwMDAwIiwidmlkZW9JZCI6ImUwN2E4MTM3N2Y1YjcxZjFhYzU1NDUzMTk1OGMwNDAyIiwiY3VycmVudFRpbWVTdGFtcCI6MTc4NDAyMjI1NDY4OSwiZXhwaXJlVGltZVN0YW1wIjoxOTQxNzAyMjU0Njg5LCJyZWdpb25JZCI6ImNuLXNoYW5naGFpIiwicGxheUNvbnRlbnRJbmZvIjp7InN0cmVhbVR5cGUiOiJ2aWRlbyIsImFwaVZlcnNpb24iOiIxLjAuMiIsImF1dGhUaW1lb3V0IjoyODAwMH19.XUCGx2cKrS5FBmrAKTQLpDzN-p07SpSZNRg82xlEKyA";
 
     // =========================
     // 竖屏示例（Portrait Sample）
@@ -74,7 +74,7 @@ public final class SceneConstants {
      * Sample portrait video id (Vid) used to fetch playback URL (demo only).
      * </p>
      */
-    public static final String PORTRAIT_SAMPLE_VID = "00e9b526d0d671f085715017f1e90402";
+    public static final String PORTRAIT_SAMPLE_VID = "80b6301d909371f1aa965017f0e80402";
 
     /**
      * 竖屏示例播放凭证（PlayAuth / JWTPlayAuth）
@@ -91,7 +91,7 @@ public final class SceneConstants {
      * JWTPlayAuth requires player SDK version >= 7.10.0.
      * </p>
      */
-    public static final String PORTRAIT_SAMPLE_PLAY_AUTH = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImFwcC0xMDAwMDAwIiwidmlkZW9JZCI6IjAwZTliNTI2ZDBkNjcxZjA4NTcxNTAxN2YxZTkwNDAyIiwiY3VycmVudFRpbWVTdGFtcCI6MTc2ODE4ODIzNzAwNiwiZXhwaXJlVGltZVN0YW1wIjoxOTI1ODY4MjM3MDA2LCJyZWdpb25JZCI6ImNuLXNoYW5naGFpIiwicGxheUNvbnRlbnRJbmZvIjp7ImZvcm1hdHMiOiJtM3U4Iiwic3RyZWFtVHlwZSI6InZpZGVvIiwiYXV0aFRpbWVvdXQiOjE4MDB9fQ.AwXM5c8EsLJbhTPoNbEiB3uFVkl7heukuFbntHmC7no";
+    public static final String PORTRAIT_SAMPLE_PLAY_AUTH = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImFwcC0xMDAwMDAwIiwidmlkZW9JZCI6IjgwYjYzMDFkOTA5MzcxZjFhYTk2NTAxN2YwZTgwNDAyIiwiY3VycmVudFRpbWVTdGFtcCI6MTc4NTkwOTgxMTY4MiwiZXhwaXJlVGltZVN0YW1wIjoxOTQzNTg5ODExNjgyLCJyZWdpb25JZCI6ImNuLXNoYW5naGFpIiwicGxheUNvbnRlbnRJbmZvIjp7InN0cmVhbVR5cGUiOiJ2aWRlbyIsImFwaVZlcnNpb24iOiIxLjAuMiIsImF1dGhUaW1lb3V0IjoyODAwMH19.gQN7Iq7ufZXIUbJ8-JAfPI5NmDGIIfZhWUCSXFafMT0";
 
     /**
      * 示例视频播放地址

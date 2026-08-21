@@ -104,6 +104,12 @@ public final class SlotConstants {
                 .excludeScenes(createSet(SceneType.MINIMAL))
                 .build());
 
+        // Seek 缩略图插槽：在 live、restricted、minimal 场景下不显示
+        configs.add(new SlotConfig.Builder()
+                .type(SlotType.SEEK_THUMBNAIL)
+                .excludeScenes(createSet(SceneType.LIVE, SceneType.RESTRICTED, SceneType.MINIMAL))
+                .build());
+
         // 选项面板插槽：在 minimal 场景下不显示
         configs.add(new SlotConfig.Builder()
                 .type(SlotType.OPTION_PANEL)

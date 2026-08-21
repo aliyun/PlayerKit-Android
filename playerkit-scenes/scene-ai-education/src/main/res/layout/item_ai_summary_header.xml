@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/ai_education_panel_padding_horizontal">
+
+    <TextView
+        android:id="@+id/tv_summary_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="@dimen/ai_education_line_spacing"
+        android:textColor="@color/ai_education_text_primary"
+        android:textSize="@dimen/ai_education_text_size_body" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/ai_education_section_margin_top"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/layout_tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+</LinearLayout>

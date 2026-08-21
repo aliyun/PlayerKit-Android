@@ -67,7 +67,7 @@ public final class ScenarioManager {
     /**
      * {@link SceneType} 协议值映射
      * <p>
-     * 索引与 {@link SceneType} int 常量严格一一对应（VOD=0, LIVE=1, VIDEO_LIST=2, RESTRICTED=3, MINIMAL=4）。
+     * 索引与 {@link SceneType} int 常量严格一一对应（VOD=0, LIVE=1, VIDEO_LIST=2, RESTRICTED=3, MINIMAL=4, AI_VOD=5）。
      * </p>
      * <p>
      * <strong>维护约束</strong>：新增 {@link SceneType} 枚举值时，<strong>必须</strong>在本数组末尾
@@ -80,6 +80,7 @@ public final class ScenarioManager {
             "list-player",  // VIDEO_LIST
             "restricted",   // RESTRICTED
             "minimal",      // MINIMAL
+            "ai-vod",       // AI_VOD
     };
 
     /**

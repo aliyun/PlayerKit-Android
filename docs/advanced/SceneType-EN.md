@@ -11,10 +11,11 @@
 | Scene | Description | Typical Business | Differences vs. VOD |
 |-------|-------------|------------------|---------------------|
 | `VOD` | Default scene; no explicit setup needed. Supports all controls | General VOD, courses, media library | — |
-| `LIVE` | Live streams have no fixed duration; timeline operations are disabled automatically | Live streaming, sports events, live commerce | Disables seek/fast-forward/playback-speed; hides `coverImage` and `seekThumbnail` |
+| `LIVE` | Live streams have no fixed duration; timeline operations are disabled automatically | Live streaming, sports events, live commerce | Disables seek/fast-forward/playback-speed; hides `cover` (cover image) |
 | `VIDEO_LIST` | Disables vertical gestures to avoid conflicting with list scrolling | Feeds, short-video lists | Disables volume/brightness vertical gestures; otherwise identical to VOD |
 | `RESTRICTED` | Anti-skip; ensures users watch sequentially and completely | Exam monitoring, training courses | Disables seek/fast-forward/playback-speed; hides `coverImage` and `seekThumbnail` |
 | `MINIMAL` | Pure picture; all controls must be implemented by you | Background playback, fully custom UI | Hides all control components and gestures; only `playerSurface`/`playState`/`overlays` are visible |
+| `AI_VOD` | AI-enhanced VOD, adds chapter navigation and AI content understanding on top of VOD | AI courses, knowledge videos | Adds chapter data model (`chapters`) and chapter navigation slot; otherwise identical to VOD |
 
 ---
 
@@ -28,7 +29,6 @@ The scene type is specified via `AliPlayerModel.Builder.sceneType()`. **The defa
 // Build the playback data — calling sceneType() is optional, default is VOD
 AliPlayerModel playerModel = new AliPlayerModel.Builder()
     .videoSource(videoSource)
-    .videoTitle("Live Stream")
     .sceneType(SceneType.LIVE)
     .build();
 
@@ -45,29 +45,29 @@ playerView.attach(controller);
 
 The slot system automatically toggles component visibility based on the scene type:
 
-| Slot | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|------|-----|------|------------|------------|---------|
-| playerSurface | ✓ | ✓ | ✓ | ✓ | ✓ |
-| playState | ✓ | ✓ | ✓ | ✓ | ✓ |
-| overlays | ✓ | ✓ | ✓ | ✓ | ✓ |
-| coverImage | ✓ | ✗ | ✓ | ✗ | ✗ |
-| seekThumbnail | ✓ | ✗ | ✓ | ✗ | ✗ |
-| playControl | ✓ | ✓ | ✓ | ✓ | ✗ |
-| topBar | ✓ | ✓ | ✓ | ✓ | ✗ |
-| bottomBar | ✓ | ✓ | ✓ | ✓ | ✗ |
-| settingMenu | ✓ | ✓ | ✓ | ✓ | ✗ |
-| gestureControl | ✓ | ✓ | ✓ | ✓ | ✗ |
+| Slot | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|------|-----|------|------------|------------|---------|--------|
+| playerSurface | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| playState | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| overlays | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| coverImage | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| seekThumbnail | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| playControl | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| topBar | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| bottomBar | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| settingMenu | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| gestureControl | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 
 ### **3.2 Gesture Differences**
 
-| Gesture | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|---------|-----|------|------------|------------|---------|
-| Single tap (toggle control bar) | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Double tap (play/pause) | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Long press (2x speed) | ✓ | ✗ | ✓ | ✗ | ✗ |
-| Horizontal drag (seek) | ✓ | ✗ | ✓ | ✗ | ✗ |
-| Left vertical drag (brightness) | ✓ | ✓ | ✗ | ✓ | ✗ |
-| Right vertical drag (volume) | ✓ | ✓ | ✗ | ✓ | ✗ |
+| Gesture | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|---------|-----|------|------------|------------|---------|--------|
+| Single tap (toggle control bar) | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| Double tap (play/pause) | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| Long press (2x speed) | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| Horizontal drag (seek) | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| Left vertical drag (brightness) | ✓ | ✓ | ✗ | ✓ | ✗ | ✓ |
+| Right vertical drag (volume) | ✓ | ✓ | ✗ | ✓ | ✗ | ✓ |
 
 ---
 
@@ -103,3 +103,22 @@ SlotManager slotManager = playerView.getSlotManager();
 slotManager.register(SlotType.BOTTOM_BAR, parent -> new MyCustomControlSlot(parent.getContext()));
 playerView.attach(controller);
 ```
+
+### **5.3 How do I use the AI_VOD scene?**
+
+The `AI_VOD` scene adds chapter navigation capabilities on top of VOD. Configure chapter data via `chapters()`:
+
+```java
+// Build an AI playback model with chapter data
+List<ChapterInfo> chapters = ...; // Obtained from AI content analysis
+AliPlayerModel playerModel = new AliPlayerModel.Builder()
+    .videoSource(videoSource)
+    .sceneType(SceneType.AI_VOD)
+    .chapters(chapters)
+    .build();
+
+controller.configure(playerModel);
+playerView.attach(controller);
+```
+
+For a detailed integration guide, see [AI Education Scene](../scenes/AiEducation-EN.md).

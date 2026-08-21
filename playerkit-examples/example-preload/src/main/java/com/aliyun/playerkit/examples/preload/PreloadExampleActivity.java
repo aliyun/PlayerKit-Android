@@ -370,7 +370,6 @@ public class PreloadExampleActivity extends AppCompatActivity {
         // 2. 配置播放器组件数据
         AliPlayerModel playerModel = new AliPlayerModel.Builder()
                 .videoSource(mVideoSource)
-                .videoTitle("Preload Example")
                 .build();
         mPlayerController.configure(playerModel);
 

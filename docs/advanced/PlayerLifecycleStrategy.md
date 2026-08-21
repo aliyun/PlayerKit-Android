@@ -319,9 +319,11 @@ private void switchToReusePool() {
         mCurrentStrategy.clear();
     }
 
-    // 2. 切换到复用池策略
-    mCurrentStrategy = ReusePoolLifecycleStrategy.getInstance();
-    mCurrentStrategy.setMaxPoolSize(3);
+    // 2. 切换到复用池策略（setMaxPoolSize 是 ReusePoolLifecycleStrategy 的具体方法，
+    //    不在 IPlayerLifecycleStrategy 接口上，需用具体类型的变量调用）
+    ReusePoolLifecycleStrategy reusePoolStrategy = ReusePoolLifecycleStrategy.getInstance();
+    reusePoolStrategy.setMaxPoolSize(3);
+    mCurrentStrategy = reusePoolStrategy;
 
     // 3. 预加载
     mCurrentStrategy.preload(this, 2);

@@ -5,66 +5,100 @@
     android:layout_gravity="bottom">
 
     <LinearLayout
-        android:id="@+id/ll_view_portrait"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/common_transparent"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="@dimen/bottom_bar_portrait_padding_horizontal"
-        android:paddingTop="@dimen/bottom_bar_portrait_padding_vertical"
-        android:paddingEnd="@dimen/bottom_bar_portrait_padding_horizontal"
-        android:paddingBottom="@dimen/bottom_bar_portrait_padding_vertical">
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
 
-
-        <!--  播放按钮  -->
-        <ImageView
-            android:id="@+id/iv_play_pause"
-            android:layout_width="@dimen/common_icon_size"
-            android:layout_height="@dimen/common_icon_size"
-            android:padding="@dimen/common_icon_padding"
-            android:src="@drawable/ic_play_pause_selector" />
-
-        <!--  刷新按钮（可选：直播场景）  -->
-        <ImageView
-            android:id="@+id/iv_replay"
-            android:layout_width="@dimen/common_icon_size"
-            android:layout_height="@dimen/common_icon_size"
-            android:padding="@dimen/common_icon_padding"
-            android:src="@drawable/ic_replay"
+        <!--  章节导航（AI_VOD 场景）  -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_chapter_chips"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/chapter_chip_height"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingStart="@dimen/bottom_bar_portrait_padding_horizontal"
+            android:paddingEnd="@dimen/bottom_bar_portrait_padding_horizontal"
+            android:layout_marginBottom="@dimen/bottom_bar_portrait_padding_vertical"
             android:visibility="gone" />
 
-        <!--  播放进度条  -->
-        <SeekBar
-            android:id="@+id/seek_bar"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/ll_view_portrait"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:max="100"
-            android:maxHeight="@dimen/video_slider_track_height"
-            android:minHeight="@dimen/video_slider_track_height"
-            android:paddingStart="@dimen/video_slider_track_padding_normal"
-            android:paddingEnd="@dimen/video_slider_track_padding_normal"
-            android:progressDrawable="@drawable/bg_video_slider"
-            android:splitTrack="false"
-            android:thumb="@drawable/thumb_video_slider"
-            android:thumbOffset="@dimen/video_slider_track_padding_normal" />
+            android:background="@color/common_transparent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/bottom_bar_portrait_padding_horizontal"
+            android:paddingTop="@dimen/bottom_bar_portrait_padding_vertical"
+            android:paddingEnd="@dimen/bottom_bar_portrait_padding_horizontal"
+            android:paddingBottom="@dimen/bottom_bar_portrait_padding_vertical">
 
-        <!--  播放进度/播放时长  -->
-        <TextView
-            android:id="@+id/tv_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/bottom_bar_item_margin_horizontal"
-            android:textColor="@color/common_text_white"
-            android:shadowColor="@color/top_bar_tv_shadow"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="2"
-            android:textSize="@dimen/common_text_14" />
+            <!--  播放按钮  -->
+            <ImageView
+                android:id="@+id/iv_play_pause"
+                android:layout_width="@dimen/common_icon_size"
+                android:layout_height="@dimen/common_icon_size"
+                android:padding="@dimen/common_icon_padding"
+                android:src="@drawable/ic_play_pause_selector" />
+
+            <!--  刷新按钮（可选：直播场景）  -->
+            <ImageView
+                android:id="@+id/iv_replay"
+                android:layout_width="@dimen/common_icon_size"
+                android:layout_height="@dimen/common_icon_size"
+                android:padding="@dimen/common_icon_padding"
+                android:src="@drawable/ic_replay"
+                android:visibility="gone" />
+
+            <!--  播放进度条 + 章节标记 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
+
+                <SeekBar
+                    android:id="@+id/seek_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100"
+                    android:maxHeight="@dimen/video_slider_track_height"
+                    android:minHeight="@dimen/video_slider_track_height"
+                    android:paddingStart="@dimen/video_slider_track_padding_normal"
+                    android:paddingEnd="@dimen/video_slider_track_padding_normal"
+                    android:progressDrawable="@drawable/bg_video_slider"
+                    android:splitTrack="false"
+                    android:thumb="@drawable/thumb_video_slider"
+                    android:thumbOffset="@dimen/video_slider_track_padding_normal" />
+
+                <com.aliyun.playerkit.ui.chapter.ChapterMarkerView
+                    android:id="@+id/chapter_marker_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/video_slider_track_height"
+                    android:layout_gravity="center"
+                    android:paddingStart="@dimen/video_slider_track_padding_normal"
+                    android:paddingEnd="@dimen/video_slider_track_padding_normal"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+            <!--  播放进度/播放时长  -->
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/bottom_bar_item_margin_horizontal"
+                android:shadowColor="@color/top_bar_tv_shadow"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="2"
+                android:textColor="@color/common_text_white"
+                android:textSize="@dimen/common_text_14" />
+
+        </LinearLayout>
 
     </LinearLayout>
-
 
     <ViewStub
         android:id="@+id/stub_bottom_bar_landscape"

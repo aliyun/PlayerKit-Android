@@ -10,8 +10,8 @@ AliPlayerKit 提供两个层级的自定义配置入口，满足不同粒度的�
 
 | 层级 | 接口 | 调用时机 | 典型场景 |
 |------|------|----------|----------|
-| **全局配置** | `AliPlayerKit.setOnGlobalInit()` | 全局初始化完成后（仅一次） | setOption（全局日志级别）、HTTP/2 多路复用等全局行为 |
-| **实例配置** | `AliPlayerModel.Builder.onPlayerConfig()` | 每个播放器实例 `prepare()` 前 | setPlayConfig（缓冲、Referer）、setOption 等实例行为 |
+| **全局配置** | `AliPlayerKit.setOnGlobalInit()` | 全局初始化完成后（仅一次） | `AliPlayerGlobalSettings.setOption()`（全局日志级别）、HTTP/2 多路复用等全局行为 |
+| **实例配置** | `AliPlayerModel.Builder.onPlayerConfig()` | 每个播放器实例 `setDataSource()` 之后 | `aliPlayer.setConfig()`（缓冲、Referer）、`aliPlayer.setOption()` 等实例行为 |
 
 > **说明**：播放器 SDK 本身分为全局配置和实例配置两种类型。AliPlayerKit 已内置最佳实践配置，但对于未直接透出的原生接口，提供了上述两个回调入口，供开发者自行获取播放器实例并调用。
 
@@ -45,11 +45,11 @@ public class MyApplication extends Application {
         // 1. 注册全局自定义配置回调（在 init 之前调用）
         AliPlayerKit.setOnGlobalInit(() -> {
             // 示例：启用 HTTP/2 多路复用
-            AliPlayerFactory.setOption(
+            AliPlayerGlobalSettings.setOption(
                 AliPlayerGlobalSettings.ENABLE_H2_MULTIPLEX, 1
             );
             // 示例：设置全局日志级别
-            // AliPlayerFactory.setOption(...);
+            // AliPlayerGlobalSettings.setOption(...);
         });
 
         // 2. 初始化（内部会在初始化完成后触发上面注册的回调）
@@ -82,8 +82,10 @@ public class MyApplication extends Application {
 
 - 通过 `AliPlayerModel.Builder.onPlayerConfig()` 传入回调
 - 在每次 `controller.configure(model)` 时触发
-- 回调在 `setDataSource()` 之后、`prepare()` 前执行
-- 回调参数为 `IMediaPlayer` 实例，可通过此实例访问底层 SDK 的全部配置能力
+- 回调在 `player.setDataSource(model)` 执行完毕之后同步触发
+- 回调参数为 `IMediaPlayer` 实例，需先调用 `player.getInternalPlayer()` 获取底层原生播放器实例，再访问底层 SDK 的配置能力
+
+> **⚠️ 已知限制**：`setDataSource(model)` 内部已隐式调用 `prepare()`，因此 `onPlayerConfig` 回调实际在 `prepare()` **之后**触发，而非之前。这意味着依赖"prepare 前生效"的配置项（如部分缓冲参数）在当前实现下可能无法在首次 prepare 时生效。如有此类强依赖，建议关注后续版本更新。
 
 ### **3.3 使用方式**
 
@@ -93,16 +95,19 @@ public class MyApplication extends Application {
 AliPlayerModel model = new AliPlayerModel.Builder()
         .videoSource(videoSource)
         .onPlayerConfig(player -> {
+            // 先获取底层原生播放器实例
+            AliPlayer aliPlayer = player.getInternalPlayer();
+
             // 示例 1：自定义缓冲策略和 Referer
-            PlayerConfig config = player.getPlayConfig();
+            PlayerConfig config = aliPlayer.getConfig();
             config.mMaxBufferDuration = 50000;                  // 最大缓冲时长 50s
             config.mHighBufferDuration = 3000;                  // 高水位缓冲 3s
             config.mStartBufferDuration = 500;                  // 起播缓冲 500ms
             config.mReferrer = "https://your-domain.com";       // 设置 Referer 防盗链
-            player.setPlayConfig(config);
+            aliPlayer.setConfig(config);
 
             // 示例 2：设置实例级 Option
-            player.setOption(AliPlayerGlobalSettings.ALLOW_PRE_RENDER, 1);
+            aliPlayer.setOption(AliPlayer.ALLOW_PRE_RENDER, 1);
         })
         .build();
 
@@ -115,8 +120,8 @@ controller.configure(model);
 | 要点 | 说明 |
 |-----|------|
 | 触发频率 | 每次调用 `controller.configure(model)` 都会触发该回调，适合动态配置场景 |
-| 执行时机 | 回调在 `setDataSource()` 之后、`prepare()` 之前执行，是进行自定义配置的最佳时机 |
-| 回调参数 | `IMediaPlayer` 实例，可调用底层 SDK 的所有接口 |
+| 执行时机 | 回调在 `setDataSource()` 之后执行（`setDataSource()` 内部已完成 `prepare()`），见上方已知限制 |
+| 回调参数 | `IMediaPlayer` 实例，需通过 `getInternalPlayer()` 获取底层原生播放器实例后再调用底层 SDK 接口 |
 | 传 null 可选 | `onPlayerConfig()` 为可选配置，不设置时不影响正常播放 |
 
 ---
@@ -144,11 +149,9 @@ controller.configure(model)
     │
     ├── lifecycleStrategy.acquire()               ← 获取播放器实例
     │
-    ├── player.setDataSource(model)               ← 配置视频源
+    ├── player.setDataSource(model)               ← 配置视频源（内部已隐式调用 prepare()）
     │
-    ├── onPlayerConfig.onPlayerConfig(player)     ← 触发实例配置回调
-    │
-    └── player.prepare() / player.start()         ← 开始播放
+    └── onPlayerConfig.onPlayerConfig(player)     ← 触发实例配置回调（此时已在 prepare() 之后）
 ```
 
 ### **4.3 完整生命周期**
@@ -175,9 +178,8 @@ controller.configure(model)
 │                                                                  │
 │  controller.configure(model)                                     │
 │      │                                                           │
-│      ├── setDataSource(model)                                    │
-│      ├── callback.onPlayerConfig(player)  ← 实例配置             │
-│      └── prepare() / start()                                     │
+│      ├── setDataSource(model)  ← 内部已隐式调用 prepare()          │
+│      └── callback.onPlayerConfig(player)  ← 实例配置（prepare 后） │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -213,9 +215,9 @@ public interface OnGlobalInitCallback {
 @FunctionalInterface
 public interface OnPlayerConfigCallback {
     /**
-     * 播放器自定义配置回调，在 prepare() 前调用。
+     * 播放器自定义配置回调，在 setDataSource() 之后调用。
      *
-     * @param player 播放器实例，可通过此实例访问底层 SDK 配置能力
+     * @param player 播放器实例，需通过 getInternalPlayer() 获取底层实例后访问底层 SDK 配置能力
      */
     void onPlayerConfig(@NonNull IMediaPlayer player);
 }
@@ -248,7 +250,7 @@ public interface OnPlayerConfigCallback {
 
 ### **6.1 全局配置和实例配置的执行顺序是什么？**
 
-全局配置（`setOnGlobalInit`）在应用启动时执行一次；实例配置（`onPlayerConfig`）在每个播放器实例 `prepare()` 前执行。两者互不影响。
+全局配置（`setOnGlobalInit`）在应用启动时执行一次；实例配置（`onPlayerConfig`）在每个播放器实例 `setDataSource()` 之后执行（此时已完成 `prepare()`）。两者互不影响。
 
 ### **6.2 如果不设置自定义配置会怎样？**
 
@@ -256,7 +258,7 @@ AliPlayerKit 已内置最佳实践配置，不设置任何自定义配置即可�
 
 ### **6.3 实例配置回调中可以做异步操作吗？**
 
-不建议。Android 端的回调是同步执行的，回调完成后才会继续执行 `prepare()`。如果在回调中执行耗时操作，会阻塞播放器的启动流程。
+不建议。该回调在主线程同步执行，若在回调中执行耗时操作，会阻塞 `controller.configure()` 的返回及后续播放流程（如 `autoPlay` 场景下的启动播放）。
 
 ### **6.4 可以在实例配置中修改视频源吗？**
 

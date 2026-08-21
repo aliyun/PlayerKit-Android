@@ -240,7 +240,6 @@ public class MobileOpsActivity extends AppCompatActivity {
         // 构建播放数据
         AliPlayerModel playerModel = new AliPlayerModel.Builder()
                 .videoSource(videoSource)
-                .videoTitle("Mobile Ops Demo")
                 .build();
 
         // 配置数据并绑定控制器到视图

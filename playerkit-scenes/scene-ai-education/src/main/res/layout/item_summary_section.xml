@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/ai_education_list_item_padding_horizontal"
+    android:paddingTop="@dimen/ai_education_section_margin_top"
+    android:paddingEnd="@dimen/ai_education_list_item_padding_horizontal"
+    android:paddingBottom="@dimen/ai_education_section_margin_top">
+
+    <!-- Segment header: title + time -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_segment_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/ai_education_text_primary"
+            android:textSize="@dimen/ai_education_text_size_body"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_segment_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/ai_education_text_secondary"
+            android:textSize="@dimen/ai_education_text_size_secondary" />
+
+    </LinearLayout>
+
+    <!-- Content: summary text or markdown -->
+    <TextView
+        android:id="@+id/tv_segment_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/ai_education_content_margin_top"
+        android:lineSpacingExtra="@dimen/ai_education_line_spacing"
+        android:textColor="@color/ai_education_text_primary"
+        android:textSize="@dimen/ai_education_text_size_content" />
+
+</LinearLayout>

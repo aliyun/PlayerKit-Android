@@ -12,7 +12,7 @@ import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.strategy.BaseStrategy;
 import com.aliyun.playerkit.utils.ToastUtils;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,6 +35,15 @@ import java.util.List;
 public class FirstFrameStrategy extends BaseStrategy {
 
     private static final String TAG = "FirstFrameStrategy";
+
+    /**
+     * 本策略需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
+            PlayerEvents.StateChanged.class,
+            PlayerEvents.Prepared.class,
+            PlayerEvents.FirstFrameRendered.class
+    );
 
     /**
      * 首帧耗时结果回调
@@ -96,11 +105,7 @@ public class FirstFrameStrategy extends BaseStrategy {
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        List<Class<? extends PlayerEvent>> events = new ArrayList<>();
-        events.add(PlayerEvents.StateChanged.class);
-        events.add(PlayerEvents.Prepared.class);
-        events.add(PlayerEvents.FirstFrameRendered.class);
-        return events;
+        return OBSERVED_EVENTS;
     }
 
     @Override

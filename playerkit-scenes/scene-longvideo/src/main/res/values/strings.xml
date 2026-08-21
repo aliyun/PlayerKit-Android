@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 退出播放确认弹窗 -->
+    <string name="long_video_exit_confirm_title">提示</string>
+    <string name="long_video_exit_confirm_message">确定要退出播放吗？</string>
+    <string name="long_video_exit_confirm_exit">退出</string>
+
+</resources>

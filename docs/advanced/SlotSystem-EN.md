@@ -74,12 +74,15 @@ The Slot System decouples UI components from the player component, allowing cust
 | PLAY_STATE | Play State, displays loading/error messages | PlayStateSlot |
 | LOG_PANEL | Log panel, displays player logs during debugging | LogPanelSlot |
 | TOP_BAR | Top Bar, displays back/title/settings, etc. | TopBarSlot |
+| SEEK_THUMBNAIL | Seek thumbnail preview, shows the target frame while dragging the progress bar | SeekThumbnailSlot |
 | BOTTOM_BAR | Bottom Bar, displays playback controls/progress bar | BottomBarSlot |
-| SETTING_MENU | Settings Menu, displays speed/quality/mirror settings | SettingMenuSlot |
+| SETTING_MENU | Settings Menu, displays speed/quality/mirror settings (headless event bridge; actual UI is rendered by SettingMenuDialogFragment) | SettingMenuSlot |
+| OPTION_PANEL | Option panel, an independent selection panel for speed/quality shown in landscape scenarios | OptionPanelSlot |
+| CHAPTER_PANEL | Chapter panel, slides in from the right in fullscreen to list chapters and jump on tap | ChapterPanelSlot |
 
 ### **3.2 Scene Adaptation**
 
-AliPlayerKit defines 5 playback scenes. Slot behavior automatically adapts under different scenes:
+AliPlayerKit defines 6 playback scenes. Slot behavior automatically adapts under different scenes:
 
 | Scene | Description | Typical Use Cases |
 |-------|-------------|-------------------|
@@ -88,42 +91,49 @@ AliPlayerKit defines 5 playback scenes. Slot behavior automatically adapts under
 | VIDEO_LIST | List playback scene, disables vertical gestures | Feed, short video lists |
 | RESTRICTED | Restricted playback scene, restricts seeking | Education/training, exam monitoring |
 | MINIMAL | Minimal playback scene, only displays the video frame | Background videos, decorative videos |
+| AI_VOD | AI-enhanced VOD scene, adds chapter navigation and AI content display on top of VOD | AI courses, knowledge videos |
 
 **Slot Visibility Rules**:
 
-| Slot | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|------|-----|------|------------|------------|---------|
-| PLAYER_SURFACE | ✓ | ✓ | ✓ | ✓ | ✓ |
-| FULLSCREEN | ✓ | ✓ | ✓ | ✓ | ✓ |
-| GESTURE_CONTROL | ✓ | ✓ | ✓ | ✓ | ✗ |
-| LANDSCAPE_HINT | ✓ | ✓ | ✓ | ✓ | ✗ |
-| COVER | ✓ | ✗ | ✓ | ✗ | ✗ |
-| CENTER_DISPLAY | ✓ | ✓ | ✓ | ✓ | ✗ |
-| PLAY_STATE | ✓ | ✓ | ✓ | ✓ | ✓ |
-| LOG_PANEL | Configurable | Configurable | Configurable | Configurable | ✗ |
-| TOP_BAR | ✓ | ✓ | ✓ | ✓ | ✗ |
-| BOTTOM_BAR | ✓ | ✓ | ✓ | ✓ | ✗ |
-| SETTING_MENU | ✓ | ✓ | ✓ | ✓ | ✗ |
+| Slot | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|------|-----|------|------------|------------|---------|--------|
+| PLAYER_SURFACE | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| FULLSCREEN | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| GESTURE_CONTROL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| LANDSCAPE_HINT | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| COVER | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| CENTER_DISPLAY | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| PLAY_STATE | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| LOG_PANEL | Configurable | Configurable | Configurable | Configurable | ✗ | Configurable |
+| TOP_BAR | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| SEEK_THUMBNAIL | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| BOTTOM_BAR | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| SETTING_MENU | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| OPTION_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| CHAPTER_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+
+> 💡 `CHAPTER_PANEL` declares no scene-exclusion rule, so it is mounted in every non-MINIMAL scene. However it stays hidden by default and only expands when it receives `ControlBarEvents.ShowChapterPanel` with non-empty chapter data. That event is posted solely by the `BottomBarSlot` chapter button, which appears only in the `AI_VOD` scene with at least 2 chapters — so in practice it behaves as "visible in AI_VOD only".
 
 **Gesture Behavior Differences**:
 
-| Gesture | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|---------|-----|------|------------|------------|---------|
-| Tap | Show/Hide control bar | Show/Hide control bar | Show/Hide control bar | Show/Hide control bar | Disabled |
-| Double-tap | Toggle play/pause | Toggle play/pause | Toggle play/pause | Toggle play/pause | Disabled |
-| Long press | 2x speed playback | Disabled | 2x speed playback | Disabled | Disabled |
-| Horizontal drag | Seek | Disabled | Seek | Disabled | Disabled |
-| Left vertical drag | Brightness adjustment | Brightness adjustment | Disabled | Brightness adjustment | Disabled |
-| Right vertical drag | Volume adjustment | Volume adjustment | Disabled | Volume adjustment | Disabled |
+| Gesture | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|---------|-----|------|------------|------------|---------|--------|
+| Tap | Show/Hide control bar | Show/Hide control bar | Show/Hide control bar | Show/Hide control bar | Disabled | Show/Hide control bar |
+| Double-tap | Toggle play/pause | Toggle play/pause | Toggle play/pause | Toggle play/pause | Disabled | Toggle play/pause |
+| Long press | 2x speed playback | Disabled | 2x speed playback | Disabled | Disabled | 2x speed playback |
+| Horizontal drag | Seek | Disabled | Seek | Disabled | Disabled | Seek |
+| Left vertical drag | Brightness adjustment | Brightness adjustment | Disabled | Brightness adjustment | Disabled | Brightness adjustment |
+| Right vertical drag | Volume adjustment | Volume adjustment | Disabled | Volume adjustment | Disabled | Volume adjustment |
 
 **Bottom Bar Differences**:
 
-| Control | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|---------|-----|------|------------|------------|---------|
-| Play/Pause button | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Progress bar | Draggable | Not draggable | Draggable | Not draggable | ✗ |
-| Time display | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Refresh button | ✗ | ✓ | ✗ | ✗ | ✗ |
+| Control | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|---------|-----|------|------------|------------|---------|--------|
+| Play/Pause button | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| Progress bar | Draggable | Not draggable | Draggable | Not draggable | ✗ | Draggable |
+| Time display | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| Refresh button | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ |
+| Chapter markers & chapter button | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ (when chapters ≥ 2) |
 
 ---
 
@@ -766,9 +776,11 @@ The player UI consists of multiple stacked slots; the z-order directly determine
 | PLAY_STATE | 60 | Status layer | Loading/error messages |
 | LOG_PANEL | 70 | Debug layer | Log panel |
 | TOP_BAR | 80 | Control layer | Top Bar |
+| SEEK_THUMBNAIL | 85 | Control layer | Seek thumbnail preview. Displays a video frame thumbnail and timestamp for the target position when dragging the progress bar. Requires AliPlayer SDK ≥ 7.16.0 |
 | BOTTOM_BAR | 90 | Control layer | Bottom Bar |
 | SETTING_MENU | 100 | Menu layer | Settings Menu overlay |
 | OPTION_PANEL | 110 | Menu layer | Option panel (landscape speed/quality) |
+| CHAPTER_PANEL | 115 | Menu layer | Chapter panel (AI_VOD scene, slides in from the right in fullscreen) |
 
 > **Z-Order Rule**: Smaller order values are at the bottom (rendered first, occluded first); larger order values are on top (rendered last, occluding others).
 
@@ -868,7 +880,7 @@ This design satisfies most scenarios while keeping order values readable.
 | Background layer above the video frame | 11~19 | Above PLAYER_SURFACE, below GESTURE_CONTROL |
 | Watermark/subtitles above the cover | 41~49 | Above COVER, below CENTER_DISPLAY |
 | Danmaku near the control bars | 81~89 | Above TOP_BAR, below BOTTOM_BAR |
-| Topmost global overlay | >110 | Above all built-in slots |
+| Topmost global overlay | >115 | Above all built-in slots |
 
 **Backward Compatibility Guarantees**:
 
@@ -915,8 +927,11 @@ playerView.attach(controller);
 // Final render order (bottom to top):
 // PLAYER_SURFACE(10) → FULLSCREEN(15) → GESTURE_CONTROL(20) → WATERMARK(25)
 // → LANDSCAPE_HINT(30) → COVER(40) → CENTER_DISPLAY(50) → SUBTITLE(55)
-// → PLAY_STATE(60) → LOG_PANEL(70) → TOP_BAR(80) → DANMAKU(85) → BOTTOM_BAR(90)
-// → SETTING_MENU(100) → OPTION_PANEL(110) → GLOBAL_OVERLAY(120)
+// → PLAY_STATE(60) → LOG_PANEL(70) → TOP_BAR(80) → SEEK_THUMBNAIL(85) → DANMAKU(85)
+// → BOTTOM_BAR(90) → SETTING_MENU(100) → OPTION_PANEL(110)
+// → CHAPTER_PANEL(115) → GLOBAL_OVERLAY(120)
+// Note: DANMAKU shares order 85 with the built-in SEEK_THUMBNAIL; ties are broken by
+// registration order (registered later renders on top)
 ```
 
 ---

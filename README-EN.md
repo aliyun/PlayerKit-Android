@@ -12,17 +12,30 @@ Language: [中文](README.md) | English
 
 **AliPlayerKit** is Alibaba Cloud's **player UI integration solution** for video applications, offering **low-code, extensible player UI components** and **scenario-based solutions**. 
 
+<p align="center">
+  <img
+    src="https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/playerkit-ui-preview.png"
+    alt="AliPlayerKit UI preview"
+    width="100%"
+  />
+</p>
+
+<p align="center">
+  <sub>Ready-to-use player UI components for multiple playback scenarios</sub>
+</p>
+
 By encapsulating player capabilities and UI interactions, it enables rapid development of app playback features with minimal integration effort — no need to call underlying player APIs directly or build complex player UIs from scratch.
 
 ---
 
 ## **2. Core Features**
 
-- **Low-code Integration** — Integrate video playback capabilities with just a few lines of code, without directly calling low-level player APIs.
-- **Out-of-the-Box UI Components** — Configurable player UI components covering basic playback and common interaction capabilities.
-- **Scenario-based Solutions** — Built-in typical business scenarios such as medium/long video, short video, live streaming, and playlists, enabling rapid construction of complete playback experiences.
-- **Highly Extensible Architecture** — The slot system supports flexible UI composition, while the strategy system supports flexible extension of business logic.
-- **Unified Cross-platform Architecture** — Shared design philosophy and API semantics across platforms, reducing multi-platform integration and maintenance costs.
+- **Low-Code Integration** — Minimalist API design; integrate the player in just a few lines of code.
+- **Ready-to-Use UI Components** — Configurable player UI components covering essential playback and common interactions, with support for on-demand customization.
+- **All-in-One Playback Experience** — Simply pass a video VID to automatically display cover images, video titles, seek thumbnails, and other complete playback information for a one-stop playback experience.
+- **Scenario-Based Solutions** — Built-in support for typical business scenarios such as mid/long-form video, short video, live streaming, list playback, and AI education to quickly build complete playback experiences.
+- **Highly Extensible Architecture** — A slot system for flexible UI composition and a strategy system for extensible business logic.
+- **Cross-Platform Unified Architecture** — All platforms share the same design philosophy and API semantics, reducing multi-platform integration and maintenance costs.
 
 | Platform | Description | Source | Docs |
 |----------|-------------|--------|------|
@@ -66,22 +79,20 @@ This index provides a clear documentation structure with step-by-step instructio
 
 ## **5. Quick Integration**
 
-AliPlayerKit provides two integration approaches. The complete integration flow is as follows:
+AliPlayerKit adopts a **layered architecture design**, providing two integration approaches that you can choose from based on your business needs:
 
-![Integration](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/Integration-EN.png)
+| Layer                   | Module             | Description                                                          | Use Cases                                                 |
+| ----------------------- | ------------------ | -------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Component Layer**     | `playerkit`        | Core UI components, providing player views, controllers, and data models | When custom UI or flexible playback control is needed  |
+| **Scene Layer**         | `playerkit-scenes` | Complete scenario solutions, including UI and business logic         | Quickly implement standard playback scenarios              |
+
+> **Note**: The scene layer depends on the component layer. If you choose scene-layer integration, you must first complete component-layer integration.
 
 > **Detailed Steps**: See [Integration](./docs/Integration-EN.md). For more information, refer to the [Documentation Index](./docs/README-EN.md).
 
 ---
 
 ## **6. Quick Onboarding**
-
-AliPlayerKit adopts a **layered architecture design**, providing two integration approaches that you can choose from based on your business needs:
-
-| Layer | Module | Description | Use Cases |
-|-----|------|------|---------|
-| **Component Layer** | `playerkit` | Core UI components, providing player views, controllers, and data models | When custom UI or flexible playback control is needed |
-| **Scene Layer** | `playerkit-scenes` | Complete scenario solutions, including UI and business logic | Quickly implement standard playback scenarios |
 
 In just a few steps, you can easily implement video playback. The diagram below shows the **component layer integration** flow:
 
@@ -110,7 +121,7 @@ Before running the project, ensure the following requirements are met:
 | Android Studio | Latest version |
 | Android SDK | Minimum API 21 (Android 5.0), recommended compileSdkVersion 31+ |
 | Gradle | Version 7.0 or higher |
-| License | Player License certificate and License Key obtained. See [License Authorization and Management](https://www.alibabacloud.com/help/en/apsara-video-sdk/) for details |
+| License | Player License certificate and License Key obtained. See [Obtain an ApsaraVideo Player SDK license](https://www.alibabacloud.com/help/en/vod/developer-reference/obtain-the-player-sdk-license) for details |
 
 #### **Running Steps**
 
@@ -131,7 +142,11 @@ Add the following inside the `<application>` element of `demo-app/src/main/Andro
     android:value="assets/cert/license.crt" />
 ```
 
-**Step 3: Run the Project**
+**Step 3: Configure License**
+
+The player SDK requires a valid License to function properly. See [Integrate a license](https://www.alibabacloud.com/help/en/vod/developer-reference/access-to-license) for License acquisition and configuration.
+
+**Step 4: Run the Project**
 
 Open the project in Android Studio and run the `demo-app` module.
 
@@ -143,7 +158,7 @@ Open the project in Android Studio and run the `demo-app` module.
 2. Update `applicationId` in `demo-app/build.gradle`
 3. Update the `package` attribute in `demo-app/src/main/AndroidManifest.xml`
 
-> **Note**: Without proper License configuration, the player will not work and may throw authorization exceptions.
+> **Note**: Without proper License configuration, the player will not work and may throw authorization exceptions. See [License FAQ](https://www.alibabacloud.com/help/en/vod/developer-reference/faqs-for-sdk-license) for details.
 
 ### **7.2 Demo App**
 
@@ -159,13 +174,14 @@ Scan the following QR code with your phone to quickly download and install the d
 
 ---
 
-## **8. Related Products**
+## **8. Device-Cloud Synergy**
 
-AliPlayerKit is built on top of Alibaba Cloud's audio and video capabilities. We recommend combining it with the following cloud products to deliver a better playback experience through end-to-cloud integration:
+AliPlayerKit is built on top of Alibaba Cloud's audio and video capabilities. We recommend using it together with Alibaba Cloud products to take full advantage of device-cloud synergy and further enhance playback capabilities and the video experience.
 
-- [ApsaraVideo for VOD](https://www.alibabacloud.com/en/product/apsaravideo-for-vod)
-- [ApsaraVideo for Live](https://www.alibabacloud.com/en/product/apsaravideo-for-live)
-- [ApsaraVideo SDK](https://www.alibabacloud.com/help/en/apsara-video-sdk/)
+| Cloud Product                                                                        | Description                                                                                        |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| [ApsaraVideo for VOD](https://www.alibabacloud.com/en/product/apsaravideo-for-vod)    | Provides one-stop video-on-demand services, including video upload, storage, transcoding, distribution, and playback |
+| [ApsaraVideo for Live](https://www.alibabacloud.com/en/product/apsaravideo-for-live)  | Provides end-to-end live streaming services, including stream ingest, transcoding, distribution, and playback |
 
 ---
 
@@ -176,4 +192,4 @@ AliPlayerKit is built on top of Alibaba Cloud's audio and video capabilities. We
 - 📝 **Submit a Ticket**: [Alibaba Cloud Official Technical Support](https://smartservice.console.alibabacloud.com/service/create-ticket)
 - 💬 **GitHub Issues**: [Feedback and suggestions are welcome](https://github.com/aliyun/PlayerKit-Android/issues)
 
-For more FAQs and fixes about using the Alibaba Cloud Player SDK, see [FAQ about ApsaraVideo Player](https://www.alibabacloud.com/help/en/vod/support/faq-about-apsaravideo-player/).
+For more FAQs and fixes about using the Alibaba Cloud player, see [FAQ about ApsaraVideo Player](https://www.alibabacloud.com/help/en/vod/support/faq-about-apsaravideo-player/).

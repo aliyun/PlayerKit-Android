@@ -96,6 +96,13 @@ State change events produced internally by the player to notify external compone
 | `SetRotationCompleted` | Rotation setting completed | `rotation` |
 | `TrackQualityListUpdated` | Quality list updated | `trackQualityList` |
 | `TrackSelected` | Quality selection completed | `trackIndex` |
+| `TrackSwitchCompleted` | Quality switch completed | `quality` target quality |
+| `TrackSwitchFailed` | Quality switch failed | `quality` target quality, `errorInfo` error info |
+| `CoverUrlReady` | Cover image URL is ready (extracted from cloud MediaInfo) | `coverUrl` cover image URL |
+| `VideoTitleReady` | Video title is ready (extracted from cloud MediaInfo) | `title` video title |
+| `ThumbnailUrlReady` | Thumbnail URL is ready (extracted from cloud MediaInfo) | `thumbnailUrl` thumbnail URL |
+
+> 💡 `CoverUrlReady` / `VideoTitleReady` / `ThumbnailUrlReady` belong to the VID All-in-One playback experience. They are dispatched automatically after the player is `prepared` and require AliPlayer SDK ≥ 7.16.0. See [VID All-in-One Playback Experience](../CoreFeatures-EN.md#38-vid-all-in-one-playback-experience).
 
 ### **3.2 Player Commands (PlayerCommand)**
 
@@ -140,22 +147,29 @@ Events produced by user gestures, describing the gesture itself without business
 
 ### **3.4 Control Bar Events (ControlBarEvents)**
 
-Control bar visibility synchronization events.
+Control bar visibility synchronization events, plus overlay events triggered from the control bar.
 
-| Event | Description |
-|-------|-------------|
-| `Show` | Show control bar |
-| `Hide` | Hide control bar |
-| `ResetTimer` | Reset auto-hide timer |
-| `ShowSettings` | Show settings UI |
+| Event | Description | Payload |
+|-------|-------------|---------|
+| `Show` | Show control bar | - |
+| `Hide` | Hide control bar | - |
+| `ResetTimer` | Reset auto-hide timer | - |
+| `ShowSettings` | Show settings UI | - |
+| `ShowSpeedPanel` | Show the speed selection panel (landscape) | - |
+| `ShowQualityPanel` | Show the quality selection panel (landscape) | - |
+| `ShowSeekThumbnail` | Progress bar dragging started — show the seek thumbnail overlay | - |
+| `UpdateSeekThumbnail` | Update thumbnail, chapter highlight and time display while dragging | `positionMs`, `durationMs` |
+| `HideSeekThumbnail` | Progress bar dragging stopped — hide the seek thumbnail overlay | - |
+| `ShowChapterPanel` | Show the chapter panel (AI_VOD scene, triggered by the bottom bar chapter button) | - |
 
 ### **3.5 Fullscreen Events (FullscreenEvents)**
 
 Fullscreen mode toggle events.
 
-| Event | Description |
-|-------|-------------|
-| `Toggle` | Toggle fullscreen state |
+| Event | Description | Data |
+|-------|-------------|------|
+| `Toggle` | Toggle fullscreen state | - |
+| `FullScreenChanged` | Fullscreen state change completed | `isFullscreen` whether fullscreen |
 
 ### **3.6 Player Lifecycle Events (PlayerLifecycleEvents)**
 

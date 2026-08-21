@@ -212,9 +212,7 @@ public class SlotSystemExampleActivity extends AppCompatActivity {
         );
 
         AliPlayerModel.Builder builder = new AliPlayerModel.Builder()
-                .videoSource(videoSource)
-                .videoTitle(getString(R.string.slot_demo_video_title));
-
+                .videoSource(videoSource);
         return builder.build();
     }
 

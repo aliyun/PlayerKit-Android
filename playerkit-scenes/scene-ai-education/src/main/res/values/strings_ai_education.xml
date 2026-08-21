@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_education_chapter">章节</string>
+    <string name="ai_education_ai_analysis">AI 解析</string>
+    <string name="ai_education_chapter_count">章节 共%d段</string>
+    <string name="ai_education_summary">摘要</string>
+    <string name="ai_education_scene_title">AI 教育场景</string>
+
+    <string name="ai_education_error_server_unreachable">无法连接 App Server，请检查网络或服务器设置</string>
+    <string name="ai_education_error_ai_content_load_failed">AI 内容加载失败</string>
+</resources>

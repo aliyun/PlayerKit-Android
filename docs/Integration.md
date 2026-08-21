@@ -52,7 +52,7 @@ AliPlayerKit 提供两种集成方案，您可以根据业务需求选择：
 ### **2.2 License 准备**
 
 - 您已获取音视频终端 SDK 的播放器 License 授权证书和 License Key
-- 获取详细步骤请参见 [管理 License](https://help.aliyun.com/zh/vod/developer-reference/license-authorization-and-management)
+- 获取详细步骤请参见 [获取播放器SDK License](https://help.aliyun.com/zh/vod/developer-reference/obtain-the-player-sdk-license)
 
 > **注意**：如未正确配置 License，播放器将无法正常工作，并可能抛出授权异常。
 
@@ -132,30 +132,9 @@ dependencies {
 
 ### **步骤 3：配置 License**
 
-#### **3.1 添加 License 证书文件**
+播放器 SDK 需要有效的 License 授权才能正常工作。请参阅 [接入 License](https://help.aliyun.com/zh/vod/developer-reference/access-to-license) 完成 License 的配置。
 
-将准备好的 License 证书文件（如 `license.crt`）放置到 app 模块的 `src/main/assets/cert/` 目录下。
-
-#### **3.2 添加 License 配置**
-
-在 app 模块的 `AndroidManifest.xml` 中添加以下配置：
-
-```xml
-<!--    配置license    -->
-<!--    接入 License：https://help.aliyun.com/zh/vod/developer-reference/access-to-license     -->
-<meta-data
-    android:name="com.aliyun.alivc_license.licensekey"
-    android:value="您的 License Key" />
-<meta-data
-    android:name="com.aliyun.alivc_license.licensefile"
-    android:value="assets/cert/license.crt" />
-```
-
-> **注意**：
->
-> - 确保 `<meta-data>` 节点处于 `<application>` 元素下面，且 `name` 属性正确
-> - 若播放器 SDK 服务环境为海外，请参考 [Android 端接入 License](https://help.aliyun.com/zh/vod/developer-reference/access-to-license) 完成配置
-> - 完整配置示例可参考 `demo-app` 模块
+> **注意**：未正确配置 License 将导致播放器无法正常工作，播放时出现黑屏等异常。
 
 ### **步骤 4：验证集成**
 
@@ -182,7 +161,7 @@ git commit -m "feat: integrate AliPlayerKit module (source commit: 2c30d92)"
 
 ## **4. 方案二：场景层集成**
 
-场景层提供针对具体业务场景的播放示例，如中长视频、短视频、直播和列表播放等。每个场景模块都是一个独立的示例，您可以根据业务需求选择参考或直接集成。
+场景层提供针对具体业务场景的播放示例，如中长视频、短视频、直播、列表播放和 AI 教育等。每个场景模块都是一个独立的示例，您可以根据业务需求选择参考或直接集成。
 
 > **前置条件**：场景层依赖组件层能力。在集成场景层之前，请先完成 **组件层集成**。
 
@@ -197,6 +176,7 @@ git commit -m "feat: integrate AliPlayerKit module (source commit: 2c30d92)"
 | `scene-shortvideo` | 短视频场景示例 |
 | `scene-live` | 直播场景示例 |
 | `scene-playlist` | 列表播放场景示例 |
+| `scene-ai-education` | AI 教育场景示例。**额外依赖第三方库 Markwon / OkHttp / Gson / Glide**，用于 Markdown 渲染、网络请求与图片加载 |
 
 ```bash
 # scene-common 包含示例视频常量，如自行实现视频源可省略
@@ -205,6 +185,7 @@ cp -r playerkit-scenes/scene-common /path/to/your/project/
 # 其他场景模块按需选择
 cp -r playerkit-scenes/scene-longvideo /path/to/your/project/
 cp -r playerkit-scenes/scene-live /path/to/your/project/
+cp -r playerkit-scenes/scene-ai-education /path/to/your/project/
 # ...
 ```
 
@@ -223,6 +204,7 @@ cp -r playerkit-scenes/scene-live /path/to/your/project/
 | `scene-live` | `demo-settings`、`scene-common` | 移除 `demo-settings`，`scene-common` 可选 |
 | `scene-shortvideo` | `scene-common` | `scene-common` 可选 |
 | `scene-playlist` | `scene-common` | `scene-common` 可选 |
+| `scene-ai-education` | `scene-common`、Markwon / OkHttp / Gson / Glide | `scene-common` 可选；第三方库需保留（详见 2.4） |
 
 **2.1 移除 demo-settings 依赖**（如适用）
 
@@ -276,6 +258,19 @@ private String getVideoPlayAuth() {
 }
 ```
 
+**2.4 处理 scene-ai-education 的第三方依赖**（如集成该模块）
+
+`scene-ai-education` 模块除 `playerkit` 与 `scene-common` 外，还依赖以下第三方库，均已声明在该模块的 `build.gradle` 中，Gradle 同步时自动拉取：
+
+| 第三方库 | 版本 | 用途 |
+|---------|------|------|
+| Markwon（`core` / `html` / `ext-tables` / `ext-strikethrough` / `image-glide`） | 4.6.2 | 渲染 AI 分析内容的 Markdown 文本 |
+| OkHttp | 4.8.1 | 请求 App Server 的播放凭证与 AI 分析接口 |
+| Gson | 2.8.0 | 解析 App Server 返回的 JSON 数据 |
+| Glide | 4.13.0 | 加载章节缩略图 |
+
+> **说明**：这些依赖仅由 `scene-ai-education` 引入。若不集成 AI 教育场景，即不会引入上述第三方库；`playerkit` 组件层与其他场景模块不受影响。
+
 ### **步骤 3：Gradle 项目配置**
 
 #### **3.1 添加模块引用**
@@ -285,6 +280,8 @@ private String getVideoPlayAuth() {
 ```groovy
 include ':scene-common'
 include ':scene-longvideo'
+// AI 教育场景模块
+include ':scene-ai-education'
 // 按需添加其他场景模块...
 ```
 
@@ -293,6 +290,8 @@ include ':scene-longvideo'
 ```kotlin
 include(":scene-common")
 include(":scene-longvideo")
+// AI 教育场景模块
+include(":scene-ai-education")
 // 按需添加其他场景模块...
 ```
 
@@ -305,6 +304,9 @@ dependencies {
     // AliPlayerKit 播放场景模块：基于 AliPlayerKit 核心组件，提供开箱即用的标准播放场景方案
     // 中长视频场景模块：提供中长视频播放的完整解决方案
     implementation project(':scene-longvideo')
+
+    // AI 教育场景模块：提供章节导航与 AI 内容展示的完整解决方案
+    implementation project(':scene-ai-education')
 }
 ```
 
@@ -315,6 +317,9 @@ dependencies {
     // AliPlayerKit 播放场景模块：基于 AliPlayerKit 核心组件，提供开箱即用的标准播放场景方案
     // 中长视频场景模块：提供中长视频播放的完整解决方案
     implementation(project(":scene-longvideo"))
+
+    // AI 教育场景模块：提供章节导航与 AI 内容展示的完整解决方案
+    implementation(project(":scene-ai-education"))
 }
 ```
 
@@ -337,6 +342,7 @@ AliPlayerKit 内部依赖以下 SDK：
 | SDK | 说明 |
 |-----|------|
 | **AliPlayer SDK** | 阿里云播放器 SDK，提供视频解码、渲染及播放控制等基础播放能力 |
+| **AlivcArtc** | 播放器与 RTS 低延时直播组件的桥接层，版本号需与 AliPlayer SDK 保持一致，需要和 RtsSDK 一起集成 |
 | **RtsSDK** | 阿里云 RTS SDK，提供 RTS 超低延时直播播放能力，支持毫秒级延迟的实时流媒体播放 |
 
 如需升级底层 SDK 版本，可参考以下步骤。
@@ -364,7 +370,10 @@ AliPlayerKit 内部依赖以下 SDK：
    ```groovy
    def player_sdk_version = "x.x.x"  // 替换为目标版本
    api "com.aliyun.sdk.android:AliyunPlayer:$player_sdk_version-full"
-   
+
+   // AlivcArtc 桥接层版本号需与播放器版本保持一致
+   api "com.aliyun.sdk.android:AlivcArtc:$player_sdk_version"
+
    // RtsSDK 版本号需与播放器版本保持一致
    def rts_sdk_version = "x.x.x"  // 替换为目标版本
    api "com.aliyun.rts.android:RtsSDK:$rts_sdk_version"
@@ -393,6 +402,8 @@ AliPlayerKit 内部依赖以下 SDK：
 **问题**：播放器报 License 错误
 
 **解决方案**：
+
+请确认 License 已正确获取与配置，详见 [License相关常见问题](https://help.aliyun.com/zh/vod/developer-reference/faqs-for-sdk-license)。
 
 1. 确认已正确配置 License 证书和 Key
 2. 检查 License 是否已过期

@@ -120,6 +120,7 @@ public class LinkActivity extends AppCompatActivity {
         if (filterKeys != null && !filterKeys.isEmpty()) {
             mItems = new ArrayList<>();
             for (LinkItem item : allItems) {
+                if (item.isDivider()) continue;
                 if (filterKeys.contains(item.getKey())) {
                     mItems.add(item);
                 }
@@ -131,6 +132,7 @@ public class LinkActivity extends AppCompatActivity {
 
         // 加载已保存的数据
         for (LinkItem item : mItems) {
+            if (item.isDivider()) continue;
             String savedValue = SPManager.getInstance().getString(item.getKey());
             if (savedValue != null) {
                 item.setLink(savedValue);
@@ -210,6 +212,7 @@ public class LinkActivity extends AppCompatActivity {
      */
     private void saveData() {
         for (LinkItem item : mItems) {
+            if (item.isDivider()) continue;
             SPManager.getInstance().saveString(item.getKey(), item.getLink());
         }
         ToastUtils.showToast(R.string.setting_link_toast_save_success);

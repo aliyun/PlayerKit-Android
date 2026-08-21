@@ -190,10 +190,6 @@ VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(
 // 2. Create the playback model
 AliPlayerModel model = new AliPlayerModel.Builder()
     .videoSource(videoSource)
-    .coverUrl("https://example.com/cover.jpg")
-    .videoTitle("Sample Video")
-    .sceneType(SceneType.VOD)
-    .autoPlay(true)
     .build();
 
 // 3. Create the controller

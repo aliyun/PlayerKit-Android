@@ -74,12 +74,15 @@
 | PLAY_STATE | 播放状态，显示加载中/错误提示等 | PlayStateSlot |
 | LOG_PANEL | 日志面板，调试时显示播放器日志 | LogPanelSlot |
 | TOP_BAR | 顶部控制栏，显示返回/标题/设置等 | TopBarSlot |
+| SEEK_THUMBNAIL | 进度条缩略图预览，拖动进度条时显示对应画面 | SeekThumbnailSlot |
 | BOTTOM_BAR | 底部控制栏，显示播放控制/进度条等 | BottomBarSlot |
-| SETTING_MENU | 设置菜单，显示倍速/清晰度/镜像等设置 | SettingMenuSlot |
+| SETTING_MENU | 设置菜单，显示倍速/清晰度/镜像等设置（无 UI 事件桥接层，实际 UI 由 SettingMenuDialogFragment 弹窗承载） | SettingMenuSlot |
+| OPTION_PANEL | 选项面板，横屏场景下显示倍速/清晰度等独立选择面板 | OptionPanelSlot |
+| CHAPTER_PANEL | 章节面板，全屏下从右侧滑入展示章节列表并支持点击跳转 | ChapterPanelSlot |
 
 ### **3.2 场景适配**
 
-AliPlayerKit 定义了 5 种播放场景，不同场景下插槽行为自动适配：
+AliPlayerKit 定义了 6 种播放场景，不同场景下插槽行为自动适配：
 
 | 场景 | 说明 | 典型应用 |
 |-----|------|---------|
@@ -88,42 +91,49 @@ AliPlayerKit 定义了 5 种播放场景，不同场景下插槽行为自动适�
 | VIDEO_LIST | 列表播放场景，禁用垂直手势 | 信息流、短视频列表 |
 | RESTRICTED | 受限播放场景，限制跳跃播放 | 教育培训、考试监控 |
 | MINIMAL | 最小化播放场景，仅显示视频画面 | 背景视频、装饰视频 |
+| AI_VOD | AI 增强点播场景，在 VOD 基础上增加章节导航与 AI 内容展示 | AI 课程、知识视频 |
 
 **插槽可见性规则**：
 
-| 插槽 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|-----|-----|------|------------|------------|---------|
-| PLAYER_SURFACE | ✓ | ✓ | ✓ | ✓ | ✓ |
-| FULLSCREEN | ✓ | ✓ | ✓ | ✓ | ✓ |
-| GESTURE_CONTROL | ✓ | ✓ | ✓ | ✓ | ✗ |
-| LANDSCAPE_HINT | ✓ | ✓ | ✓ | ✓ | ✗ |
-| COVER | ✓ | ✗ | ✓ | ✗ | ✗ |
-| CENTER_DISPLAY | ✓ | ✓ | ✓ | ✓ | ✗ |
-| PLAY_STATE | ✓ | ✓ | ✓ | ✓ | ✓ |
-| LOG_PANEL | 可配置 | 可配置 | 可配置 | 可配置 | ✗ |
-| TOP_BAR | ✓ | ✓ | ✓ | ✓ | ✗ |
-| BOTTOM_BAR | ✓ | ✓ | ✓ | ✓ | ✗ |
-| SETTING_MENU | ✓ | ✓ | ✓ | ✓ | ✗ |
+| 插槽 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|-----|-----|------|------------|------------|---------|--------|
+| PLAYER_SURFACE | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| FULLSCREEN | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| GESTURE_CONTROL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| LANDSCAPE_HINT | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| COVER | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| CENTER_DISPLAY | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| PLAY_STATE | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| LOG_PANEL | 可配置 | 可配置 | 可配置 | 可配置 | ✗ | 可配置 |
+| TOP_BAR | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| SEEK_THUMBNAIL | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| BOTTOM_BAR | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| SETTING_MENU | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| OPTION_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| CHAPTER_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+
+> 💡 `CHAPTER_PANEL` 未配置场景排除规则，因此在非 MINIMAL 场景下都会被挂载，但它默认隐藏，且只有在收到 `ControlBarEvents.ShowChapterPanel` 且章节数据非空时才会展开。而该事件仅由 `BottomBarSlot` 的章节按钮触发，章节按钮只在 `AI_VOD` 场景且章节数 ≥ 2 时出现，因此实际效果等价于「仅 AI_VOD 场景可见」。
 
 **手势行为差异**：
 
-| 手势 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|-----|-----|------|------------|------------|---------|
-| 单击 | 显示/隐藏控制栏 | 显示/隐藏控制栏 | 显示/隐藏控制栏 | 显示/隐藏控制栏 | 禁用 |
-| 双击 | 切换播放/暂停 | 切换播放/暂停 | 切换播放/暂停 | 切换播放/暂停 | 禁用 |
-| 长按 | 2倍速播放 | 禁用 | 2倍速播放 | 禁用 | 禁用 |
-| 水平拖动 | 进度跳转 | 禁用 | 进度跳转 | 禁用 | 禁用 |
-| 左侧垂直拖动 | 亮度调节 | 亮度调节 | 禁用 | 亮度调节 | 禁用 |
-| 右侧垂直拖动 | 音量调节 | 音量调节 | 禁用 | 音量调节 | 禁用 |
+| 手势 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|-----|-----|------|------------|------------|---------|--------|
+| 单击 | 显示/隐藏控制栏 | 显示/隐藏控制栏 | 显示/隐藏控制栏 | 显示/隐藏控制栏 | 禁用 | 显示/隐藏控制栏 |
+| 双击 | 切换播放/暂停 | 切换播放/暂停 | 切换播放/暂停 | 切换播放/暂停 | 禁用 | 切换播放/暂停 |
+| 长按 | 2倍速播放 | 禁用 | 2倍速播放 | 禁用 | 禁用 | 2倍速播放 |
+| 水平拖动 | 进度跳转 | 禁用 | 进度跳转 | 禁用 | 禁用 | 进度跳转 |
+| 左侧垂直拖动 | 亮度调节 | 亮度调节 | 禁用 | 亮度调节 | 禁用 | 亮度调节 |
+| 右侧垂直拖动 | 音量调节 | 音量调节 | 禁用 | 音量调节 | 禁用 | 音量调节 |
 
 **底部控制栏差异**：
 
-| 控件 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|-----|-----|------|------------|------------|---------|
-| 播放/暂停按钮 | ✓ | ✓ | ✓ | ✓ | ✗ |
-| 进度条 | 可拖拽 | 不可拖拽 | 可拖拽 | 不可拖拽 | ✗ |
-| 时间显示 | ✓ | ✓ | ✓ | ✓ | ✗ |
-| 刷新按钮 | ✗ | ✓ | ✗ | ✗ | ✗ |
+| 控件 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|-----|-----|------|------------|------------|---------|--------|
+| 播放/暂停按钮 | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| 进度条 | 可拖拽 | 不可拖拽 | 可拖拽 | 不可拖拽 | ✗ | 可拖拽 |
+| 时间显示 | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| 刷新按钮 | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ |
+| 章节标记与章节按钮 | ✗ | ✗ | ✗ | ✗ | ✗ | ✓（章节数 ≥ 2 时） |
 
 ---
 
@@ -766,9 +776,11 @@ AliPlayerKit 的插槽系统采用**显式层级控制**机制，通过 `order` 
 | PLAY_STATE | 60 | 状态层 | 加载中/错误提示 |
 | LOG_PANEL | 70 | 调试层 | 日志面板 |
 | TOP_BAR | 80 | 控制层 | 顶部控制栏 |
+| SEEK_THUMBNAIL | 85 | 控制层 | 进度条缩略图预览。拖动进度条时显示目标时间点的视频帧缩略图与时间戳。需要 AliPlayer SDK ≥ 7.16.0 |
 | BOTTOM_BAR | 90 | 控制层 | 底部控制栏 |
 | SETTING_MENU | 100 | 菜单层 | 设置菜单浮层 |
 | OPTION_PANEL | 110 | 菜单层 | 选项面板（横屏倍速/清晰度） |
+| CHAPTER_PANEL | 115 | 菜单层 | 章节面板（AI_VOD 场景，全屏下从右侧滑入） |
 
 > **层级规则**：order 值越小越靠底层（先渲染、先被遮盖），order 值越大越靠顶层（后渲染、后遮盖其他）。
 
@@ -868,7 +880,7 @@ public class WatermarkSlot extends BaseSlot {
 | 视频画面之上的背景层 | 11~19 | 位于 PLAYER_SURFACE 之上、GESTURE_CONTROL 之下 |
 | 封面之上的水印/字幕 | 41~49 | 位于 COVER 之上、CENTER_DISPLAY 之下 |
 | 控制栏附近的弹幕 | 81~89 | 位于 TOP_BAR 之上、BOTTOM_BAR 之下 |
-| 最顶层的全局浮层 | >110 | 位于所有内置插槽之上 |
+| 最顶层的全局浮层 | >115 | 位于所有内置插槽之上 |
 
 **向后兼容保证**：
 
@@ -915,8 +927,10 @@ playerView.attach(controller);
 // 最终渲染顺序（从底到顶）：
 // PLAYER_SURFACE(10) → FULLSCREEN(15) → GESTURE_CONTROL(20) → WATERMARK(25)
 // → LANDSCAPE_HINT(30) → COVER(40) → CENTER_DISPLAY(50) → SUBTITLE(55)
-// → PLAY_STATE(60) → LOG_PANEL(70) → TOP_BAR(80) → DANMAKU(85) → BOTTOM_BAR(90)
-// → SETTING_MENU(100) → OPTION_PANEL(110) → GLOBAL_OVERLAY(120)
+// → PLAY_STATE(60) → LOG_PANEL(70) → TOP_BAR(80) → SEEK_THUMBNAIL(85) → DANMAKU(85)
+// → BOTTOM_BAR(90) → SETTING_MENU(100) → OPTION_PANEL(110)
+// → CHAPTER_PANEL(115) → GLOBAL_OVERLAY(120)
+// 注意：DANMAKU 与内置的 SEEK_THUMBNAIL 同为 85，同值时按注册顺序排列（后注册的在上）
 ```
 
 ---

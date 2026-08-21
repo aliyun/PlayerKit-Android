@@ -280,9 +280,12 @@ public class SlotHostLayout extends FrameLayout implements SlotHost, ISurfaceMan
         }
         LogHub.i(TAG, "Scene type changed: " + this.sceneType + " -> " + sceneType);
 
+        // 先写入再更新：增量更新中新建的插槽会在 onAttach() 里读取 getSceneType()，
+        // 必须已是新场景，否则新插槽按旧场景初始化。
+        this.sceneType = sceneType;
+
         // 使用增量更新策略
         updateSlotsIncremental(sceneType);
-        this.sceneType = sceneType;
     }
 
     // ==================== 插槽构建 ====================

@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.playerkit.R;
+import com.aliyun.playerkit.utils.DensityUtil;
 
 import java.util.List;
 
@@ -71,8 +72,6 @@ public abstract class BaseSettingItemAdapter extends RecyclerView.Adapter<Recycl
      */
     protected final int mColorNormal;
 
-    private final float mDensity;
-
     /**
      * 构造适配器。
      * <p>
@@ -87,7 +86,6 @@ public abstract class BaseSettingItemAdapter extends RecyclerView.Adapter<Recycl
         this.mContext = context;
         this.mColorSelected = ContextCompat.getColor(context, R.color.setting_option_selected_color);
         this.mColorNormal = ContextCompat.getColor(context, R.color.setting_option_normal_color);
-        this.mDensity = context.getResources().getDisplayMetrics().density;
     }
 
     @Override
@@ -207,7 +205,7 @@ public abstract class BaseSettingItemAdapter extends RecyclerView.Adapter<Recycl
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
-                lp.setMarginStart(dp2px(16));
+                lp.setMarginStart(DensityUtil.dip2px(mContext, 16));
                 optionView.setLayoutParams(lp);
                 container.addView(optionView);
             }
@@ -304,19 +302,6 @@ public abstract class BaseSettingItemAdapter extends RecyclerView.Adapter<Recycl
             view.setTextColor(mColorNormal);
             view.setTypeface(Typeface.DEFAULT);
         }
-    }
-
-    /**
-     * dp 转 px 工具方法。
-     * <p>
-     * Utility method: dp to px conversion.
-     * </p>
-     *
-     * @param dp dp 值 / Value in dp
-     * @return px 值 / Value in px
-     */
-    protected int dp2px(float dp) {
-        return (int) (dp * mDensity + 0.5f);
     }
 
     // ---------------------------------------------------------------------

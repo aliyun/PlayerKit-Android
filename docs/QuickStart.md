@@ -14,15 +14,13 @@
 
 只需几步，您就可以轻松实现视频播放功能！
 
-通过极简的 API 设计，帮助您以低代码的方式快速集成视频播放功能，无需直接调用底层播放器 API，也无需自行实现复杂的播放器 UI。
+**AliPlayerKit 提供极简的 API 设计**，帮助您以低代码的方式快速集成视频播放功能。无需直接调用底层播放器 API，也无需自行实现复杂的播放器 UI。
 
 > **注意**：在开始之前，请确保您已经按照 [集成准备](./Integration.md) 完成环境配置和依赖添加。
 
 ---
 
 ## **1. 接入流程概览**
-
-只需几步，您就可以轻松实现视频播放功能！**AliPlayerKit 提供了极简的 API 设计**，帮助您以低代码的方式快速集成视频播放功能。
 
 下图展示了 **组件层接入** 的流程：
 
@@ -138,10 +136,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
                         "您的视频 ID",    // 视频 ID
                         "您的播放凭证"    // 播放凭证
                 ))
-                .sceneType(SceneType.VOD)
-                .coverUrl("https://example.com/cover.jpg")  // 替换为实际封面图地址
-                .videoTitle("示例视频")
-                .autoPlay(true)
                 .build());
 
         // 3. 绑定视图
@@ -179,10 +173,6 @@ class VideoPlayerActivity : AppCompatActivity() {
                         "您的视频 ID",    // 视频 ID
                         "您的播放凭证"    // 播放凭证
                 ))
-                .sceneType(SceneType.VOD)
-                .coverUrl("https://example.com/cover.jpg")  // 替换为实际封面图地址
-                .videoTitle("示例视频")
-                .autoPlay(true)
                 .build())
 
         // 3. 绑定视图
@@ -199,6 +189,8 @@ class VideoPlayerActivity : AppCompatActivity() {
 ```
 
 > **提示**：如果暂时无法获取 **视频 ID** 和 **播放凭证**，可使用 `SceneConstants.java` 中提供的示例数据进行测试，以便快速跑通示例。
+
+> 💡 使用 VID 方式播放时，封面图、标题、Seek 缩略图等媒资信息会自动从云端获取，无需手动配置。
 
 ### **步骤 3（可选）：处理返回键**
 
@@ -238,7 +230,7 @@ override fun onBackPressed() {
 
 ## **5. 方案二：场景层接入**
 
-场景层提供针对特定业务场景的完整播放解决方案，如长视频、短视频、直播等。场景层基于组件层封装，集成后即可开箱使用，无需额外开发。
+场景层提供针对特定业务场景的完整播放解决方案，如长视频、短视频、直播、AI 教育等。场景层基于组件层封装，集成后即可开箱使用，无需额外开发。
 
 > **前置条件**：在接入场景层之前，请先完成 [集成准备](./Integration.md) 中的场景层集成步骤，并完成 [全局初始化](#3-全局初始化)。
 
@@ -253,6 +245,7 @@ override fun onBackPressed() {
 | `scene-shortvideo` | **短视频场景**：提供短视频滑动播放的完整解决方案 |
 | `scene-live` | **直播场景**：提供直播播放的完整解决方案 |
 | `scene-playlist` | **列表播放场景**：提供视频列表播放的完整解决方案 |
+| `scene-ai-education` | **AI 教育场景**：在点播基础上提供章节导航与 AI 内容展示，详见 [AI 教育场景](./scenes/AiEducation.md) |
 
 ### **步骤 2：启动场景页面**
 

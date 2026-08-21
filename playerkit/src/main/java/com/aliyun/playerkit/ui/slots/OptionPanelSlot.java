@@ -15,7 +15,7 @@ import com.aliyun.playerkit.data.TrackQuality;
 import com.aliyun.playerkit.event.ControlBarEvents;
 import com.aliyun.playerkit.event.PlayerCommand;
 import com.aliyun.playerkit.event.PlayerEvent;
-import com.aliyun.playerkit.slot.BaseSlot;
+import com.aliyun.playerkit.slot.BasePanelSlot;
 import com.aliyun.playerkit.slot.SlotHost;
 import com.aliyun.playerkit.ui.setting.SettingConstants;
 import com.aliyun.playerkit.utils.StringUtil;
@@ -35,9 +35,7 @@ import java.util.List;
  * @author junhuiYe
  * @date 2026/05/28
  */
-public class OptionPanelSlot extends BaseSlot {
-
-    private static final long ANIM_DURATION_MS = 250L;
+public class OptionPanelSlot extends BasePanelSlot {
 
     private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
             ControlBarEvents.ShowSpeedPanel.class,
@@ -51,8 +49,6 @@ public class OptionPanelSlot extends BaseSlot {
     private RecyclerView mRecyclerView;
     private final List<String> mLabels = new ArrayList<>();
     private OptionPanelAdapter mAdapter;
-
-    private boolean mIsAnimating;
 
     public OptionPanelSlot(@NonNull Context context) {
         super(context);
@@ -89,7 +85,6 @@ public class OptionPanelSlot extends BaseSlot {
     @Override
     public void onUnbindData() {
         mPlayerId = null;
-        mIsAnimating = false;
         mLabels.clear();
         super.onUnbindData();
     }
@@ -97,7 +92,6 @@ public class OptionPanelSlot extends BaseSlot {
     @Override
     public void onDetach() {
         mPlayerId = null;
-        mIsAnimating = false;
         super.onDetach();
     }
 
@@ -192,33 +186,16 @@ public class OptionPanelSlot extends BaseSlot {
         showPanel();
     }
 
-    // ----- Show / Hide -----
+    // ==================== BasePanelSlot ====================
 
-    private void showPanel() {
-        if (isShow() || mIsAnimating) return;
-        mIsAnimating = true;
-
+    @Override
+    protected void onPerformShowAnimation() {
         bringToFront();
-        setVisibility(View.VISIBLE);
-        setAlpha(0f);
-        animate()
-                .alpha(1f)
-                .setDuration(ANIM_DURATION_MS)
-                .withEndAction(() -> mIsAnimating = false)
-                .start();
+        animateAlphaIn(this, this::onPanelShown);
     }
 
-    private void hidePanel() {
-        if (!isShow() || mIsAnimating) return;
-        mIsAnimating = true;
-
-        animate()
-                .alpha(0f)
-                .setDuration(ANIM_DURATION_MS)
-                .withEndAction(() -> {
-                    setVisibility(View.GONE);
-                    mIsAnimating = false;
-                })
-                .start();
+    @Override
+    protected void onPerformHideAnimation() {
+        animateAlphaOut(this, this::onPanelHidden);
     }
 }

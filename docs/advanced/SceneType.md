@@ -11,10 +11,11 @@
 | 场景 | 说明 | 适用业务 | 与 VOD 的差异 |
 |------|------|---------|---------------|
 | `VOD` | 默认场景，无需显式指定。支持全部控制能力 | 常规点播、课程、媒体库 | — |
-| `LIVE` | 实时流无固定时长，自动禁用时间轴操作 | 直播、赛事、电商直播 | 禁用进度拖拽/快进/倍速；隐藏 `coverImage`、`seekThumbnail` |
+| `LIVE` | 实时流无固定时长，自动禁用时间轴操作 | 直播、赛事、电商直播 | 禁用进度拖拽/快进/倍速；隐藏 `cover`（封面图） |
 | `VIDEO_LIST` | 禁用垂直手势，避免与列表滚动冲突 | 信息流、短视频列表 | 禁用音量/亮度垂直手势；其余与 VOD 一致 |
 | `RESTRICTED` | 防跳播，确保用户按序完整观看 | 考试监控、培训课程 | 禁用进度拖拽/快进/倍速；隐藏 `coverImage`、`seekThumbnail` |
 | `MINIMAL` | 纯净画面，所有控制需自行实现 | 背景播放、完全自定义 UI | 隐藏所有控制组件和手势；仅 `playerSurface`/`playState`/`overlays` 可见 |
+| `AI_VOD` | AI 增强点播，基于 VOD 增加章节导航与 AI 内容理解能力 | AI 课程、知识视频 | 新增章节数据模型(`chapters`)和章节导航插槽；其余与 VOD 一致 |
 
 ---
 
@@ -28,7 +29,6 @@
 // 构建播放数据 —— 调用 sceneType()，默认即为 VOD
 AliPlayerModel playerModel = new AliPlayerModel.Builder()
     .videoSource(videoSource)
-    .videoTitle("Live Stream")
     .sceneType(SceneType.LIVE)
     .build();
 
@@ -45,29 +45,30 @@ playerView.attach(controller);
 
 插槽系统根据场景类型自动控制组件可见性：
 
-| 插槽 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|-----|-----|------|------------|------------|---------|
-| playerSurface | ✓ | ✓ | ✓ | ✓ | ✓ |
-| playState | ✓ | ✓ | ✓ | ✓ | ✓ |
-| overlays | ✓ | ✓ | ✓ | ✓ | ✓ |
-| coverImage | ✓ | ✗ | ✓ | ✗ | ✗ |
-| seekThumbnail | ✓ | ✗ | ✓ | ✗ | ✗ |
-| playControl | ✓ | ✓ | ✓ | ✓ | ✗ |
-| topBar | ✓ | ✓ | ✓ | ✓ | ✗ |
-| bottomBar | ✓ | ✓ | ✓ | ✓ | ✗ |
-| settingMenu | ✓ | ✓ | ✓ | ✓ | ✗ |
-| gestureControl | ✓ | ✓ | ✓ | ✓ | ✗ |
+
+| 插槽 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|-----|-----|------|------------|------------|---------|--------|
+| playerSurface | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| playState | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| overlays | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| coverImage | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| seekThumbnail | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| playControl | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| topBar | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| bottomBar | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| settingMenu | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| gestureControl | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 
 ### **3.2 手势行为差异**
 
-| 手势 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL |
-|-----|-----|------|------------|------------|---------|
-| 单击（显示/隐藏控制栏） | ✓ | ✓ | ✓ | ✓ | ✗ |
-| 双击（播放/暂停） | ✓ | ✓ | ✓ | ✓ | ✗ |
-| 长按（2倍速） | ✓ | ✗ | ✓ | ✗ | ✗ |
-| 水平拖动（进度跳转） | ✓ | ✗ | ✓ | ✗ | ✗ |
-| 左侧垂直拖动（亮度） | ✓ | ✓ | ✗ | ✓ | ✗ |
-| 右侧垂直拖动（音量） | ✓ | ✓ | ✗ | ✓ | ✗ |
+| 手势 | VOD | LIVE | VIDEO_LIST | RESTRICTED | MINIMAL | AI_VOD |
+|-----|-----|------|------------|------------|---------|--------|
+| 单击（显示/隐藏控制栏） | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| 双击（播放/暂停） | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
+| 长按（2倍速） | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| 水平拖动（进度跳转） | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| 左侧垂直拖动（亮度） | ✓ | ✓ | ✗ | ✓ | ✗ | ✓ |
+| 右侧垂直拖动（音量） | ✓ | ✓ | ✗ | ✓ | ✗ | ✓ |
 
 ---
 
@@ -103,3 +104,22 @@ SlotManager slotManager = playerView.getSlotManager();
 slotManager.register(SlotType.BOTTOM_BAR, parent -> new MyCustomControlSlot(parent.getContext()));
 playerView.attach(controller);
 ```
+
+### **5.3 AI_VOD 场景如何使用？**
+
+`AI_VOD` 场景在 VOD 基础上增加章节导航能力，通过 `chapters()` 配置章节数据：
+
+```java
+// 构建包含章节数据的 AI 播放模型
+List<ChapterInfo> chapters = ...; // 从 AI 内容分析获取
+AliPlayerModel playerModel = new AliPlayerModel.Builder()
+    .videoSource(videoSource)
+    .sceneType(SceneType.AI_VOD)
+    .chapters(chapters)
+    .build();
+
+controller.configure(playerModel);
+playerView.attach(controller);
+```
+
+详细接入指南请参考 [AI 教育场景](../scenes/AiEducation.md)。

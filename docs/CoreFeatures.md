@@ -21,7 +21,7 @@ AliPlayerKit 的设计目标并不仅限于播放器 UI 组件，而是将其定
 | 设计目标 | 说明 |
 |---------|------|
 | **低代码接入** | 通过少量代码即可接入完整播放场景 |
-| **多场景覆盖** | 覆盖点播、直播、短视频等多种播放场景 |
+| **多场景覆盖** | 覆盖点播、直播、短视频、AI 教育等多种播放场景 |
 | **可复用架构** | 通过插槽 + 策略架构，避免各业务重复建设播放器能力 |
 | **统一基座** | 作为所有播放器解决方案和场景化解决方案的统一基座 |
 
@@ -34,7 +34,9 @@ AliPlayerKit 的设计目标并不仅限于播放器 UI 组件，而是将其定
 | 层级       | 定位           | 模块位置            | 职责                                                         |
 | ---------- | -------------- | ------------------- | ------------------------------------------------------------ |
 | **组件层** | 播放器 UI 组件 | `playerkit/`        | 提供开箱即用、可配置的播放器 UI 组件，覆盖基础播放与常见交互能力。 |
-| **场景层** | 场景化解决方案 | `playerkit-scenes/` | 围绕短剧、中长视频、直播等典型场景，提供标准化接入示例，帮助客户以少量代码快速搭建完整播放能力。 |
+| **场景层** | 场景化解决方案 | `playerkit-scenes/` | 围绕短剧、中长视频、直播、AI 教育等典型场景，提供标准化接入示例，帮助客户以少量代码快速搭建完整播放能力。 |
+
+> 📌 **场景方案示例**：[AI 教育场景](./scenes/AiEducation.md) — 面向课程/知识视频，提供 AI 章节划分、摘要、知识点解析等增强播放体验。
 
 ---
 
@@ -59,7 +61,7 @@ AliPlayerKit 采用经典的 **MVC 架构**，将播放器拆分为独立的组�
 
 | 组件 | 类型 | 职责 | 生命周期 |
 |-----|------|------|---------|
-| `AliPlayerKit` | 全局入口 | 全局配置、缓存管理、版本信息 | 应用级 |
+| `AliPlayerKit` | 全局入口 | 全局配置、缓存管理、版本信息、日志管理、预加载管理 | 应用级 |
 | `AliPlayerView` | View | UI 展示、插槽管理、生命周期绑定 | 页面级 |
 | `AliPlayerController` | Controller | 播放控制、状态管理、事件分发 | 页面级 |
 | `AliPlayerModel` | Model | 配置数据封装、Builder 模式 | 请求级 |
@@ -276,7 +278,7 @@ UI 组件与播放器核心彻底解耦，定制不再意味着修改源码，�
 
 ### **3.2 策略系统**
 
-**策略系统** 将播放器的业务逻辑封装为独立的策略组件，每个策略承载一个明确的功能，如首帧耗时统计、卡顿检测、流量保护、记忆播放等。
+**策略系统** 将播放器的业务逻辑封装为独立的策略组件，每个策略承载一个明确的功能，如首帧耗时统计、卡顿检测、流量保护等。
 
 业务方可以在策略层进行扩展，而无需侵入框架核心。每个策略职责单一、相互隔离，既可以在不同播放器实例间复用，也支持按需启用或禁用。框架升级与业务定制各行其道，互不干扰。
 
@@ -325,9 +327,54 @@ AliPlayerKit 支持多种视频源类型，**推荐使用 VidAuth 方式**：
 | 层级 | 注册方式 | 触发时机 | 典型场景 |
 |------|---------|---------|----------|
 | 全局 | `AliPlayerKit.setOnGlobalInit()` | `init()` 完成后（仅一次） | setOption、全局日志级别 |
-| 实例 | `AliPlayerModel.Builder.onPlayerConfig()` | `configure()` 中 `prepare()` 前 | setPlayConfig、Referer |
+| 实例 | `AliPlayerModel.Builder.onPlayerConfig()` | `configure()` 中 `setDataSource()` 之后 | setConfig、Referer |
 
 详见 [自定义配置](./advanced/CustomConfig.md)。
+
+### **3.8 VID All-in-One 播放体验**
+
+依托 AliPlayerKit 与阿里云视频点播 VOD 的协同能力，业务侧仅需传入视频 VID，即可自动获取播放资源，以及关联的视频标题、封面图和缩略图等媒资信息，减少播放地址获取、媒资信息传递及端侧参数配置，简化播放接入。
+
+AliPlayerKit 会在播放器 `prepared` 后自动从云端 MediaInfo 中提取以下媒体信息，并通过事件系统分发给对应 Slot 消费：
+
+| 媒体信息 | 事件 | 消费 Slot | 说明 |
+|---------|------|----------|------|
+| 封面图 URL | `CoverUrlReady` | CoverSlot | 播放前展示封面图 |
+| 视频标题 | `VideoTitleReady` | TopBarSlot | 顶部栏展示视频标题 |
+| 缩略图 URL | `ThumbnailUrlReady` | SeekThumbnailSlot | 拖动进度条时展示缩略图 |
+
+**优先级规则：** 通过 `AliPlayerModel.Builder` 手动配置的值优先级高于 MediaInfo 自动获取。仅当未手动配置时，才使用 MediaInfo 中的值。
+
+> 💡 该能力需要阿里云播放器 SDK 版本 ≥ 7.16.0。
+
+### **3.9 视频拆条**
+
+将长视频按内容结构智能拆分为多个章节片段，帮助用户快速定位重点内容，提升视频学习与内容理解效率。章节数据由 AI 内容理解服务对视频进行分析后生成，通过 `AliPlayerModel.Builder.chapters()` 注入。
+
+| 组件 | 能力 |
+|------|------|
+| `ChapterInfo` 数据模型 | 描述拆条片段的时间区间（`[startMs, endMs)`）与展示信息（标题、缩略图） |
+| `BottomBarSlot` 章节标记 | 进度条上直观展示视频内容结构的拆分点，配合章节 Chip 列表支持点击跳转；横屏下额外提供「章节」入口与「下一章」按钮 |
+| `ChapterPanelSlot` | 全屏下从右侧滑入结构化内容导航面板，支持点击快速跳转到目标片段 |
+
+**场景限定：** 仅在 `SceneType.AI_VOD` 场景且章节数 ≥ 2 时生效。
+
+**接入示例**
+
+```java
+List<ChapterInfo> chapters = new ArrayList<>();
+chapters.add(new ChapterInfo(0, 65_000, "课程导入"));
+chapters.add(new ChapterInfo(65_000, 210_000, "核心概念讲解"));
+chapters.add(new ChapterInfo(210_000, 320_000, "例题演练"));
+
+AliPlayerModel model = new AliPlayerModel.Builder()
+        .videoSource(videoSource)
+        .sceneType(SceneType.AI_VOD)
+        .chapters(chapters)
+        .build();
+```
+
+详见 [AI 教育场景](./scenes/AiEducation.md)。
 
 ---
 

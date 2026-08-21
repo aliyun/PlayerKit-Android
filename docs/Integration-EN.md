@@ -52,7 +52,7 @@ Before using **AliPlayerKit**, please ensure your development environment meets 
 ### **2.2 License Preparation**
 
 - You have obtained the Player License authorization certificate and License Key for the Audio & Video Terminal SDK
-- For detailed steps, please refer to [Manage License](https://www.alibabacloud.com/help/en/vod/developer-reference/license-authorization-and-management)
+- For detailed steps, please refer to [Obtain an ApsaraVideo Player SDK license](https://www.alibabacloud.com/help/en/vod/developer-reference/obtain-the-player-sdk-license)
 
 > **Note**: If the License is not configured correctly, the player will not work properly and may throw an authorization exception.
 
@@ -130,32 +130,11 @@ dependencies {
 }
 ```
 
-### **Step 3: Configure the License**
+### **Step 3: Configure License**
 
-#### **3.1 Add the License Certificate File**
+The Player SDK requires a valid License to function properly. Please refer to [Integrate a license](https://www.alibabacloud.com/help/en/vod/developer-reference/access-to-license) to configure the License.
 
-Place the prepared License certificate file (such as `license.crt`) into the `src/main/assets/cert/` directory of the app module.
-
-#### **3.2 Add License Configuration**
-
-Add the following configuration to `AndroidManifest.xml` of the app module:
-
-```xml
-<!--    Configure license    -->
-<!--    Access License: https://www.alibabacloud.com/help/en/vod/developer-reference/access-to-license     -->
-<meta-data
-    android:name="com.aliyun.alivc_license.licensekey"
-    android:value="Your License Key" />
-<meta-data
-    android:name="com.aliyun.alivc_license.licensefile"
-    android:value="assets/cert/license.crt" />
-```
-
-> **Note**:
->
-> - Make sure the `<meta-data>` nodes are placed under the `<application>` element and the `name` attribute is correct
-> - If the player SDK service environment is overseas, please refer to [Access License on Android](https://www.alibabacloud.com/help/en/vod/developer-reference/access-to-license) to complete the configuration
-> - For a complete configuration example, refer to the `demo-app` module
+> **Note**: Failure to properly configure the License will cause the player to malfunction, resulting in issues such as black screen during playback.
 
 ### **Step 4: Verify Integration**
 
@@ -182,7 +161,7 @@ git commit -m "feat: integrate AliPlayerKit module (source commit: 2c30d92)"
 
 ## **4. Solution 2: Scene-Layer Integration**
 
-The scene layer provides playback examples for specific business scenarios such as medium/long video, short video, live streaming, and list playback. Each scene module is an independent example. You can choose to reference or directly integrate them based on your business needs.
+The scene layer provides playback examples for specific business scenarios such as medium/long video, short video, live streaming, list playback, and AI education. Each scene module is an independent example. You can choose to reference or directly integrate them based on your business needs.
 
 > **Prerequisite**: The scene layer depends on the capabilities of the component layer. Before integrating the scene layer, please complete the **component-layer integration** first.
 
@@ -197,6 +176,7 @@ According to your business needs, copy the required scene modules into your proj
 | `scene-shortvideo` | Short video scene example |
 | `scene-live` | Live streaming scene example |
 | `scene-playlist` | List playback scene example |
+| `scene-ai-education` | AI education scene example. **Additionally depends on the third-party libraries Markwon / OkHttp / Gson / Glide** for Markdown rendering, network requests, and image loading |
 
 ```bash
 # scene-common contains example video constants and can be omitted if you implement your own video sources
@@ -205,6 +185,7 @@ cp -r playerkit-scenes/scene-common /path/to/your/project/
 # Other scene modules: choose as needed
 cp -r playerkit-scenes/scene-longvideo /path/to/your/project/
 cp -r playerkit-scenes/scene-live /path/to/your/project/
+cp -r playerkit-scenes/scene-ai-education /path/to/your/project/
 # ...
 ```
 
@@ -223,6 +204,7 @@ The `build.gradle` of the scene modules depends on `demo-settings` and `scene-co
 | `scene-live` | `demo-settings`, `scene-common` | Remove `demo-settings`; `scene-common` is optional |
 | `scene-shortvideo` | `scene-common` | `scene-common` is optional |
 | `scene-playlist` | `scene-common` | `scene-common` is optional |
+| `scene-ai-education` | `scene-common`, Markwon / OkHttp / Gson / Glide | `scene-common` is optional; the third-party libraries must be kept (see 2.4) |
 
 **2.1 Remove demo-settings Dependency** (if applicable)
 
@@ -276,6 +258,19 @@ private String getVideoPlayAuth() {
 }
 ```
 
+**2.4 Handle the Third-Party Dependencies of scene-ai-education** (if you integrate this module)
+
+Besides `playerkit` and `scene-common`, the `scene-ai-education` module depends on the following third-party libraries. They are all declared in that module's `build.gradle` and are fetched automatically during Gradle sync:
+
+| Library | Version | Purpose |
+|---------|------|------|
+| Markwon (`core` / `html` / `ext-tables` / `ext-strikethrough` / `image-glide`) | 4.6.2 | Renders the Markdown text of AI analysis content |
+| OkHttp | 4.8.1 | Requests play credentials and the AI analysis API from the App Server |
+| Gson | 2.8.0 | Parses the JSON data returned by the App Server |
+| Glide | 4.13.0 | Loads chapter thumbnails |
+
+> **Note**: These dependencies are introduced only by `scene-ai-education`. If you do not integrate the AI education scene, none of the libraries above are pulled in; the `playerkit` component layer and the other scene modules are unaffected.
+
 ### **Step 3: Gradle Project Configuration**
 
 #### **3.1 Add Module References**
@@ -285,6 +280,8 @@ private String getVideoPlayAuth() {
 ```groovy
 include ':scene-common'
 include ':scene-longvideo'
+// AI education scene module
+include ':scene-ai-education'
 // Add other scene modules as needed...
 ```
 
@@ -293,6 +290,8 @@ include ':scene-longvideo'
 ```kotlin
 include(":scene-common")
 include(":scene-longvideo")
+// AI education scene module
+include(":scene-ai-education")
 // Add other scene modules as needed...
 ```
 
@@ -305,6 +304,9 @@ dependencies {
     // AliPlayerKit playback scene module: based on AliPlayerKit core components, provides out-of-the-box standard playback scene solutions
     // Medium/long video scene module: a complete solution for medium/long video playback
     implementation project(':scene-longvideo')
+
+    // AI education scene module: a complete solution for chapter navigation and AI content display
+    implementation project(':scene-ai-education')
 }
 ```
 
@@ -315,6 +317,9 @@ dependencies {
     // AliPlayerKit playback scene module: based on AliPlayerKit core components, provides out-of-the-box standard playback scene solutions
     // Medium/long video scene module: a complete solution for medium/long video playback
     implementation(project(":scene-longvideo"))
+
+    // AI education scene module: a complete solution for chapter navigation and AI content display
+    implementation(project(":scene-ai-education"))
 }
 ```
 
@@ -393,6 +398,8 @@ You can view the latest versions and documentation of the related SDKs through t
 **Issue**: The player reports a License error
 
 **Solution**:
+
+Confirm that the License has been properly obtained and configured. See [License FAQ](https://www.alibabacloud.com/help/en/vod/developer-reference/faqs-for-sdk-license) for details.
 
 1. Verify that the License certificate and Key are correctly configured
 2. Check whether the License has expired

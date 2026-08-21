@@ -2,6 +2,7 @@ package com.aliyun.playerkit.ui.slots;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.ImageView;
@@ -10,9 +11,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.playerkit.AliPlayerModel;
 import com.aliyun.playerkit.R;
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.event.ControlBarEvents;
@@ -22,8 +26,12 @@ import com.aliyun.playerkit.event.PlayerEvent;
 import com.aliyun.playerkit.event.PlayerEvents;
 import com.aliyun.playerkit.slot.SlotElements;
 import com.aliyun.playerkit.slot.SlotHost;
+import com.aliyun.playerkit.ui.chapter.ChapterChipAdapter;
+import com.aliyun.playerkit.ui.chapter.ChapterMarkerView;
 import com.aliyun.playerkit.utils.FormatUtil;
+import com.aliyun.playerkit.utils.ToastUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -135,10 +143,46 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
     private ImageView mIvReplayLS;
 
     /**
+     * 章节标记 View（竖屏）
+     */
+    private ChapterMarkerView mChapterMarkerView;
+
+    /**
+     * 章节标记 View（横屏）
+     */
+    private ChapterMarkerView mChapterMarkerViewLS;
+
+    /**
+     * 横屏 - 章节按钮
+     */
+    private TextView mTvChapterLS;
+
+    /**
+     * 横屏 - 下一章按钮
+     */
+    private TextView mTvNextChapterLS;
+
+    /**
+     * 横屏 - 分隔符（·）
+     */
+    private View mTvSeparatorDotLS;
+
+    /**
+     * 横屏 - 分隔符（|）
+     */
+    private View mTvSeparatorPipeLS;
+
+    /**
      * 本插槽需要订阅的事件类型列表（静态常量，避免重复创建）
      */
-    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(ControlBarEvents.Show.class, ControlBarEvents.Hide.class, ControlBarEvents.ResetTimer.class, PlayerEvents.StateChanged.class, PlayerEvents.Prepared.class, PlayerEvents.Info.class, FullscreenEvents.FullScreenChanged.class);
-
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(ControlBarEvents.Show.class,
+            ControlBarEvents.Hide.class,
+            ControlBarEvents.ResetTimer.class,
+            PlayerEvents.StateChanged.class,
+            PlayerEvents.Prepared.class,
+            PlayerEvents.Info.class,
+            FullscreenEvents.FullScreenChanged.class
+    );
 
     /**
      * 视频总时长（毫秒）
@@ -156,6 +200,64 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      */
     @SceneType
     private int mSceneType = SceneType.VOD;
+
+    // ==================== AI_VOD 章节相关 ====================
+
+    /**
+     * 章节信息列表（仅 AI_VOD 场景有值）
+     */
+    @Nullable
+    private List<ChapterInfo> mChapters;
+
+    /**
+     * 章节导航 RecyclerView（竖屏）
+     */
+    @Nullable
+    private RecyclerView mRvChapterChips;
+
+    /**
+     * 章节 Chip 适配器（竖屏）
+     */
+    @Nullable
+    private ChapterChipAdapter mChapterChipAdapter;
+
+    /**
+     * 章节 Chip 适配器（横屏）
+     */
+    @Nullable
+    private ChapterChipAdapter mChapterChipAdapterLS;
+
+    /**
+     * 上一次显示的章节索引，用于避免重复更新
+     */
+    private int mLastChapterIndex = -1;
+
+    /**
+     * 章节 Chip 点击回调（竖屏/横屏共用）
+     * <p>
+     * Chapter chip click listener (shared by portrait and landscape)
+     * </p>
+     */
+    private final ChapterChipAdapter.OnChipClickListener mChipClickListener = (position, chapter) -> {
+        if (mPlayerId != null) {
+            seekTo(chapter.getStartMs());
+            updateChapterHighlight(chapter.getStartMs());
+        }
+    };
+
+    /**
+     * 章节标记点点击回调（竖屏/横屏共用）
+     * <p>
+     * Chapter marker click listener (shared by portrait and landscape)
+     * </p>
+     */
+    private final ChapterMarkerView.OnMarkerClickListener mMarkerClickListener = (markerIndex, normalizedPosition) -> {
+        if (mPlayerId != null && mDuration > 0) {
+            long targetPosition = (long) (normalizedPosition * mDuration);
+            seekTo(targetPosition);
+            updateChapterHighlight(targetPosition);
+        }
+    };
 
     // ==================== 构造函数 ====================
 
@@ -201,6 +303,20 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         mSeekBar = findViewByIdCompat(R.id.seek_bar);
         setSeekbarListener(mSeekBar);
 
+        // 初始化章节标记 View
+        mChapterMarkerView = findViewByIdCompat(R.id.chapter_marker_view);
+        if (mChapterMarkerView != null) {
+            mChapterMarkerView.setOnMarkerClickListener(mMarkerClickListener);
+        }
+
+        // 初始化章节导航 RecyclerView
+        mRvChapterChips = findViewByIdCompat(R.id.rv_chapter_chips);
+        if (mRvChapterChips != null) {
+            mRvChapterChips.setLayoutManager(
+                    new LinearLayoutManager(mRvChapterChips.getContext(), LinearLayoutManager.HORIZONTAL, false));
+            mRvChapterChips.setHasFixedSize(true);
+        }
+
         mViewStub = findViewByIdCompat(R.id.stub_bottom_bar_landscape);
     }
 
@@ -221,12 +337,18 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
                 syncLandscapeState();
             }
             mPortraitView.setVisibility(View.GONE);
+            if (mRvChapterChips != null) {
+                mRvChapterChips.setVisibility(View.GONE);
+            }
             mLandScapeView.setVisibility(View.VISIBLE);
         } else {
             if (mLandScapeView != null) {
                 mLandScapeView.setVisibility(View.GONE);
             }
             mPortraitView.setVisibility(View.VISIBLE);
+            if (mRvChapterChips != null && mChapters != null && !mChapters.isEmpty()) {
+                mRvChapterChips.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -263,6 +385,35 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         mTvTimeLS = mLandScapeView.findViewById(R.id.tv_time_landscape);
 
         mSeekBarLS = mLandScapeView.findViewById(R.id.seek_bar_landscape);
+        mChapterMarkerViewLS = mLandScapeView.findViewById(R.id.chapter_marker_view_landscape);
+        if (mChapterMarkerViewLS != null) {
+            mChapterMarkerViewLS.setOnMarkerClickListener(mMarkerClickListener);
+        }
+
+        // 横屏初始化后，如果章节数据已加载，立即应用标记
+        if (mChapterMarkerViewLS != null && mChapters != null && !mChapters.isEmpty() && mDuration > 0) {
+            List<Float> positions = new ArrayList<>();
+            for (ChapterInfo chapter : mChapters) {
+                float pos = (float) chapter.getStartMs() / mDuration;
+                if (pos > 0f && pos < 1f) {
+                    positions.add(pos);
+                }
+            }
+            if (!positions.isEmpty()) {
+                mChapterMarkerViewLS.setMarkerPositions(positions);
+                mChapterMarkerViewLS.setVisibility(View.VISIBLE);
+            }
+        }
+
+        // 横屏初始化后，如果章节数据已加载，立即绑定到横屏 adapter
+        if (mChapters != null && !mChapters.isEmpty()) {
+            if (mChapterChipAdapterLS == null) {
+                mChapterChipAdapterLS = new ChapterChipAdapter();
+                mChapterChipAdapterLS.setOnChipClickListener(mChipClickListener);
+            }
+            mChapterChipAdapterLS.setChapters(mChapters);
+            mChapterChipAdapterLS.updateCurrentIndex(mLastChapterIndex);
+        }
 
         mIvReplayLS = mLandScapeView.findViewById(R.id.iv_replay_landscape);
 
@@ -275,8 +426,21 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         setSeekbarListener(mSeekBarLS);
 
         setViewClickListener(this, mIvPlayPauseLS, mIvReplayLS, tvQuality, tvSpeed);
-    }
 
+        // 初始化章节按钮
+        mTvChapterLS = mLandScapeView.findViewById(R.id.tv_chapter_landscape);
+        mTvNextChapterLS = mLandScapeView.findViewById(R.id.tv_next_chapter_landscape);
+        mTvSeparatorDotLS = mLandScapeView.findViewById(R.id.tv_separator_dot);
+        mTvSeparatorPipeLS = mLandScapeView.findViewById(R.id.tv_separator_pipe);
+
+        setViewClickListener(this, mTvChapterLS, mTvNextChapterLS);
+
+        // 如果章节数据已加载，同步按钮显示状态
+        if (mChapters != null && !mChapters.isEmpty()) {
+            setChapterButtonsVisible(true);
+            updateChapterButtonText();
+        }
+    }
 
     @Override
     public void onBindData(@NonNull AliPlayerModel model) {
@@ -285,6 +449,39 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         mSceneType = model.getSceneType();
         // 刷新按钮（可选：直播场景）
         updateReplayButtonVisibility();
+
+        // AI_VOD 章节标记初始化
+        if (model.getSceneType() == SceneType.AI_VOD
+                && model.getChapters() != null
+                && model.getChapters().size() >= 2) {
+            mChapters = model.getChapters();
+            // 注意：章节标记需要 duration 信息，延迟到收到 duration 后再应用
+
+            // 初始化章节导航适配器（竖屏）
+            if (mChapterChipAdapter == null) {
+                mChapterChipAdapter = new ChapterChipAdapter();
+                mChapterChipAdapter.setOnChipClickListener(mChipClickListener);
+            }
+            mChapterChipAdapter.setChapters(mChapters);
+            if (mRvChapterChips != null) {
+                mRvChapterChips.setAdapter(mChapterChipAdapter);
+                mRvChapterChips.setVisibility(View.VISIBLE);
+            }
+
+            // 初始化章节导航适配器（横屏）
+            if (mChapterChipAdapterLS == null) {
+                mChapterChipAdapterLS = new ChapterChipAdapter();
+                mChapterChipAdapterLS.setOnChipClickListener(mChipClickListener);
+            }
+            mChapterChipAdapterLS.setChapters(mChapters);
+
+            // 横屏章节按钮
+            setChapterButtonsVisible(true);
+            updateChapterButtonText();
+        } else {
+            mChapters = null;
+        }
+
     }
 
     /**
@@ -297,12 +494,20 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         setViewVisible((mSceneType == SceneType.LIVE), mIvReplay, mIvReplayLS);
     }
 
+
     @Override
     public void onDetach() {
         // 清理状态
         mIsDragging = false;
         mDuration = 0;
         mSceneType = SceneType.VOD;
+
+        // 清理章节相关状态
+        mChapters = null;
+        mRvChapterChips = null;
+        mChapterChipAdapter = null;
+        mChapterChipAdapterLS = null;
+        mLastChapterIndex = -1;
 
         // 清理横屏视图引用，防止重新 attach 时持有已脱离视图树的旧引用
         mViewStub = null;
@@ -311,6 +516,11 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         mSeekBarLS = null;
         mIvPlayPauseLS = null;
         mIvReplayLS = null;
+        mTvChapterLS = null;
+        mTvNextChapterLS = null;
+        mChapterMarkerViewLS = null;
+        mTvSeparatorDotLS = null;
+        mTvSeparatorPipeLS = null;
 
         // 取消自动隐藏任务
         cancelAutoHide();
@@ -366,6 +576,10 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
     private void onPrepared(@NonNull PlayerEvents.Prepared event) {
         mDuration = event.duration;
         updateTimeText(0, mDuration);
+
+        if (mChapters != null && mDuration > 0) {
+            applyChapterMarkers(mDuration);
+        }
     }
 
     /**
@@ -384,6 +598,11 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         }
         mDuration = event.duration;
         updateProgress(event.currentPosition, event.bufferedPosition, event.duration);
+
+        // AI_VOD: 更新章节高亮
+        if (mChapters != null && !mChapters.isEmpty()) {
+            updateChapterHighlight(event.currentPosition);
+        }
     }
 
 
@@ -552,6 +771,12 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
                     // 用户拖动时，实时更新时间显示
                     long targetPosition = (long) ((progress / 100.0f) * mDuration);
                     updateTimeText(targetPosition, mDuration);
+                    // AI_VOD: 更新章节高亮
+                    updateChapterHighlight(targetPosition);
+                    // 发布 Seek 缩略图更新事件
+                    if (mPlayerId != null) {
+                        postEvent(new ControlBarEvents.UpdateSeekThumbnail(mPlayerId, targetPosition, mDuration));
+                    }
                     notifyInteraction();
                 }
             }
@@ -568,6 +793,10 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
 
                 // 开始拖动时，标记拖动状态并重置自动隐藏计时器
                 mIsDragging = true;
+                // 发布 Seek 缩略图显示事件
+                if (mPlayerId != null) {
+                    postEvent(new ControlBarEvents.ShowSeekThumbnail(mPlayerId));
+                }
                 notifyInteraction();
             }
 
@@ -583,6 +812,10 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
 
                 // 结束拖动时，执行跳转操作
                 mIsDragging = false;
+                // 发布 Seek 缩略图隐藏事件
+                if (mPlayerId != null) {
+                    postEvent(new ControlBarEvents.HideSeekThumbnail(mPlayerId));
+                }
                 long targetPosition = (long) ((seekBar.getProgress() / 100.0f) * mDuration);
                 seekTo(targetPosition);
 
@@ -614,6 +847,16 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         else if (id == R.id.tv_speed) {
             showSpeedDialog();
         }
+        // 章节面板
+        else if (id == R.id.tv_chapter_landscape) {
+            notifyInteraction();
+            showChapterPanel();
+        }
+        // 下一章
+        else if (id == R.id.tv_next_chapter_landscape) {
+            notifyInteraction();
+            seekToNextChapter();
+        }
     }
 
     private void showQualityDialog() {
@@ -626,5 +869,138 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         if (mPlayerId == null) return;
         postEvent(new ControlBarEvents.Hide(mPlayerId));
         postEvent(new ControlBarEvents.ShowSpeedPanel(mPlayerId));
+    }
+
+    /**
+     * 显示章节面板
+     * <p>
+     * Show chapter panel
+     * </p>
+     */
+    private void showChapterPanel() {
+        if (mPlayerId == null) return;
+        postEvent(new ControlBarEvents.Hide(mPlayerId));
+        postEvent(new ControlBarEvents.ShowChapterPanel(mPlayerId));
+    }
+
+    /**
+     * 定位到下一章节
+     * <p>
+     * Seek to next chapter
+     * </p>
+     */
+    private void seekToNextChapter() {
+        if (mChapters == null || mPlayerId == null || mLastChapterIndex < 0) return;
+        Context context = getContext();
+        if (context == null) return;
+
+        if (mLastChapterIndex >= mChapters.size() - 1) {
+            ToastUtils.showToast(R.string.toast_last_chapter);
+            return;
+        }
+        ChapterInfo next = mChapters.get(mLastChapterIndex + 1);
+        seekTo(next.getStartMs());
+        updateChapterHighlight(next.getStartMs());
+        String time = FormatUtil.formatDuration(next.getStartMs());
+        ToastUtils.showToast(context.getString(R.string.toast_seek_to_chapter, time));
+    }
+
+    /**
+     * 更新横屏章节按钮文本
+     * <p>
+     * Update landscape chapter button text
+     * </p>
+     */
+    private void updateChapterButtonText() {
+        if (mTvChapterLS == null || mChapters == null || mLastChapterIndex < 0) return;
+        if (mLastChapterIndex >= mChapters.size()) return;
+        Context context = getContext();
+        if (context == null) return;
+        ChapterInfo current = mChapters.get(mLastChapterIndex);
+        String text = context.getString(R.string.chapter_button_format,
+                mLastChapterIndex + 1, current.getTitle());
+        mTvChapterLS.setText(text);
+    }
+
+    /**
+     * 设置横屏章节按钮的可见性
+     * <p>
+     * Set landscape chapter buttons visibility
+     * </p>
+     */
+    private void setChapterButtonsVisible(boolean visible) {
+        int visibility = visible ? View.VISIBLE : View.GONE;
+        if (mTvSeparatorDotLS != null) mTvSeparatorDotLS.setVisibility(visibility);
+        if (mTvChapterLS != null) mTvChapterLS.setVisibility(visibility);
+        if (mTvSeparatorPipeLS != null) mTvSeparatorPipeLS.setVisibility(visibility);
+        if (mTvNextChapterLS != null) mTvNextChapterLS.setVisibility(visibility);
+    }
+
+    // ==================== AI_VOD 章节方法 ====================
+
+    /**
+     * 将章节标记应用到 ChapterMarkerView 上
+     * <p>
+     * Apply chapter markers to ChapterMarkerView
+     * </p>
+     */
+    private void applyChapterMarkers(long durationMs) {
+        if (mChapters == null || durationMs <= 0) return;
+
+        // 计算归一化位置
+        List<Float> positions = new ArrayList<>();
+        for (ChapterInfo chapter : mChapters) {
+            float pos = (float) chapter.getStartMs() / durationMs;
+            if (pos > 0f && pos < 1f) {
+                positions.add(pos);
+            }
+        }
+
+        if (positions.isEmpty()) return;
+
+        // 应用到竖屏标记 View
+        if (mChapterMarkerView != null) {
+            mChapterMarkerView.setMarkerPositions(positions);
+            mChapterMarkerView.setVisibility(View.VISIBLE);
+        }
+        // 应用到横屏标记 View
+        if (mChapterMarkerViewLS != null) {
+            mChapterMarkerViewLS.setMarkerPositions(positions);
+            mChapterMarkerViewLS.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**
+     * 更新章节导航高亮
+     * <p>
+     * 根据当前播放位置更新 ChapterChipAdapter 的高亮索引，并滚动到当前章节。
+     * </p>
+     *
+     * @param positionMs 当前播放位置（毫秒）
+     */
+    private void updateChapterHighlight(long positionMs) {
+        if (mChapters == null || mChapters.isEmpty()) return;
+
+        int index = ChapterInfo.findIndexByPosition(mChapters, positionMs);
+        if (index == mLastChapterIndex) return; // 避免重复更新
+        mLastChapterIndex = index;
+
+        if (index >= 0) {
+            if (mChapterChipAdapter != null) {
+                mChapterChipAdapter.updateCurrentIndex(index);
+            }
+            if (mChapterChipAdapterLS != null) {
+                mChapterChipAdapterLS.updateCurrentIndex(index);
+            }
+            // 滚动到当前章节使其在最左侧
+            if (mRvChapterChips != null) {
+                LinearLayoutManager lm = (LinearLayoutManager) mRvChapterChips.getLayoutManager();
+                if (lm != null) {
+                    lm.scrollToPositionWithOffset(index, 0);
+                }
+            }
+        }
+
+        updateChapterButtonText();
     }
 }

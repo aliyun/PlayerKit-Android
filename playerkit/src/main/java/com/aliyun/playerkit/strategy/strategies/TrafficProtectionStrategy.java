@@ -21,7 +21,7 @@ import com.aliyun.playerkit.strategy.BaseStrategy;
 import com.aliyun.playerkit.strategy.StrategyContext;
 import com.aliyun.playerkit.utils.ToastUtils;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,6 +45,12 @@ import java.util.List;
 public class TrafficProtectionStrategy extends BaseStrategy {
 
     private static final String TAG = "TrafficProtectionStrategy";
+
+    /**
+     * 本策略需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS =
+            Collections.singletonList(PlayerEvents.StateChanged.class);  // 监听播放状态，用于判断是否需要触发保护
 
     // 回调接口
     @Nullable
@@ -120,9 +126,7 @@ public class TrafficProtectionStrategy extends BaseStrategy {
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        List<Class<? extends PlayerEvent>> events = new ArrayList<>();
-        events.add(PlayerEvents.StateChanged.class);  // 监听播放状态，用于判断是否需要触发保护
-        return events;
+        return OBSERVED_EVENTS;
     }
 
     @Override

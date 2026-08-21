@@ -178,6 +178,23 @@ public enum SlotType {
     TOP_BAR(80),
 
     /**
+     * Seek 缩略图插槽
+     * <p>
+     * 用于在用户拖动进度条（Seek）时显示缩略图和时间预览浮层。
+     * order 值为 85，位于 TOP_BAR(80) 和 BOTTOM_BAR(90) 之间，
+     * 确保预览浮层位于底部控制栏之下，不遮挡进度条交互。
+     * </p>
+     * <p>
+     * Seek Thumbnail Slot
+     * <p>
+     * Displays a thumbnail and time preview overlay when the user drags the progress bar (Seek).
+     * The order value is 85, positioned between TOP_BAR(80) and BOTTOM_BAR(90),
+     * ensuring the preview overlay stays below the bottom control bar without blocking seek bar interaction.
+     * </p>
+     */
+    SEEK_THUMBNAIL(85),
+
+    /**
      * 底部控制栏插槽
      * <p>
      * 显示播放控制、进度条、全屏切换等。
@@ -215,7 +232,15 @@ public enum SlotType {
      * Used to display an independent selection panel for speed, quality, etc. in landscape mode.
      * </p>
      */
-    OPTION_PANEL(110);
+    OPTION_PANEL(110),
+
+    /**
+     * 章节面板（从右往左滑入）
+     * <p>
+     * Chapter panel (slide in from right)
+     * </p>
+     */
+    CHAPTER_PANEL(115);
 
     // ==================== 层级顺序 ====================
 

@@ -14,15 +14,13 @@
 
 In just a few steps, you can easily implement video playback functionality!
 
-With an extremely simple API design, AliPlayerKit helps you integrate video playback in a low-code way, without directly invoking the underlying player APIs or implementing complex Player UI yourself.
+**AliPlayerKit provides an extremely simple API design** that helps you integrate video playback in a low-code way. There is no need to directly invoke the underlying player APIs or implement a complex Player UI yourself.
 
 > **Note**: Before getting started, please make sure you have completed the environment configuration and dependency setup as described in [Integration Preparation](./Integration-EN.md).
 
 ---
 
 ## **1. Integration Process Overview**
-
-In just a few steps, you can easily implement video playback! **AliPlayerKit provides an extremely simple API design** that helps you integrate video playback in a low-code way.
 
 The diagram below shows the **component-layer integration** process:
 
@@ -138,10 +136,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
                         "Your Video ID",    // Video ID
                         "Your PlayAuth"     // Playback credential
                 ))
-                .sceneType(SceneType.VOD)
-                .coverUrl("https://example.com/cover.jpg")  // Replace with the actual cover image URL
-                .videoTitle("Sample Video")
-                .autoPlay(true)
                 .build());
 
         // 3. Bind the view
@@ -179,10 +173,6 @@ class VideoPlayerActivity : AppCompatActivity() {
                         "Your Video ID",    // Video ID
                         "Your PlayAuth"     // Playback credential
                 ))
-                .sceneType(SceneType.VOD)
-                .coverUrl("https://example.com/cover.jpg")  // Replace with the actual cover image URL
-                .videoTitle("Sample Video")
-                .autoPlay(true)
                 .build())
 
         // 3. Bind the view
@@ -199,6 +189,8 @@ class VideoPlayerActivity : AppCompatActivity() {
 ```
 
 > **Tip**: If you are temporarily unable to obtain a **Video ID** and **PlayAuth**, you can use the example data provided in `SceneConstants.java` for testing, in order to quickly run through the example.
+
+> 💡 When playing a video by VID, associated media information—including the cover image, title, and seek thumbnails—is automatically retrieved from the cloud, with no manual configuration required.
 
 ### **Step 3 (Optional): Handle the Back Key**
 
@@ -238,7 +230,7 @@ override fun onBackPressed() {
 
 ## **5. Solution 2: Scene-Layer Integration**
 
-The scene layer provides complete playback solutions for specific business scenarios such as long video, short video, and live streaming. The scene layer is built on top of the component layer and is ready to use after integration without additional development.
+The scene layer provides complete playback solutions for specific business scenarios such as long video, short video, live streaming, and AI education. The scene layer is built on top of the component layer and is ready to use after integration without additional development.
 
 > **Prerequisite**: Before integrating the scene layer, complete the scene-layer integration steps in [Integration Preparation](./Integration-EN.md), and complete [Global Initialization](#3-global-initialization).
 
@@ -253,6 +245,7 @@ Scene modules are located under the `playerkit-scenes` directory and currently i
 | `scene-shortvideo` | **Short Video Scene**: a complete solution for short video swipe playback |
 | `scene-live` | **Live Streaming Scene**: a complete solution for live streaming playback |
 | `scene-playlist` | **List Playback Scene**: a complete solution for video list playback |
+| `scene-ai-education` | **AI Education Scene**: adds chapter navigation and AI content display on top of VOD playback; see [AI Education Scene](./scenes/AiEducation-EN.md) |
 
 ### **Step 2: Launch the Scene Page**
 

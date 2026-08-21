@@ -14,4 +14,6 @@
   - [Locale](./advanced/Locale-EN.md)
   - [Scene Type](./advanced/SceneType-EN.md)
   - [Video Source](./advanced/VideoSource-EN.md)
+- **Scenario Solutions**
+  - [AI Education Scene](./scenes/AiEducation-EN.md)
 - [Changelog](./CHANGELOG-EN.md)

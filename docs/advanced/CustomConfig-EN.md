@@ -10,8 +10,8 @@ AliPlayerKit provides two tiers of custom configuration entry points to satisfy 
 
 | Tier | API | Invocation Timing | Typical Scenarios |
 |------|-----|-------------------|-------------------|
-| **Global Config** | `AliPlayerKit.setOnGlobalInit()` | After global initialization completes (only once) | setOption (global log level), HTTP/2 multiplexing, and other global behaviors |
-| **Instance Config** | `AliPlayerModel.Builder.onPlayerConfig()` | Before each player instance's `prepare()` | setPlayConfig (buffering, Referer), setOption, and other per-instance behaviors |
+| **Global Config** | `AliPlayerKit.setOnGlobalInit()` | After global initialization completes (only once) | `AliPlayerGlobalSettings.setOption()` (global log level), HTTP/2 multiplexing, and other global behaviors |
+| **Instance Config** | `AliPlayerModel.Builder.onPlayerConfig()` | After each player instance's `setDataSource()` | `aliPlayer.setConfig()` (buffering, Referer), `aliPlayer.setOption()`, and other per-instance behaviors |
 
 > **Note**: The player SDK itself splits configuration into global and instance types. AliPlayerKit has built-in best-practice settings, but for native APIs that are not directly exposed, the two callback entry points above let developers obtain the player instance and invoke them directly.
 
@@ -45,11 +45,11 @@ public class MyApplication extends Application {
         // 1. Register the global custom config callback (must be called before init)
         AliPlayerKit.setOnGlobalInit(() -> {
             // Example: enable HTTP/2 multiplexing
-            AliPlayerFactory.setOption(
+            AliPlayerGlobalSettings.setOption(
                 AliPlayerGlobalSettings.ENABLE_H2_MULTIPLEX, 1
             );
             // Example: set the global log level
-            // AliPlayerFactory.setOption(...);
+            // AliPlayerGlobalSettings.setOption(...);
         });
 
         // 2. Initialize (the registered callback fires after initialization completes)
@@ -82,8 +82,10 @@ public class MyApplication extends Application {
 
 - Register a callback via `AliPlayerModel.Builder.onPlayerConfig()`
 - It is triggered on every `controller.configure(model)` call
-- The callback runs **after** `setDataSource()` and **before** `prepare()`
-- The callback parameter is an `IMediaPlayer` instance, granting access to all underlying SDK configuration capabilities
+- The callback runs synchronously right after `player.setDataSource(model)` returns
+- The callback parameter is an `IMediaPlayer` instance; call `player.getInternalPlayer()` first to obtain the underlying native player instance before accessing low-level SDK configuration
+
+> **⚠️ Known limitation**: `setDataSource(model)` internally calls `prepare()` implicitly, so the `onPlayerConfig` callback actually fires **after** `prepare()`, not before. This means configuration options that depend on being set "before prepare" (e.g. certain buffering parameters) may not take effect for the initial `prepare()` call under the current implementation. If you have a hard dependency on this, keep an eye out for future updates.
 
 ### **3.3 Usage**
 
@@ -93,16 +95,19 @@ When building an `AliPlayerModel`, pass the callback via `onPlayerConfig()`:
 AliPlayerModel model = new AliPlayerModel.Builder()
         .videoSource(videoSource)
         .onPlayerConfig(player -> {
+            // Get the underlying native player instance first
+            AliPlayer aliPlayer = player.getInternalPlayer();
+
             // Example 1: custom buffering strategy and Referer
-            PlayerConfig config = player.getPlayConfig();
+            PlayerConfig config = aliPlayer.getConfig();
             config.mMaxBufferDuration = 50000;                  // Max buffer 50s
             config.mHighBufferDuration = 3000;                  // High watermark 3s
             config.mStartBufferDuration = 500;                  // Start-up buffer 500ms
             config.mReferrer = "https://your-domain.com";       // Set Referer for hot-link protection
-            player.setPlayConfig(config);
+            aliPlayer.setConfig(config);
 
             // Example 2: set an instance-level Option
-            player.setOption(AliPlayerGlobalSettings.ALLOW_PRE_RENDER, 1);
+            aliPlayer.setOption(AliPlayer.ALLOW_PRE_RENDER, 1);
         })
         .build();
 
@@ -115,8 +120,8 @@ controller.configure(model);
 | Item | Description |
 |------|-------------|
 | Trigger frequency | The callback fires on every `controller.configure(model)` call, ideal for dynamic configuration |
-| Execution timing | The callback runs after `setDataSource()` and before `prepare()` — the optimal point for custom configuration |
-| Callback parameter | The `IMediaPlayer` instance, exposing all underlying SDK APIs |
+| Execution timing | The callback runs after `setDataSource()` returns (which has already completed `prepare()` internally) — see the known limitation above |
+| Callback parameter | The `IMediaPlayer` instance; call `getInternalPlayer()` to obtain the underlying native player instance before invoking low-level SDK APIs |
 | Optional | `onPlayerConfig()` is optional; not setting it does not affect normal playback |
 
 ---
@@ -144,11 +149,9 @@ controller.configure(model)
     │
     ├── lifecycleStrategy.acquire()               ← Acquire player instance
     │
-    ├── player.setDataSource(model)               ← Configure video source
+    ├── player.setDataSource(model)               ← Configure video source (prepare() runs internally)
     │
-    ├── onPlayerConfig.onPlayerConfig(player)     ← Fire instance config callback
-    │
-    └── player.prepare() / player.start()         ← Start playback
+    └── onPlayerConfig.onPlayerConfig(player)     ← Fire instance config callback (already past prepare())
 ```
 
 ### **4.3 Full Lifecycle**
@@ -175,9 +178,8 @@ controller.configure(model)
 │                                                                  │
 │  controller.configure(model)                                     │
 │      │                                                           │
-│      ├── setDataSource(model)                                    │
-│      ├── callback.onPlayerConfig(player)  ← Instance config      │
-│      └── prepare() / start()                                     │
+│      ├── setDataSource(model)  ← prepare() runs internally       │
+│      └── callback.onPlayerConfig(player)  ← Instance config       │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -213,9 +215,9 @@ Per-instance player configuration callback.
 @FunctionalInterface
 public interface OnPlayerConfigCallback {
     /**
-     * Player configuration callback invoked before prepare().
+     * Player configuration callback invoked after setDataSource().
      *
-     * @param player the player instance, exposing the underlying SDK config capabilities
+     * @param player the player instance; call getInternalPlayer() to access underlying SDK config capabilities
      */
     void onPlayerConfig(@NonNull IMediaPlayer player);
 }
@@ -248,7 +250,7 @@ public interface OnPlayerConfigCallback {
 
 ### **6.1 What is the execution order between global config and instance config?**
 
-The global config (`setOnGlobalInit`) runs once at application startup; the instance config (`onPlayerConfig`) runs before each player instance's `prepare()`. They are independent of each other.
+The global config (`setOnGlobalInit`) runs once at application startup; the instance config (`onPlayerConfig`) runs after each player instance's `setDataSource()` (which has already completed `prepare()`). They are independent of each other.
 
 ### **6.2 What happens if I do not set any custom configuration?**
 
@@ -256,7 +258,7 @@ AliPlayerKit ships with best-practice defaults — no custom configuration is re
 
 ### **6.3 Can I perform asynchronous operations inside the instance config callback?**
 
-Not recommended. On Android the callback runs synchronously, and `prepare()` only proceeds after it returns. Performing time-consuming work inside the callback would block player startup.
+Not recommended. The callback runs synchronously on the main thread. Performing time-consuming work inside it would block the return of `controller.configure()` and any subsequent playback flow (e.g. starting playback when `autoPlay` is enabled).
 
 ### **6.4 Can I change the video source inside the instance config?**
 

@@ -13,7 +13,7 @@ import com.aliyun.playerkit.logging.LogHub;
 import com.aliyun.playerkit.strategy.BaseStrategy;
 import com.aliyun.playerkit.utils.StringUtil;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -51,6 +51,15 @@ public class ResumePlayStrategy extends BaseStrategy {
      * 视频接近结束的阈值（毫秒），当剩余时长小于此值时清除记忆播放记录
      */
     private static final long NEAR_END_THRESHOLD_MS = 10 * 1000;
+
+    /**
+     * 本策略需要订阅的事件类型列表（静态常量，避免重复创建）
+     */
+    private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
+            PlayerEvents.Prepared.class,
+            PlayerEvents.Info.class,
+            PlayerEvents.StateChanged.class
+    );
 
     /**
      * 上次保存进度的时间戳
@@ -95,11 +104,7 @@ public class ResumePlayStrategy extends BaseStrategy {
     @Nullable
     @Override
     protected List<Class<? extends PlayerEvent>> observedEvents() {
-        List<Class<? extends PlayerEvent>> events = new ArrayList<>();
-        events.add(PlayerEvents.Prepared.class);      // 准备完成时初始化媒体信息（mediaId、duration）
-        events.add(PlayerEvents.Info.class);          // 定期更新播放进度
-        events.add(PlayerEvents.StateChanged.class);   // 监听状态变化
-        return events;
+        return OBSERVED_EVENTS;
     }
 
     @Override

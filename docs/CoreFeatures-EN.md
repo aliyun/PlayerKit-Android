@@ -21,7 +21,7 @@ AliPlayerKit is not just designed as a set of player UI components — it is pos
 | Design Goal | Description |
 |---------|------|
 | **Low-code Integration** | Integrate complete playback scenarios with minimal code |
-| **Multi-scenario Coverage** | Cover diverse playback scenarios including VOD, live streaming, and short video |
+| **Multi-scenario Coverage** | Cover diverse playback scenarios including VOD, live streaming, short video, and AI education |
 | **Reusable Architecture** | Avoid duplicate development of player capabilities across business lines through the slot + strategy architecture |
 | **Unified Foundation** | Serve as the unified foundation for all player solutions and scenario-based solutions |
 
@@ -34,7 +34,9 @@ In terms of architecture, **AliPlayerKit sits on top of the player core**, provi
 | Layer | Positioning | Module Location | Responsibilities |
 | ---------- | -------------- | ------------------- | ------------------------------------------------------------ |
 | **Component Layer** | Player UI Components | `playerkit/` | Provides out-of-the-box, configurable player UI components covering basic playback and common interactions. |
-| **Scene Layer** | Scenario-based Solutions | `playerkit-scenes/` | Provides standardized integration examples for typical scenarios such as short drama, medium/long video, and live streaming, helping clients rapidly build complete playback capabilities with minimal code. |
+| **Scene Layer** | Scenario-based Solutions | `playerkit-scenes/` | Provides standardized integration examples for typical scenarios such as short drama, medium/long video, live streaming, and AI education, helping clients rapidly build complete playback capabilities with minimal code. |
+
+> 📌 **Scenario Solution Example**: [AI Education Scene](./scenes/AiEducation-EN.md) — For courses and knowledge videos, providing AI chapter segmentation, summaries, knowledge point analysis, and other enhanced playback experiences.
 
 ---
 
@@ -59,7 +61,7 @@ AliPlayerKit adopts the classic **MVC architecture**, splitting the player into 
 
 | Component | Type | Responsibilities | Lifecycle |
 |-----|------|------|---------|
-| `AliPlayerKit` | Global Entry | Global configuration, cache management, version information | Application-level |
+| `AliPlayerKit` | Global Entry | Global configuration, cache management, version information, log management, preload management | Application-level |
 | `AliPlayerView` | View | UI presentation, slot management, lifecycle binding | Page-level |
 | `AliPlayerController` | Controller | Playback control, state management, event dispatching | Page-level |
 | `AliPlayerModel` | Model | Configuration data encapsulation, Builder pattern | Request-level |
@@ -276,7 +278,7 @@ For details, see [Slot System](./advanced/SlotSystem-EN.md).
 
 ### **3.2 Strategy System**
 
-The **Strategy System** encapsulates the player's business logic into independent strategy components, each carrying a clear responsibility — such as first-frame timing statistics, stuttering detection, traffic protection, memory playback, etc.
+The **Strategy System** encapsulates the player's business logic into independent strategy components, each carrying a clear responsibility — such as first-frame timing statistics, stuttering detection, traffic protection, etc.
 
 Business teams can extend at the strategy layer without intruding into the framework core. Each strategy has a single responsibility and is isolated from others; strategies can be reused across player instances and enabled or disabled on demand. Framework upgrades and business customizations operate independently and do not interfere with each other.
 
@@ -325,9 +327,54 @@ For details, see [Multi Video Source Support](./advanced/VideoSource-EN.md).
 | Layer | Registration | Trigger Timing | Typical Use Cases |
 |------|---------|---------|----------|
 | Global | `AliPlayerKit.setOnGlobalInit()` | After `init()` completes (only once) | setOption, global log level |
-| Instance | `AliPlayerModel.Builder.onPlayerConfig()` | Inside `configure()`, before `prepare()` | setPlayConfig, Referer |
+| Instance | `AliPlayerModel.Builder.onPlayerConfig()` | Inside `configure()`, after `setDataSource()` | setConfig, Referer |
 
 For details, see [Custom Config](./advanced/CustomConfig-EN.md).
+
+### **3.8 VID All-in-One Playback**
+
+Through the integration of AliPlayerKit with ApsaraVideo VOD, applications only need to pass a video VID to automatically retrieve the playback resources and associated media information, including the video title, cover image, and thumbnails. This reduces the need to obtain playback URLs, transfer media information, and configure client-side parameters, simplifying playback integration.
+
+After the player enters the `prepared` state, AliPlayerKit automatically extracts the following media information from the cloud-based `MediaInfo` and distributes it to the corresponding Slots through the event system:
+
+| Media Information | Event               | Consumer Slot       | Description                                               |
+| ----------------- | ------------------- | ------------------- | --------------------------------------------------------- |
+| Cover Image URL   | `CoverUrlReady`     | `CoverSlot`         | Displays the cover image before playback                  |
+| Video Title       | `VideoTitleReady`   | `TopBarSlot`        | Displays the video title in the top bar                   |
+| Thumbnail URL     | `ThumbnailUrlReady` | `SeekThumbnailSlot` | Displays thumbnails while the user drags the progress bar |
+
+**Priority rule:** Values manually configured through `AliPlayerModel.Builder` take precedence over values automatically retrieved from `MediaInfo`. Values from `MediaInfo` are used only when the corresponding fields have not been manually configured.
+
+> 💡 This feature requires Alibaba Cloud Player SDK 7.16.0 or later.
+
+### **3.9 Video Chaptering**
+
+Long videos are intelligently split into multiple chapter segments based on content structure, helping users quickly locate key content and improving learning and comprehension efficiency. Chapter data is produced by the AI content understanding service after analyzing the video, and is injected through `AliPlayerModel.Builder.chapters()`.
+
+| Component | Capability |
+|------|------|
+| `ChapterInfo` data model | Describes the time range (`[startMs, endMs)`) and display information (title, thumbnail) of a chapter segment |
+| `BottomBarSlot` chapter markers | Visualizes the content structure split points on the progress bar; combined with the chapter chip list, taps seek to the target segment. In landscape, an extra "Chapters" entry and "Next chapter" button are provided |
+| `ChapterPanelSlot` | Slides a structured content navigation panel in from the right in fullscreen; tap to jump to the target segment |
+
+**Scene restriction:** Effective only in the `SceneType.AI_VOD` scene with at least 2 chapters.
+
+**Integration Example**
+
+```java
+List<ChapterInfo> chapters = new ArrayList<>();
+chapters.add(new ChapterInfo(0, 65_000, "Course introduction"));
+chapters.add(new ChapterInfo(65_000, 210_000, "Core concepts"));
+chapters.add(new ChapterInfo(210_000, 320_000, "Worked examples"));
+
+AliPlayerModel model = new AliPlayerModel.Builder()
+        .videoSource(videoSource)
+        .sceneType(SceneType.AI_VOD)
+        .chapters(chapters)
+        .build();
+```
+
+See [AI Education Scene](./scenes/AiEducation-EN.md).
 
 ---
 

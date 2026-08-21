@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="26dp"
+    android:height="26dp"
+    android:viewportWidth="26"
+    android:viewportHeight="26">
+
+    <!-- 圆形背景 -->
+    <path
+        android:pathData="M13,0C5.8203,0 0,5.8203 0,13C0,20.1797 5.8203,26 13,26C20.1797,26 26,20.1797 26,13C26,5.8203 20.1797,0 13,0Z"
+        android:fillColor="#2C2C2E" />
+
+    <!-- 叉号 -->
+    <path
+        android:pathData="M17.0626,8.9375L8.93738,17.0628M8.93738,8.9375L17.0626,17.0628"
+        android:strokeColor="#8E8E93"
+        android:strokeWidth="1.625"
+        android:strokeLineCap="round" />
+</vector>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_chapter_chip"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/chapter_chip_height"
+    android:layout_marginEnd="@dimen/chapter_chip_margin_end"
+    android:background="@drawable/bg_chapter_chip"
+    android:ellipsize="end"
+    android:gravity="center"
+    android:maxWidth="@dimen/chapter_chip_max_width"
+    android:paddingStart="@dimen/chapter_chip_padding_horizontal"
+    android:paddingEnd="@dimen/chapter_chip_padding_horizontal"
+    android:singleLine="true"
+    android:textColor="@color/text_chapter_chip"
+    android:textSize="@dimen/common_text_12" />

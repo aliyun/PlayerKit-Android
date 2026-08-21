@@ -2,6 +2,26 @@
 
 Language: [中文简体](CHANGELOG.md) | English
 
+## [7.16.0] - 2026-08-26
+
+### SDK Upgrade
+
+- AliyunPlayer: 7.15.0 → 7.16.0
+- AlivcArtc: 7.15.0 → 7.16.0
+
+### Added
+
+- **VID All-in-One Playback**: Through the integration of AliPlayerKit with ApsaraVideo VOD, applications only need to pass a video VID to automatically retrieve the playback resources and associated media information, including the video title, cover image, and thumbnails. This reduces the need to obtain playback URLs, transfer media information, and configure client-side parameters, simplifying playback integration.
+- **Video Chapter Splitting**: Intelligently segments long videos into multiple chapter clips by content structure, with progress bar markers and a chapter panel to help users quickly locate key content
+- **Seek Thumbnails**: Displays video thumbnails while the user drags the progress bar. When playing a video by VID, thumbnails are retrieved automatically. Manually supplied thumbnail data is also supported.
+- **AI-Powered Education Scenarios**:
+  - Introduces an AI-powered video solution for online education, knowledge-based courses, and similar scenarios. It provides intelligent chapters, content summaries, key knowledge points, and illustrated explanations, helping users quickly locate important content and improve learning and content comprehension.
+  - Adds the `SceneType.AI_VOD` scene type. In addition to standard VOD playback capabilities, it supports chapter segmentation, chapter navigation, and the display of chapter information during seeking.
+
+### Documentation
+
+- Added [AI Education Scene](./scenes/AiEducation-EN.md) scenario solution documentation
+
 ## [7.15.0] - 2026-06-04
 
 ### SDK Upgrade
