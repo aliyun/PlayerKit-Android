@@ -113,7 +113,7 @@ public final class AiContentConstants {
      * real integration, you should dynamically pass the actual MediaId based on your business
      * scenario.
      */
-    public static final String DEFAULT_MEDIA_ID = "30158cf1907c71f180176723a78f0102";
+    public static final String DEFAULT_MEDIA_ID = "2042d63ea5c771f19a6b4531859c0102";
 
     // ==================== API Endpoints ====================
 
