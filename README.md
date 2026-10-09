@@ -1,6 +1,6 @@
 Language: 中文简体 | [English](README-EN.md)
 
-![alibaba_cloud_logo](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/AlibabaCloud.svg)
+![alibaba_cloud_logo](./docs/_media/AlibabaCloud.svg)
 
 # **AliPlayerKit Android**
 
@@ -14,7 +14,7 @@ Language: 中文简体 | [English](README-EN.md)
 
 <p align="center">
   <img
-    src="https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/playerkit-ui-preview.png"
+    src="./docs/_media/playerkit-ui-preview.png"
     alt="AliPlayerKit UI 组件预览"
     width="100%"
   />
@@ -49,7 +49,7 @@ Language: 中文简体 | [English](README-EN.md)
 
 在架构层级上，**AliPlayerKit 位于播放器内核之上**，通过统一的 UI 组件体系与播放场景抽象，承载不同播放业务的共性能力：
 
-![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/ProductArchitecture.png)
+![ProductArchitecture](./docs/_media/ProductArchitecture.png)
 
 项目模块结构如下：
 
@@ -96,7 +96,7 @@ AliPlayerKit 采用 **分层架构设计**，提供两种接入方式，您可�
 
 只需几步，您就可以轻松实现视频播放功能！下图展示了 **组件层接入** 的流程：
 
-![QuickStart](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/QuickStart.png)
+![QuickStart](./docs/_media/QuickStart.png)
 
 > **详细步骤**：请参阅 [快速开始](./docs/QuickStart.md)。如需了解更多内容，请参考 [文档目录](./docs/README.md)。
 
@@ -168,7 +168,7 @@ AliPlayerKit 采用 **分层架构设计**，提供两种接入方式，您可�
 
 使用手机扫描以下二维码，即可快速下载并安装演示包：
 
-![Demo QR Code](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/demo-qr-code.png)
+![Demo QR Code](./docs/_media/demo-qr-code.png)
 
 > **注意**：二维码链接指向最新版本的演示包，请确保您的设备已开启允许安装第三方应用的权限。
 

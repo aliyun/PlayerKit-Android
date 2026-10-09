@@ -29,7 +29,7 @@ AliPlayerKit is not just designed as a set of player UI components — it is pos
 
 In terms of architecture, **AliPlayerKit sits on top of the player core**, providing a unified UI component system and playback scenario abstraction to host the common capabilities of various playback businesses:
 
-![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/ProductArchitecture-EN.png)
+![ProductArchitecture](./_media/ProductArchitecture-EN.png)
 
 | Layer | Positioning | Module Location | Responsibilities |
 | ---------- | -------------- | ------------------- | ------------------------------------------------------------ |
@@ -55,7 +55,7 @@ In terms of architecture, **AliPlayerKit sits on top of the player core**, provi
 
 AliPlayerKit adopts the classic **MVC architecture**, splitting the player into independent components:
 
-![InterfaceDesign](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/InterfaceDesign-EN.png)
+![InterfaceDesign](./_media/InterfaceDesign-EN.png)
 
 ### **2.2 Component Responsibilities**
 
@@ -260,7 +260,7 @@ classDiagram
 
 The complete invocation flow of the core APIs, covering the full lifecycle from creation, binding, playback to release:
 
-![CallSequence](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/CallSequence-EN.png)
+![CallSequence](./_media/CallSequence-EN.png)
 
 > **Quick Onboarding**: See [Quick Start](./QuickStart-EN.md) for the full integration steps.
 

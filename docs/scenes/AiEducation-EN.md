@@ -10,7 +10,7 @@ It uses the player as a unified entry point, with VOD providing video content an
 
 Whether it's online courses, vocational training, corporate learning, paid knowledge services, or academic lectures, this solution can enhance learning efficiency and viewing experience, revitalize existing video content, and reduce the integration and development costs of player and AI features.
 
-![AiEducation](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/ai-education-ui-preview.png)
+![AiEducation](../_media/ai_education/ai-education-ui-preview.png)
 
 ---
 
@@ -93,7 +93,7 @@ The global business flow describes the complete pipeline from production, storag
 
 VOD is responsible for unified storage of media assets and AI analysis results; ICE / AI workflow handles content understanding and structured analysis; App Server encapsulates server-side capabilities and provides a unified interface to the client.
 
-![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/ProductArchitecture-EN.png)
+![ProductArchitecture](../_media/ai_education/ProductArchitecture-EN.png)
 
 ### **5.2 Client Interaction Flow**
 
@@ -101,7 +101,7 @@ The client interaction flow describes the calling relationships between the clie
 
 During page initialization, the client obtains play credentials and AI analysis results in parallel or sequentially; after data loading is complete, users can view chapters, summaries, and knowledge points through the chapter content panel, and jump to the corresponding video position.
 
-![CallSequence](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/CallSequence-EN.png)
+![CallSequence](../_media/ai_education/CallSequence-EN.png)
 
 When the AI analysis API request fails or returns empty results, the client can still use the play credentials to complete normal video playback, but will not display the chapter and AI analysis panel.
 
@@ -111,7 +111,7 @@ The client adopts a layered design consisting of the Scene Layer, PlayerKit Capa
 
 The Scene Layer is responsible for page orchestration, data loading, and AI content display; PlayerKit provides player control bar entry points and panel extension capabilities through the Slot mechanism; the underlying Player SDK handles media playback, progress control, and playback state callbacks.
 
-![LayeredArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/resources/ai_education/LayeredArchitecture-Android-EN.png)
+![LayeredArchitecture](../_media/ai_education/LayeredArchitecture-Android-EN.png)
 
 ---
 

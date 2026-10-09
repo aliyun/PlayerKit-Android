@@ -1,6 +1,6 @@
 Language: [中文](README.md) | English
 
-![alibaba_cloud_logo](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/AlibabaCloud.svg)
+![alibaba_cloud_logo](./docs/_media/AlibabaCloud.svg)
 
 # **AliPlayerKit Android**
 
@@ -14,7 +14,7 @@ Language: [中文](README.md) | English
 
 <p align="center">
   <img
-    src="https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/playerkit-ui-preview.png"
+    src="./docs/_media/playerkit-ui-preview.png"
     alt="AliPlayerKit UI preview"
     width="100%"
   />
@@ -49,7 +49,7 @@ By encapsulating player capabilities and UI interactions, it enables rapid devel
 
 In terms of architecture, **AliPlayerKit sits on top of the player core**, providing a unified UI component system and playback scenario abstraction to host the common capabilities of various playback businesses:
 
-![ProductArchitecture](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/ProductArchitecture-EN.png)
+![ProductArchitecture](./docs/_media/ProductArchitecture-EN.png)
 
 The project module structure is as follows:
 
@@ -96,7 +96,7 @@ AliPlayerKit adopts a **layered architecture design**, providing two integration
 
 In just a few steps, you can easily implement video playback. The diagram below shows the **component layer integration** flow:
 
-![QuickStart](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/Android/QuickStart-EN.png)
+![QuickStart](./docs/_media/QuickStart-EN.png)
 
 > **Detailed Steps**: See [Quick Start](./docs/QuickStart-EN.md). For more information, refer to the [Documentation Index](./docs/README-EN.md).
 
@@ -168,7 +168,7 @@ To help developers quickly experience the features of AliPlayerKit, we have buil
 
 Scan the following QR code with your phone to quickly download and install the demo:
 
-![Demo QR Code](https://alivc-demo-cms.alicdn.com/versionProduct/installPackage/AliPlayerKit/demo-qr-code_en.png)
+![Demo QR Code](./docs/_media/demo-qr-code_en.png)
 
 > **Note**: The QR code points to the latest version of the demo. Please ensure that your device allows the installation of third-party applications.
 
