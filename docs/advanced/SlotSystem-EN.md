@@ -112,7 +112,7 @@ AliPlayerKit defines 6 playback scenes. Slot behavior automatically adapts under
 | OPTION_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 | CHAPTER_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 
-> 💡 `CHAPTER_PANEL` declares no scene-exclusion rule, so it is mounted in every non-MINIMAL scene. However it stays hidden by default and only expands when it receives `ControlBarEvents.ShowChapterPanel` with non-empty chapter data. That event is posted solely by the `BottomBarSlot` chapter button, which appears only in the `AI_VOD` scene with at least 2 chapters — so in practice it behaves as "visible in AI_VOD only".
+> 💡 `CHAPTER_PANEL` declares no scene-exclusion rule, so it is mounted in every non-MINIMAL scene. However it stays hidden by default and only expands when it receives `ControlBarEvents.ShowChapterPanel` with non-empty chapter data. That event is posted solely by the `BottomBarSlot` chapter button, which appears only when the chapter feature is available (any scene other than `LIVE`/`MINIMAL` with non-empty chapter data).
 
 **Gesture Behavior Differences**:
 
@@ -133,7 +133,7 @@ AliPlayerKit defines 6 playback scenes. Slot behavior automatically adapts under
 | Progress bar | Draggable | Not draggable | Draggable | Not draggable | ✗ | Draggable |
 | Time display | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 | Refresh button | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Chapter markers & chapter button | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ (when chapters ≥ 2) |
+| Chapter markers & chapter button | ✓ (requires chapter data) | ✗ | ✓ (requires chapter data) | ✓ (requires chapter data) | ✗ | ✓ (requires chapter data) |
 
 ---
 

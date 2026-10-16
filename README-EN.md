@@ -4,7 +4,7 @@ Language: [中文](README.md) | English
 
 # **AliPlayerKit Android**
 
-[![Platform](https://img.shields.io/badge/Platform-Android%20API%2021%2B-brightgreen)](https://www.android.com/) [![Language](https://img.shields.io/badge/Language-Java-orange)](https://www.java.com/) [![Gradle](https://img.shields.io/badge/Gradle-compatible-green)](https://gradle.org/) [![website](https://img.shields.io/badge/Product-VOD-FF6A00)](https://www.alibabacloud.com/en/product/apsaravideo-for-vod)
+[![Release](https://img.shields.io/github/v/release/aliyun/PlayerKit-Android?logo=github)](https://github.com/aliyun/PlayerKit-Android/releases) [![Platform](https://img.shields.io/badge/Platform-Android%20API%2021%2B-brightgreen)](https://www.android.com/) [![Language](https://img.shields.io/badge/Language-Java-orange)](https://www.java.com/) [![Gradle](https://img.shields.io/badge/Gradle-compatible-green)](https://gradle.org/) [![website](https://img.shields.io/badge/Product-VOD-FF6A00)](https://www.alibabacloud.com/en/product/apsaravideo-for-vod)
 
 ---
 

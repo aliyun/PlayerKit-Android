@@ -150,7 +150,7 @@ AliPlayerKit provides a rich set of API interfaces to enable developers to direc
 | `coverUrl(String)` | Cover image URL | Set cover image URL (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
 | `videoTitle(String)` | Video title | Set video title (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
 | `thumbnailUrl(String)` | Thumbnail URL | Set the seek thumbnail URL (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
-| `chapters(List<ChapterInfo>)` | Chapter list | Set video chapter data (optional), used by the video chaptering capability of the `SceneType.AI_VOD` scene |
+| `chapters(List<ChapterInfo>)` | Chapter list | Set video chapter data (optional), used by the video chaptering capability (effective in scenes other than `LIVE`/`MINIMAL` when data is non-empty) |
 | `autoPlay(boolean)` | Whether to auto play | Set whether to auto play |
 | `traceId(String)` | Trace ID | Set the trace identifier |
 | `startTime(long)` | Start position | Set the start position (milliseconds) |

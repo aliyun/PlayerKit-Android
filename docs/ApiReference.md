@@ -150,7 +150,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `coverUrl(String)` | 封面图 URL | 设置封面图地址（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
 | `videoTitle(String)` | 视频标题 | 设置视频标题（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
 | `thumbnailUrl(String)` | 缩略图 URL | 设置 Seek 缩略图地址（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
-| `chapters(List<ChapterInfo>)` | 章节列表 | 设置视频章节数据（可选），用于 `SceneType.AI_VOD` 场景的视频拆条能力 |
+| `chapters(List<ChapterInfo>)` | 章节列表 | 设置视频章节数据（可选），用于视频拆条能力（非 `LIVE`/`MINIMAL` 场景且数据非空时生效） |
 | `autoPlay(boolean)` | 是否自动播放 | 设置是否自动播放 |
 | `traceId(String)` | 跟踪 ID | 设置跟踪标识 |
 | `startTime(long)` | 起播位置 | 设置起播位置（毫秒） |

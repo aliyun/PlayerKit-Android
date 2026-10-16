@@ -201,10 +201,10 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
     @SceneType
     private int mSceneType = SceneType.VOD;
 
-    // ==================== AI_VOD 章节相关 ====================
+    // ==================== 章节相关 ====================
 
     /**
-     * 章节信息列表（仅 AI_VOD 场景有值）
+     * 章节信息列表（章节能力可用时有值，判断规则见 {@link #isChapterAvailable()}）
      */
     @Nullable
     private List<ChapterInfo> mChapters;
@@ -239,6 +239,8 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      * </p>
      */
     private final ChapterChipAdapter.OnChipClickListener mChipClickListener = (position, chapter) -> {
+        // RESTRICTED 等禁跳场景：章节仅作展示，点击不发起跳转、不更新高亮
+        if (!isChapterSeekEnabled()) return;
         if (mPlayerId != null) {
             seekTo(chapter.getStartMs());
             updateChapterHighlight(chapter.getStartMs());
@@ -252,6 +254,8 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      * </p>
      */
     private final ChapterMarkerView.OnMarkerClickListener mMarkerClickListener = (markerIndex, normalizedPosition) -> {
+        // RESTRICTED 等禁跳场景：标记仅作展示，点击不发起跳转、不更新高亮
+        if (!isChapterSeekEnabled()) return;
         if (mPlayerId != null && mDuration > 0) {
             long targetPosition = (long) (normalizedPosition * mDuration);
             seekTo(targetPosition);
@@ -346,7 +350,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
                 mLandScapeView.setVisibility(View.GONE);
             }
             mPortraitView.setVisibility(View.VISIBLE);
-            if (mRvChapterChips != null && mChapters != null && !mChapters.isEmpty()) {
+            if (mRvChapterChips != null && isChapterAvailable()) {
                 mRvChapterChips.setVisibility(View.VISIBLE);
             }
         }
@@ -391,7 +395,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         }
 
         // 横屏初始化后，如果章节数据已加载，立即应用标记
-        if (mChapterMarkerViewLS != null && mChapters != null && !mChapters.isEmpty() && mDuration > 0) {
+        if (mChapterMarkerViewLS != null && isChapterAvailable() && mDuration > 0) {
             List<Float> positions = new ArrayList<>();
             for (ChapterInfo chapter : mChapters) {
                 float pos = (float) chapter.getStartMs() / mDuration;
@@ -406,7 +410,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         }
 
         // 横屏初始化后，如果章节数据已加载，立即绑定到横屏 adapter
-        if (mChapters != null && !mChapters.isEmpty()) {
+        if (isChapterAvailable()) {
             if (mChapterChipAdapterLS == null) {
                 mChapterChipAdapterLS = new ChapterChipAdapter();
                 mChapterChipAdapterLS.setOnChipClickListener(mChipClickListener);
@@ -436,7 +440,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         setViewClickListener(this, mTvChapterLS, mTvNextChapterLS);
 
         // 如果章节数据已加载，同步按钮显示状态
-        if (mChapters != null && !mChapters.isEmpty()) {
+        if (isChapterAvailable()) {
             setChapterButtonsVisible(true);
             updateChapterButtonText();
         }
@@ -447,14 +451,23 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         super.onBindData(model);
         // 存储场景类型，用于判断是否允许进度条拖拽
         mSceneType = model.getSceneType();
+        // 重置播放进度状态，待新视频进度事件更新；
+        // mDuration 置 0：防止新视频 Prepared 前切全屏时，buildLandScapeView 用旧时长错误重建章节标记
+        mDuration = 0;
         // 刷新按钮（可选：直播场景）
         updateReplayButtonVisibility();
 
-        // AI_VOD 章节标记初始化
-        if (model.getSceneType() == SceneType.AI_VOD
-                && model.getChapters() != null
-                && model.getChapters().size() >= 2) {
-            mChapters = model.getChapters();
+        // 章节数据初始化：统一章节能力判断（非 LIVE/MINIMAL 场景且章节数据非空）
+        // 注意：Slot 可能重复绑定数据，切换数据源时需重置旧章节状态，避免残留 UI 或旧索引错位
+        mChapters = model.getChapters();
+        if (isChapterAvailable()) {
+            mLastChapterIndex = -1;
+            if (mTvChapterLS != null) {
+                mTvChapterLS.setText("");
+            }
+            // 换源时先清除上一份数据的标记点，待 onPrepared 后按新视频时长重新应用
+            setViewVisible(false, mChapterMarkerView, mChapterMarkerViewLS);
+
             // 注意：章节标记需要 duration 信息，延迟到收到 duration 后再应用
 
             // 初始化章节导航适配器（竖屏）
@@ -480,6 +493,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
             updateChapterButtonText();
         } else {
             mChapters = null;
+            clearChapterState();
         }
 
     }
@@ -577,7 +591,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         mDuration = event.duration;
         updateTimeText(0, mDuration);
 
-        if (mChapters != null && mDuration > 0) {
+        if (isChapterAvailable() && mDuration > 0) {
             applyChapterMarkers(mDuration);
         }
     }
@@ -599,8 +613,8 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         mDuration = event.duration;
         updateProgress(event.currentPosition, event.bufferedPosition, event.duration);
 
-        // AI_VOD: 更新章节高亮
-        if (mChapters != null && !mChapters.isEmpty()) {
+        // 章节可用时更新章节高亮
+        if (isChapterAvailable()) {
             updateChapterHighlight(event.currentPosition);
         }
     }
@@ -771,7 +785,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
                     // 用户拖动时，实时更新时间显示
                     long targetPosition = (long) ((progress / 100.0f) * mDuration);
                     updateTimeText(targetPosition, mDuration);
-                    // AI_VOD: 更新章节高亮
+                    // 章节可用时更新章节高亮
                     updateChapterHighlight(targetPosition);
                     // 发布 Seek 缩略图更新事件
                     if (mPlayerId != null) {
@@ -854,6 +868,8 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         }
         // 下一章
         else if (id == R.id.tv_next_chapter_landscape) {
+            // 单章数据不存在"下一章"，不响应点击
+            if (mChapters == null || mChapters.size() <= 1) return;
             notifyInteraction();
             seekToNextChapter();
         }
@@ -890,15 +906,20 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      * </p>
      */
     private void seekToNextChapter() {
-        if (mChapters == null || mPlayerId == null || mLastChapterIndex < 0) return;
+        // RESTRICTED 等禁跳场景：不发起跳转，也不提示“已跳转”
+        if (!isChapterSeekEnabled()) return;
+        if (!isChapterAvailable() || mPlayerId == null) return;
         Context context = getContext();
         if (context == null) return;
 
-        if (mLastChapterIndex >= mChapters.size() - 1) {
+        // 尚未定位到任何章节（如播放位置处于首个章节之前）时，下一章即第一章；
+        // 播放位置处于章节空隙时 mLastChapterIndex 保留最近的有效章节索引，顺延取其下一章
+        int nextIndex = mLastChapterIndex < 0 ? 0 : mLastChapterIndex + 1;
+        if (nextIndex >= mChapters.size()) {
             ToastUtils.showToast(R.string.toast_last_chapter);
             return;
         }
-        ChapterInfo next = mChapters.get(mLastChapterIndex + 1);
+        ChapterInfo next = mChapters.get(nextIndex);
         seekTo(next.getStartMs());
         updateChapterHighlight(next.getStartMs());
         String time = FormatUtil.formatDuration(next.getStartMs());
@@ -912,7 +933,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      * </p>
      */
     private void updateChapterButtonText() {
-        if (mTvChapterLS == null || mChapters == null || mLastChapterIndex < 0) return;
+        if (mTvChapterLS == null || !isChapterAvailable() || mLastChapterIndex < 0) return;
         if (mLastChapterIndex >= mChapters.size()) return;
         Context context = getContext();
         if (context == null) return;
@@ -936,7 +957,66 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         if (mTvNextChapterLS != null) mTvNextChapterLS.setVisibility(visibility);
     }
 
-    // ==================== AI_VOD 章节方法 ====================
+    // ==================== 章节方法 ====================
+
+    /**
+     * 章节能力是否可用
+     * <p>
+     * 章节功能显隐/启用的统一判断入口。
+     * 判断规则：非 LIVE/MINIMAL 场景且章节数据非空。
+     * </p>
+     * <p>
+     * Whether chapter feature is available.
+     * <p>
+     * Rules: the scene is not LIVE/MINIMAL and the chapter list is not empty.
+     * </p>
+     *
+     * @return 章节能力是否可用
+     */
+    private boolean isChapterAvailable() {
+        if (mSceneType == SceneType.LIVE || mSceneType == SceneType.MINIMAL) {
+            return false;
+        }
+        return mChapters != null && !mChapters.isEmpty();
+    }
+
+    /**
+     * 当前场景是否允许通过章节控件发起跳转
+     * <p>
+     * RESTRICTED 防跳播：章节 UI 仅作展示，点击不发起跳转、不更新高亮、不提示已跳转；
+     * 外部/自定义 UI 发起的 Seek 命令由播放控制器统一兑底拦截。
+     * </p>
+     * <p>
+     * Whether seeking via chapter controls is enabled in the current scene
+     * </p>
+     *
+     * @return 允许跳转返回 true
+     */
+    private boolean isChapterSeekEnabled() {
+        return mSceneType != SceneType.LIVE && mSceneType != SceneType.RESTRICTED;
+    }
+
+    /**
+     * 清理并隐藏章节相关 UI
+     * <p>
+     * 切换到无章节数据（或章节能力不可用场景）时调用，防止上一份数据的
+     * 章节 Chip、横屏章节按钮和进度条标记残留显示——其点击监听器仍会向新视频发起 Seek。
+     * </p>
+     * <p>
+     * Clear and hide chapter related UI
+     * </p>
+     */
+    private void clearChapterState() {
+        mLastChapterIndex = -1;
+        // 竖屏章节 Chip 与进度条章节标记（横竖屏）
+        setViewVisible(false, mRvChapterChips, mChapterMarkerView, mChapterMarkerViewLS);
+        // 横屏章节按钮组（横屏视图未 inflate 时内部判空保护）
+        setChapterButtonsVisible(false);
+        // 横屏章节标题残留文本
+        if (mTvChapterLS != null) {
+            mTvChapterLS.setText("");
+        }
+    }
 
     /**
      * 将章节标记应用到 ChapterMarkerView 上
@@ -945,7 +1025,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      * </p>
      */
     private void applyChapterMarkers(long durationMs) {
-        if (mChapters == null || durationMs <= 0) return;
+        if (!isChapterAvailable() || durationMs <= 0) return;
 
         // 计算归一化位置
         List<Float> positions = new ArrayList<>();
@@ -956,7 +1036,11 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
             }
         }
 
-        if (positions.isEmpty()) return;
+        if (positions.isEmpty()) {
+            // 无有效标记（如单章且 startMs=0）时清除上一份数据的残留标记并保持隐藏
+            setViewVisible(false, mChapterMarkerView, mChapterMarkerViewLS);
+            return;
+        }
 
         // 应用到竖屏标记 View
         if (mChapterMarkerView != null) {
@@ -979,11 +1063,15 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      * @param positionMs 当前播放位置（毫秒）
      */
     private void updateChapterHighlight(long positionMs) {
-        if (mChapters == null || mChapters.isEmpty()) return;
+        if (!isChapterAvailable()) return;
 
         int index = ChapterInfo.findIndexByPosition(mChapters, positionMs);
         if (index == mLastChapterIndex) return; // 避免重复更新
-        mLastChapterIndex = index;
+        // 播放位置处于章节空隙（未命中任何章节区间）时仅清除展示态，
+        // mLastChapterIndex 保留最近的有效章节索引，供「下一章」顺延计算目标
+        if (index >= 0) {
+            mLastChapterIndex = index;
+        }
 
         if (index >= 0) {
             if (mChapterChipAdapter != null) {

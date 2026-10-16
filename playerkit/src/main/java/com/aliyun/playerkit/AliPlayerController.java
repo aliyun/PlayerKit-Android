@@ -14,6 +14,7 @@ import com.aliyun.playerkit.core.IPlayerController;
 import com.aliyun.playerkit.core.IPlayerStateStore;
 import com.aliyun.playerkit.config.OnPlayerConfigCallback;
 import com.aliyun.playerkit.data.PlayerState;
+import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.data.TrackQuality;
 import com.aliyun.playerkit.manager.GlobalManager;
 import com.aliyun.playerkit.player.DefaultPlayerFactory;
@@ -844,13 +845,37 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
      * 执行跳转操作，调用播放器的 {@link IMediaPlayer#seekTo(long)} 方法跳转到指定位置。
      * 跳转位置以毫秒为单位，应该大于等于 0，且不应超过视频总时长。
      * </p>
+     * <p>
+     * 场景门卫：LIVE（无时间轴）、MINIMAL（无 UI）、RESTRICTED（防跳播）场景下禁用 Seek，
+     * 进度条拖拽、章节 Chip/标记点/面板等交互发起的跳转请求一律拦截。
+     * </p>
      *
      * @param command 跳转命令，不能为 null，包含目标播放位置（单位：毫秒）
      */
     private void onSeekCommand(@NonNull PlayerCommand.Seek command) {
+        if (isSeekDisabledScene()) {
+            LogHub.w(TAG, "Seek blocked, sceneType=" + (model != null ? model.getSceneType() : -1));
+            return;
+        }
         if (player != null) {
             player.seekTo(command.position);
         }
+    }
+
+    /**
+     * 当前场景是否禁用 Seek
+     * <p>
+     * Whether seeking is disabled in the current scene
+     * </p>
+     *
+     * @return 当前场景禁用 Seek 时返回 true
+     */
+    private boolean isSeekDisabledScene() {
+        if (model == null) {
+            return false;
+        }
+        int sceneType = model.getSceneType();
+        return sceneType == SceneType.LIVE || sceneType == SceneType.RESTRICTED;
     }
 
     /**
