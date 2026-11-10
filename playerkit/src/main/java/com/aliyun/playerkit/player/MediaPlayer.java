@@ -27,6 +27,7 @@ import com.aliyun.playerkit.converter.PlayerTrackConverter;
 import com.aliyun.playerkit.converter.VideoSourceConverter;
 import com.aliyun.playerkit.controller.PlayerStateStore;
 import com.aliyun.playerkit.core.IPlayerStateStore;
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.data.TrackQuality;
@@ -573,6 +574,12 @@ public class MediaPlayer implements IMediaPlayer {
         LogHub.i(TAG, "setLoop", loop, playerId);
         aliPlayer.setLoop(loop);
         stateStore.updateLoop(loop);
+    }
+
+    @Override
+    public void setChapters(@Nullable List<ChapterInfo> chapters) {
+        // 章节数据不进底层播放器，仅写入状态存储并触发变更事件，供 UI 插槽刷新
+        stateStore.updateChapters(chapters);
     }
 
     @Override

@@ -94,7 +94,7 @@ public class AiEducationActivity extends AppCompatActivity {
 
         String vid = AiContentConstants.DEFAULT_MEDIA_ID;
 
-        // 步骤 4：异步链式加载（PlayAuth → AI 内容 → 配置播放器）
+        // 步骤 4：异步链式加载（PlayAuth → 起播 → AI 内容返回后补写章节）
         mContentLoader = new AiContentLoader();
         mContentLoader.loadPlayAuth(vid, playAuth -> {
             // 回调在主线程执行，页面已销毁时不再处理
@@ -108,6 +108,11 @@ public class AiEducationActivity extends AppCompatActivity {
                 finish();
                 return;
             }
+
+            // 先起播：PlayAuth 就绪即可播放，不被 AI 内容接口耗时阻塞
+            configurePlayer(vid, playAuth);
+
+            // 后补章节：AI 内容返回后再写入章节数据通道，章节相关 UI 随即生效
             mContentLoader.loadAiAnalysis(vid, response -> {
                 if (isFinishing() || isDestroyed()) {
                     return;
@@ -116,7 +121,7 @@ public class AiEducationActivity extends AppCompatActivity {
                     // AI 内容加载失败不影响播放，仅提示用户知情
                     ToastUtils.showToast(R.string.ai_education_error_ai_content_load_failed);
                 }
-                configurePlayer(vid, playAuth, response);
+                applyAiContent(response);
             });
         });
     }
@@ -139,26 +144,43 @@ public class AiEducationActivity extends AppCompatActivity {
     }
 
     /**
-     * 配置播放器（在 PlayAuth 和 AI 内容加载完成后调用）
+     * 配置播放器并起播
+     * <p>
+     * 不携带章节数据：章节属于 AI 内容，耗时不可控，先起播、后补章节，
+     * 避免 AI 接口拖慢首帧。
+     * </p>
+     *
+     * @param vid      视频 Vid
+     * @param playAuth 播放凭证
      */
-    private void configurePlayer(@NonNull String vid, @NonNull String playAuth, @Nullable AiAnalysisResponse response) {
-        // 消费侧显式调用 Assembler 构建章节列表
-        List<ChapterInfo> chapters = response != null ? AiContentAssembler.buildChapters(response) : null;
-        // 仅当章节非空且非空列表时才下发章节数据
-        boolean hasChapters = chapters != null && !chapters.isEmpty();
-
+    private void configurePlayer(@NonNull String vid, @NonNull String playAuth) {
         VideoSource.VidAuthSource videoSource = VideoSourceFactory.createVidAuthSource(vid, playAuth);
-        AliPlayerModel.Builder builder = new AliPlayerModel.Builder()
+        AliPlayerModel playerModel = new AliPlayerModel.Builder()
                 .videoSource(videoSource)
-                .sceneType(SceneType.AI_VOD);
-        if (hasChapters) {
-            builder.chapters(chapters);
-        }
-        AliPlayerModel playerModel = builder.build();
+                .sceneType(SceneType.AI_VOD)
+                .build();
 
         // 配置播放源并挂载控制器（挂载后插槽才会创建，自动开始播放）
         playerController.configure(playerModel);
         playerView.attach(playerController);
+    }
+
+    /**
+     * 应用 AI 内容（章节懒加载入口）
+     * <p>
+     * 章节数据通过 {@link AliPlayerController#setChapters(List)} 写入章节数据通道，
+     * 无需重新 configure；进度条章节标记、章节信息行与「下一章」、竖屏章节胶囊
+     * 以及章节面板入口会同步生效。
+     * </p>
+     *
+     * @param response 服务端 AI 内容，可为 null（表示无章节与摘要）
+     */
+    private void applyAiContent(@Nullable AiAnalysisResponse response) {
+        // 消费侧显式调用 Assembler 构建章节列表
+        List<ChapterInfo> chapters = response != null ? AiContentAssembler.buildChapters(response) : null;
+
+        // 运行期写入章节数据：空列表等同于无章节，章节 UI 自然降级
+        playerController.setChapters(chapters);
 
         // attach 后显式把 AI DTO 推给面板插槽（插槽之间互不感知）
         if (mChapterContentPanelSlot != null) {

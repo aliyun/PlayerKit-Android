@@ -1,6 +1,7 @@
 package com.aliyun.playerkit.ui.slots;
 
 import android.content.Context;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import com.aliyun.playerkit.ui.chapter.ChapterPanelListAdapter;
 import com.aliyun.playerkit.utils.StringUtil;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,7 +46,8 @@ public class ChapterPanelSlot extends BasePanelSlot {
     private static final List<Class<? extends PlayerEvent>> OBSERVED_EVENTS = Arrays.asList(
             ControlBarEvents.ShowChapterPanel.class,
             ControlBarEvents.Show.class,
-            PlayerEvents.Info.class
+            PlayerEvents.Info.class,
+            PlayerEvents.ChapterListUpdated.class
     );
 
     @Nullable
@@ -111,7 +114,8 @@ public class ChapterPanelSlot extends BasePanelSlot {
     public void onBindData(@NonNull AliPlayerModel model) {
         super.onBindData(model);
         mPlayerId = getPlayerId();
-        mChapters = model.getChapters();
+        mChapters = readChaptersFromChannel();
+        mCurrentChapterIndex = -1;
     }
 
     @Override
@@ -146,22 +150,83 @@ public class ChapterPanelSlot extends BasePanelSlot {
             hidePanel();
         } else if (event instanceof PlayerEvents.Info) {
             updateCurrentChapter(((PlayerEvents.Info) event).currentPosition);
+        } else if (event instanceof PlayerEvents.ChapterListUpdated) {
+            onChaptersUpdated();
         }
     }
 
-    private void showChapterPanel() {
-        if (mChapters == null || mChapters.isEmpty()) return;
+    /**
+     * 从章节数据通道读取章节
+     *
+     * @return 章节列表（无数据时为空列表）
+     */
+    @NonNull
+    private List<ChapterInfo> readChaptersFromChannel() {
+        SlotHost host = getHost();
+        if (host == null) return Collections.emptyList();
+        try {
+            return host.getPlayerStateStore().getChapters();
+        } catch (IllegalStateException e) {
+            // 播放器尚未就绪，视为无章节
+            return Collections.emptyList();
+        }
+    }
 
-        // 更新头部
-        if (mTvChapterCount != null) {
-            Context context = getContext();
-            if (context != null) {
-                String text = context.getString(R.string.chapter_panel_title_format, mChapters.size());
-                mTvChapterCount.setText(text);
+    /**
+     * 处理章节数据变更
+     * <p>
+     * 事件总线为同步派发，业务可能在工作线程写入章节，统一切回主线程刷新 UI。
+     * 刷新时重新读取数据通道而非使用事件载荷：排队中的旧载荷可能晚于主线程上的新写入执行，
+     * 覆盖最新的章节数据。
+     * </p>
+     */
+    private void onChaptersUpdated() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            applyChaptersFromChannel();
+        } else {
+            post(this::applyChaptersFromChannel);
+        }
+    }
+
+    /**
+     * 按数据通道最新章节刷新面板状态
+     * <p>
+     * 面板为「打开时快照」，但展示期间收到的数据变化必须同步刷新列表快照：
+     * 否则随后的 {@link PlayerEvents.Info} 会用新列表算出的索引去高亮旧快照的行，
+     * 两份数据条目数/顺序不同时高亮会落到错误章节。
+     * </p>
+     */
+    private void applyChaptersFromChannel() {
+        List<ChapterInfo> latest = readChaptersFromChannel();
+        mChapters = latest.isEmpty() ? null : latest;
+
+        // 数据变空：收起面板，避免残留可点击但无意义的入口
+        if (mChapters == null) {
+            mCurrentChapterIndex = -1;
+            if (isShowing()) {
+                hidePanel();
             }
+            return;
         }
 
-        // 更新列表
+        if (isShowing()) {
+            renderChapterListSnapshot();
+        } else {
+            // 未展示时仅记录最新数据与索引，下次打开时由 showChapterPanel 重算快照
+            mCurrentChapterIndex = ChapterInfo.findIndexByPosition(mChapters, getCurrentPositionMs());
+        }
+    }
+
+    /**
+     * 按当前章节数据重建列表快照与高亮索引
+     * <p>
+     * 面板头部计数、列表数据和高亮索引必须同源刷新。
+     * </p>
+     */
+    private void renderChapterListSnapshot() {
+        if (mAdapter == null) return;
+        updateChapterCountHeader();
+        mCurrentChapterIndex = ChapterInfo.findIndexByPosition(mChapters, getCurrentPositionMs());
         mAdapter.setChapters(mChapters);
         if (mCurrentChapterIndex >= 0) {
             mAdapter.updateCurrentIndex(mCurrentChapterIndex);
@@ -170,6 +235,38 @@ public class ChapterPanelSlot extends BasePanelSlot {
                 mRvChapterList.scrollToPosition(mCurrentChapterIndex);
             }
         }
+    }
+
+    /**
+     * 更新面板头部的章节数量
+     */
+    private void updateChapterCountHeader() {
+        if (mTvChapterCount == null || mChapters == null) return;
+        Context context = getContext();
+        if (context == null) return;
+        mTvChapterCount.setText(context.getString(R.string.chapter_panel_title_format, mChapters.size()));
+    }
+
+    /**
+     * 从状态存储读取当前播放位置
+     *
+     * @return 当前播放位置（毫秒），不可用时返回 0
+     */
+    private long getCurrentPositionMs() {
+        SlotHost host = getHost();
+        if (host == null) return 0;
+        try {
+            return host.getPlayerStateStore().getCurrentPosition();
+        } catch (IllegalStateException e) {
+            return 0;
+        }
+    }
+
+    private void showChapterPanel() {
+        if (mChapters == null || mChapters.isEmpty()) return;
+
+        // 每次打开都按最新章节数据与实时播放位置重算快照（头部计数、列表数据、高亮索引）
+        renderChapterListSnapshot();
 
         showPanel();
     }

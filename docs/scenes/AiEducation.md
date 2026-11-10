@@ -323,7 +323,7 @@ loader.loadAiAnalysis(vid, response -> {
 });
 ```
 
-> 💡 章节数据由 `AiContentAssembler.buildChapters()` 从 DTO 组装后传入 `AliPlayerModel`，且仅非空时下发；视频摘要和章节分段等 AI 内容无法承载在 `AliPlayerModel` 上，需由场景层调用 `ChapterContentPanelSlot.updateAiContent()` 传入。
+> 💡 章节数据不再必须在配置期一次性下发：推荐先起播、待 `AiContentAssembler.buildChapters()` 组装好章节后，通过 `AliPlayerController.setChapters()` 写入章节数据通道（详见 [8.4 章节数据异步更新](#84-章节数据异步更新懒加载)）。视频摘要和章节分段等 AI 内容无法承载在章节数据通道上，仍需由场景层调用 `ChapterContentPanelSlot.updateAiContent()` 传入。
 
 ### **8.2 自定义 UI**
 
@@ -337,8 +337,8 @@ loader.loadAiAnalysis(vid, response -> {
 
 1. 初始化 `AliPlayerController`
 2. 注册 `ChapterButtonSlot` + `ChapterContentPanelSlot`（注册时保存实例引用）
-3. 加载 PlayAuth 和 AI 内容
-4. 配置播放器并挂载，挂载后把 AI 内容传给面板插槽
+3. 加载 PlayAuth，就绪后立即配置播放器并挂载（先起播，不携带章节）
+4. 加载 AI 内容，返回后写入章节数据通道，并把 AI 内容传给面板插槽
 
 **示例骨架**：
 
@@ -363,22 +363,21 @@ public class MyActivity extends AppCompatActivity {
         });
     }
 
-    private void configurePlayer(@NonNull String vid, @NonNull String playAuth,
-                                 @Nullable AiAnalysisResponse response) {
-        // 消费侧显式调用 Assembler 构建章节列表
-        List<ChapterInfo> chapters = response != null ? AiContentAssembler.buildChapters(response) : null;
-        boolean hasChapters = chapters != null && !chapters.isEmpty();
-
-        AliPlayerModel.Builder builder = new AliPlayerModel.Builder()
+    private void configurePlayer(@NonNull String vid, @NonNull String playAuth) {
+        // 先起播：不携带章节数据，不被 AI 接口耗时阻塞
+        AliPlayerModel playerModel = new AliPlayerModel.Builder()
                 .videoSource(VideoSourceFactory.createVidAuthSource(vid, playAuth))
-                .sceneType(SceneType.AI_VOD);
-        if (hasChapters) {
-            builder.chapters(chapters);
-        }
-        AliPlayerModel playerModel = builder.build();
+                .sceneType(SceneType.AI_VOD)
+                .build();
 
         playerController.configure(playerModel);
         playerView.attach(playerController);
+    }
+
+    private void applyAiContent(@Nullable AiAnalysisResponse response) {
+        // 从 DTO 组装章节，运行期写入章节数据通道（空列表等同于无章节）
+        List<ChapterInfo> chapters = response != null ? AiContentAssembler.buildChapters(response) : null;
+        playerController.setChapters(chapters);
 
         // attach 后显式把 AI DTO 传给面板插槽
         if (mChapterContentPanelSlot != null) {
@@ -393,6 +392,28 @@ public class MyActivity extends AppCompatActivity {
     }
 }
 ```
+
+### **8.4 章节数据异步更新（懒加载）**
+
+章节数据是通用能力，不绑定具体场景。除了在 `AliPlayerModel.Builder.chapters()` 中随配置下发，还支持在 `configure()` 完成后写入：
+
+```java
+// configure() 完成后（起播前或播放中）拿到章节后直接写入，无需重新 configure
+playerController.setChapters(chapters);
+```
+
+| 数据来源 | 时机 | 说明 |
+| ---------- | ---- | ---- |
+| 配置携带 | `configure()` | 作为通道初始值，原有接入方式不变 |
+| 运行期写入 | `configure()` 之后 | 一次写入立即生效，后写覆盖先写；传 null/空列表等同于清空章节；播放器未就绪时忽略本次写入并告警 |
+
+一次写入，以下入口全部同步生效：进度条章节标记点（横竖屏）、横屏「第 N 章 · 标题」与「下一章」、竖屏章节胶囊列表、横屏章节侧滑面板。
+
+章节数据为空时上述入口全部不渲染（进度条无标记点、横屏信息行回退为时间显示、竖屏无胶囊行、面板入口不存在），因此「先起播、后补章节」是安全路径。
+
+场景与权限边界保持不变：`RESTRICTED` 场景展示但拦截跳转（交互层不发起 + 命令层兜底），`LIVE` / `MINIMAL` 场景不展示。
+
+> **已知边界**：章节侧滑面板为「打开时快照」，打开期间的数据变化不实时刷新，重新打开才是最新；章节数据需按起始时间升序、区间连续不重叠。
 
 ---
 

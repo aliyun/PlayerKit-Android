@@ -1,5 +1,27 @@
 # Changelog
 
+## [Unreleased]
+
+### 新增
+
+- **章节数据动态更新（懒加载）**：章节数据不再只能随播放器配置一次性传入，业务方在 `configure()` 完成后调用 `AliPlayerController.setChapters()` 写入即可生效，无需重建播放器或重新配置（初始章节仍通过 `AliPlayerModel.Builder.chapters()` 传入；播放器未就绪时忽略本次写入并告警）
+  - 两条数据来源写同一份数据：`AliPlayerModel.Builder.chapters()` 作为配置期初始值，运行期写入后写覆盖先写
+  - 一次写入联动全部章节入口：进度条章节标记点（横竖屏）、横屏「第 N 章 · 标题」与「下一章」、竖屏章节胶囊列表、横屏章节侧滑面板
+  - 章节数据为空时上述入口全部不渲染，界面等同于普通播放器，支持「先起播、后补章节」
+  - 章节数据随播放器销毁释放，重新配置时以新配置值重置，避免上一部影片章节残留
+  - 竖屏章节列表在章节数据整体替换时自动定位到当前章节；当前位置无章节归属时回到列表开头
+  - 场景边界不变：`RESTRICTED` 展示但拦截跳转，`LIVE` / `MINIMAL` 不展示
+- 新增接口：`AliPlayerController.setChapters()` / `getChapters()`、`IPlayerStateStore.getChapters()`、`PlayerEvents.ChapterListUpdated` 事件
+
+### 变更
+
+- **AI 教育场景改为先起播后补章节**：PlayAuth 就绪即配置播放器并起播，AI 内容返回后通过 `setChapters()` 写入章节，不再被 AI 接口耗时阻塞
+
+### 文档
+
+- [API 参考](./ApiReference.md) 补充章节数据通道与 `ChapterListUpdated` 事件说明
+- [AI 教育场景](./scenes/AiEducation.md) 新增「章节数据异步更新（懒加载）」章节
+
 ## [7.16.0] - 2026-08-26
 
 ### SDK 升级

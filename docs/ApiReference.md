@@ -113,6 +113,13 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `getPlayer()` | - | IMediaPlayer | 获取播放器实例 |
 | `destroy()` | - | void | 销毁播放器并释放所有资源，应在 `onDestroy()` 中调用 |
 
+**章节数据（运行期动态更新）**
+
+| 方法 | 参数 | 返回值 | 说明 |
+|-----|------|-------|------|
+| `setChapters(List<ChapterInfo>)` | chapters: 章节列表（可为 null） | void | 在 `configure()` 之后写入章节数据通道即生效，无需重新 `configure()`；初始章节请通过 `AliPlayerModel.Builder.chapters()` 传入；整体替换，后写覆盖先写；传 null/空列表等同于清空章节；播放器未就绪时忽略本次写入并告警 |
+| `getChapters()` | - | List\<ChapterInfo\> | 获取当前章节数据（不可变，无章节时为空列表） |
+
 **状态管理**
 
 | 方法 | 参数 | 返回值 | 说明 |
@@ -150,7 +157,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `coverUrl(String)` | 封面图 URL | 设置封面图地址（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
 | `videoTitle(String)` | 视频标题 | 设置视频标题（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
 | `thumbnailUrl(String)` | 缩略图 URL | 设置 Seek 缩略图地址（可选）。VID 播放时若未设置，将自动从 MediaInfo 获取 |
-| `chapters(List<ChapterInfo>)` | 章节列表 | 设置视频章节数据（可选），用于视频拆条能力（非 `LIVE`/`MINIMAL` 场景且数据非空时生效） |
+| `chapters(List<ChapterInfo>)` | 章节列表 | 设置章节数据（可选，**配置期初始值**）。播放中可通过 `AliPlayerController.setChapters()` 动态更新；非 `LIVE`/`MINIMAL` 场景且数据非空时生效 |
 | `autoPlay(boolean)` | 是否自动播放 | 设置是否自动播放 |
 | `traceId(String)` | 跟踪 ID | 设置跟踪标识 |
 | `startTime(long)` | 起播位置 | 设置起播位置（毫秒） |
@@ -168,7 +175,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `getCoverUrl()` | String | 获取封面图地址 |
 | `getVideoTitle()` | String | 获取视频标题 |
 | `getThumbnailUrl()` | String | 获取 Seek 缩略图地址 |
-| `getChapters()` | List\<ChapterInfo\> | 获取视频章节列表（不可变列表，未设置时返回 null） |
+| `getChapters()` | List\<ChapterInfo\> | 获取配置期写入的章节列表（不可变，未设置时返回 null）；运行期最新章节请用 `AliPlayerController.getChapters()` |
 | `isAutoPlay()` | boolean | 获取是否自动播放 |
 | `getTraceId()` | String | 获取跟踪 ID |
 | `getStartTime()` | long | 获取起播位置 |
@@ -177,7 +184,9 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 
 ### **1.5 ChapterInfo（章节信息）**
 
-`ChapterInfo` 描述单个视频章节（视频拆条）的时间区间与展示信息，通过 `AliPlayerModel.Builder.chapters()` 传入。
+`ChapterInfo` 描述单个视频章节（视频拆条）的时间区间与展示信息，配置期通过 `AliPlayerModel.Builder.chapters()` 传入，运行期通过 `AliPlayerController.setChapters()` 写入。
+
+> **数据前提**：章节需按起始时间升序、区间连续不重叠。这是章节模型的既有约束，不满足时「当前章节」的判定会不准。
 
 **构造方法**
 
@@ -442,6 +451,12 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `getTrackQualityList()` | List<TrackQuality> | 获取清晰度列表 |
 | `getCurrentTrackIndex()` | int | 获取当前清晰度索引 |
 
+**章节**
+
+| 方法 | 返回值 | 说明 |
+|-----|-------|------|
+| `getChapters()` | List<ChapterInfo> | 获取章节数据通道当前值（不可变，无章节时为空列表） |
+
 ### **5.2 PlayerState（播放状态）**
 
 播放器状态流转图如下：
@@ -574,6 +589,7 @@ PlayerEventBus.getInstance().post(new PlayerCommand.SetSpeed(playerId, 1.5f));
 | `PlayerEvents.SetMirrorTypeCompleted` | mirrorType | 设置镜像完成 |
 | `PlayerEvents.SetRotationCompleted` | rotation | 设置旋转完成 |
 | `PlayerEvents.TrackQualityListUpdated` | trackQualityList | 清晰度列表更新 |
+| `PlayerEvents.ChapterListUpdated` | chapters | 章节数据通道变更（配置期初始化、运行期写入、清空均触发） |
 | `PlayerEvents.TrackSelected` | trackIndex | 清晰度选择完成 |
 | `PlayerEvents.CoverUrlReady` | coverUrl | VID 播放时从 MediaInfo 自动提取的封面图 URL 就绪 |
 | `PlayerEvents.VideoTitleReady` | title | VID 播放时从 MediaInfo 自动提取的视频标题就绪 |

@@ -2,6 +2,28 @@
 
 Language: [中文简体](CHANGELOG.md) | English
 
+## [Unreleased]
+
+### Added
+
+- **Dynamic chapter data updates (lazy loading)**: Chapter data is no longer limited to a single delivery at configure time. Applications can call `AliPlayerController.setChapters()` once `configure()` has completed, without rebuilding the player or re-configuring it (initial chapters are still passed via `AliPlayerModel.Builder.chapters()`; writes are ignored with a warning while the player is not ready).
+  - Both data sources write to the same data: `AliPlayerModel.Builder.chapters()` provides the initial value at configure time, while runtime writes take effect immediately and later writes override earlier ones
+  - A single write updates every chapter entry point: progress bar chapter markers (portrait and landscape), the landscape "Chapter N · Title" row with the "Next" entry, the portrait chapter chip list, and the landscape chapter side panel
+  - When the chapter data is empty, all of these entry points are hidden and the UI behaves like a normal player, making "start playback first, add chapters later" a safe path
+  - Chapter data is released together with the player and reset to the new configuration value on re-configure, so chapters from the previous video never leak
+  - The portrait chapter list automatically scrolls to the current chapter when the whole data set is replaced, and returns to the beginning when the current position belongs to no chapter
+  - Scene boundaries are unchanged: `RESTRICTED` displays chapters but blocks seeking, while `LIVE` / `MINIMAL` do not display them
+- New APIs: `AliPlayerController.setChapters()` / `getChapters()`, `IPlayerStateStore.getChapters()`, and the `PlayerEvents.ChapterListUpdated` event
+
+### Changed
+
+- **AI Education scene now starts playback before loading chapters**: The player is configured and started as soon as the PlayAuth is available; chapters are written via `setChapters()` after the AI content returns, so playback is no longer blocked by the AI request
+
+### Documentation
+
+- [API Reference](./ApiReference-EN.md) now documents the chapter data channel and the `ChapterListUpdated` event
+- [AI Education Scene](./scenes/AiEducation-EN.md) now documents lazy chapter data updates
+
 ## [7.16.0] - 2026-08-26
 
 ### SDK Upgrade

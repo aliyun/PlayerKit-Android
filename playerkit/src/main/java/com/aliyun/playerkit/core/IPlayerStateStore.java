@@ -3,6 +3,7 @@ package com.aliyun.playerkit.core;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.data.TrackQuality;
 import com.aliyun.playerkit.data.VideoSize;
@@ -125,6 +126,26 @@ public interface IPlayerStateStore {
      * @return 当前选中的媒体轨道索引，如果没有选中则返回 -1
      */
     int getCurrentTrackIndex();
+
+    /**
+     * 获取章节列表
+     * <p>
+     * 章节数据通道的只读入口。配置期以 {@code AliPlayerModel.chapters} 初始化，
+     * 运行期由 {@code AliPlayerController.setChapters()} 一次性写入，后写覆盖先写。
+     * 无章节时返回空列表，永不返回 null，业务可直接遍历。
+     * </p>
+     * <p>
+     * Get Chapter List
+     * <p>
+     * Read-only entry of the chapter data channel. Initialized from {@code AliPlayerModel.chapters}
+     * during configuration, and replaced at runtime via {@code AliPlayerController.setChapters()}.
+     * Returns an empty list (never null) when there are no chapters.
+     * </p>
+     *
+     * @return 章节列表（不可变，未设置时为空列表）
+     */
+    @NonNull
+    List<ChapterInfo> getChapters();
 
     /**
      * 获取是否处于全屏状态

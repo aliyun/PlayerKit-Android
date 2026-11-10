@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.aliyun.playerkit.AliPlayerModel;
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.player.IMediaPlayer;
+
+import java.util.List;
 
 /**
  * AliPlayerKit 播放控制器接口
@@ -56,6 +59,45 @@ public interface IPlayerController {
      */
     @NonNull
     IPlayerStateStore getStateStore();
+
+    /**
+     * 写入章节数据（运行期动态更新）
+     * <p>
+     * 章节数据不再只能随 {@link #configure(AliPlayerModel)} 一次性传入：
+     * 业务方在配置完成后拿到数据写入即可生效，无需重新 configure、无需重建播放器。
+     * 初始章节请通过 {@link AliPlayerModel.Builder#chapters(List)} 传入。
+     * 写入后进度条章节标记、横屏章节信息行与「下一章」、竖屏章节胶囊、
+     * 章节侧滑面板等入口会同步刷新；传入 null 或空列表表示清除章节，UI 随之降级。
+     * 播放器未就绪（configure 之前或 destroy 之后）时忽略本次写入并输出警告日志。
+     * </p>
+     * <p>
+     * 数据前提：章节需按起始时间升序且区间连续不重叠，这是章节模型的既有约束。
+     * 写入是整体替换，后写覆盖先写。
+     * </p>
+     * <p>
+     * Set Chapter Data at Runtime
+     * <p>
+     * Chapter data is no longer restricted to {@link #configure(AliPlayerModel)}: business code
+     * can write it after configuration without re-configuring or recreating the player. Initial
+     * chapters should be passed via {@link AliPlayerModel.Builder#chapters(List)}. All chapter UI
+     * refreshes accordingly. Passing null or an empty list clears the chapters. Writes are ignored
+     * with a warning log while the player is not ready (before configure or after destroy).
+     * </p>
+     *
+     * @param chapters 章节列表，可为 null（等同于清空章节）
+     */
+    void setChapters(@Nullable List<ChapterInfo> chapters);
+
+    /**
+     * 获取当前章节数据
+     * <p>
+     * 与配置期写入、运行期 {@link #setChapters(List)} 写入的是同一份数据。
+     * </p>
+     *
+     * @return 章节列表（不可变，无章节时为空列表，永不返回 null）
+     */
+    @NonNull
+    List<ChapterInfo> getChapters();
 
     /**
      * 释放资源

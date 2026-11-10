@@ -323,7 +323,7 @@ loader.loadAiAnalysis(vid, response -> {
 });
 ```
 
-> 💡 Chapter data is assembled from the DTO by `AiContentAssembler.buildChapters()` and passed to `AliPlayerModel` only when non-empty; AI content such as the video summary and chapter segments cannot be carried on `AliPlayerModel`, so the scene layer must pass it in via `ChapterContentPanelSlot.updateAiContent()`.
+> 💡 Chapter data no longer has to be delivered at configure time: the recommended flow is to start playback first, then write the assembled chapters via `AliPlayerController.setChapters()` once `AiContentAssembler.buildChapters()` returns (see [8.4 Lazy Chapter Data Updates](#84-lazy-chapter-data-updates)). AI content such as the video summary and chapter segments cannot be carried by the chapter data channel, so the scene layer must still pass it in via `ChapterContentPanelSlot.updateAiContent()`.
 
 ### **8.2 Customize UI**
 
@@ -337,8 +337,8 @@ If you don't want to use the built-in `AiEducationActivity`, you can refer to it
 
 1. Initialize `AliPlayerController`
 2. Register `ChapterButtonSlot` + `ChapterContentPanelSlot` (keep instance references when registering)
-3. Load the PlayAuth and the AI content
-4. Configure and attach the player, then pass the AI content into the panel slot
+3. Load the PlayAuth, then configure and attach the player immediately (start playback first, without chapters)
+4. Load the AI content, write the chapters into the chapter data channel and pass the AI content to the panel slot
 
 **Example Skeleton**:
 
@@ -363,22 +363,22 @@ public class MyActivity extends AppCompatActivity {
         });
     }
 
-    private void configurePlayer(@NonNull String vid, @NonNull String playAuth,
-                                 @Nullable AiAnalysisResponse response) {
-        // Consumer explicitly calls Assembler to build chapters
-        List<ChapterInfo> chapters = response != null ? AiContentAssembler.buildChapters(response) : null;
-        boolean hasChapters = chapters != null && !chapters.isEmpty();
-
-        AliPlayerModel.Builder builder = new AliPlayerModel.Builder()
+    private void configurePlayer(@NonNull String vid, @NonNull String playAuth) {
+        // Start playback first: no chapter data, so the AI request latency never blocks playback
+        AliPlayerModel playerModel = new AliPlayerModel.Builder()
                 .videoSource(VideoSourceFactory.createVidAuthSource(vid, playAuth))
-                .sceneType(SceneType.AI_VOD);
-        if (hasChapters) {
-            builder.chapters(chapters);
-        }
-        AliPlayerModel playerModel = builder.build();
+                .sceneType(SceneType.AI_VOD)
+                .build();
 
         playerController.configure(playerModel);
         playerView.attach(playerController);
+    }
+
+    private void applyAiContent(@Nullable AiAnalysisResponse response) {
+        // Assemble chapters from the DTO and write them into the chapter data channel at runtime
+        // (an empty list is equivalent to no chapters)
+        List<ChapterInfo> chapters = response != null ? AiContentAssembler.buildChapters(response) : null;
+        playerController.setChapters(chapters);
 
         // After attach, explicitly pass the AI DTO into the panel slot
         if (mChapterContentPanelSlot != null) {
@@ -393,6 +393,28 @@ public class MyActivity extends AppCompatActivity {
     }
 }
 ```
+
+### **8.4 Lazy Chapter Data Updates**
+
+Chapter data is a generic capability and is not bound to a specific scene. Besides delivering it with the configuration via `AliPlayerModel.Builder.chapters()`, it can also be written once `configure()` has completed:
+
+```java
+// Write chapters after configure() (before playback starts or while playing); no re-configure needed
+playerController.setChapters(chapters);
+```
+
+| Data source | Timing | Description |
+| ---------- | ---- | ---- |
+| Configuration | `configure()` | Used as the initial channel value; the existing integration path is unchanged |
+| Runtime write | After `configure()` | Takes effect immediately; later writes override earlier ones; `null` or an empty list clears the chapters; ignored with a warning while the player is not ready |
+
+A single write updates every chapter entry point at once: progress bar chapter markers (portrait and landscape), the landscape "Chapter N · Title" row with the "Next" entry, the portrait chapter chip list, and the landscape chapter side panel.
+
+When the chapter data is empty, all of the above entry points simply do not render (no markers on the progress bar, the landscape info row falls back to the time display, no portrait chip row, no panel entry), which makes "start playback first, add chapters later" a safe path.
+
+Scene and permission boundaries stay the same: `RESTRICTED` displays chapters but blocks seeking (blocked both at the interaction layer and as a fallback at the command layer), while `LIVE` / `MINIMAL` do not display them at all.
+
+> **Known limitations**: the chapter side panel is a snapshot taken when it is opened, so data changes made while it is open are not refreshed in real time; chapters must be sorted by start time in ascending order with contiguous, non-overlapping ranges.
 
 ---
 

@@ -11,11 +11,13 @@ import androidx.annotation.Nullable;
 import com.aliyun.player.videoview.AliDisplayView;
 import com.aliyun.playerkit.AliPlayerModel;
 import com.aliyun.playerkit.core.IPlayerStateStore;
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.data.TrackQuality;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
 
 /**
  * 媒体播放器接口
@@ -355,6 +357,25 @@ public interface IMediaPlayer {
      *             true to enable loop playback, false to disable
      */
     void setLoop(boolean loop);
+
+    /**
+     * 写入章节数据
+     * <p>
+     * 章节数据不属于底层播放器的能力，而是随播放实例维护的 UI 数据通道：
+     * 写入后由状态存储保存并发布变更事件，供章节相关插槽刷新 UI。
+     * 实现方应保证写入为整体替换（后写覆盖先写），传入 null 或空列表表示清除章节。
+     * </p>
+     * <p>
+     * Set Chapter Data
+     * <p>
+     * Chapter data is a UI data channel maintained together with the player instance rather than
+     * a capability of the underlying player. Implementations should replace the whole list on each
+     * write, and treat null or an empty list as clearing the chapters.
+     * </p>
+     *
+     * @param chapters 章节列表，可为 null（等同于清空章节）
+     */
+    void setChapters(@Nullable List<ChapterInfo> chapters);
 
     /**
      * 设置静音

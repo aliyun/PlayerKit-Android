@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.aliyun.playerkit.core.IPlayerStateStore;
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.data.TrackQuality;
 import com.aliyun.playerkit.data.VideoSize;
@@ -14,6 +15,7 @@ import com.aliyun.playerkit.player.IMediaPlayer;
 import com.aliyun.playerkit.utils.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -109,6 +111,17 @@ public class PlayerStateStore implements IPlayerStateStore {
      * 是否处于全屏状态
      */
     private boolean isFullscreen = false;
+
+    /**
+     * 章节数据通道
+     * <p>
+     * 章节数据的唯一存储：配置期以 {@code AliPlayerModel.chapters} 初始化，
+     * 运行期由 {@code updateChapters()} 整体替换（后写覆盖先写）。
+     * 空列表表示无章节；不可变，可跨线程读取。
+     * </p>
+     */
+    @NonNull
+    private volatile List<ChapterInfo> chapters = Collections.emptyList();
 
     // ==================== 状态获取 ====================
 
@@ -272,6 +285,20 @@ public class PlayerStateStore implements IPlayerStateStore {
     @Override
     public boolean isFullscreen() {
         return isFullscreen;
+    }
+
+    /**
+     * 获取章节列表
+     * <p>
+     * Get Chapter List
+     * </p>
+     *
+     * @return 章节列表（不可变，无章节时为空列表）
+     */
+    @NonNull
+    @Override
+    public List<ChapterInfo> getChapters() {
+        return chapters;
     }
 
 
@@ -495,6 +522,39 @@ public class PlayerStateStore implements IPlayerStateStore {
         this.isFullscreen = fullscreen;
     }
 
+    /**
+     * 更新章节列表
+     * <p>
+     * 整体替换章节数据通道并发布 {@link PlayerEvents.ChapterListUpdated} 事件，
+     * 传入 null 或空列表表示清除章节（UI 据此自然降级）。
+     * </p>
+     * <p>
+     * Update Chapter List
+     * <p>
+     * Replaces the chapter data channel and publishes {@link PlayerEvents.ChapterListUpdated}.
+     * Passing null or an empty list clears the chapters, so that UI degrades naturally.
+     * </p>
+     *
+     * @param chapters 章节列表，可为 null（等同于空列表）
+     */
+    public void updateChapters(@Nullable List<ChapterInfo> chapters) {
+        List<ChapterInfo> copy = (chapters == null || chapters.isEmpty())
+                ? Collections.emptyList()
+                : Collections.unmodifiableList(new ArrayList<>(chapters));
+
+        if (this.chapters == copy) {
+            return;
+        }
+        this.chapters = copy;
+
+        LogHub.i(TAG, "updateChapters", "size=" + copy.size(), playerId);
+
+        // 发布事件：UI 侧据此刷新章节相关入口
+        if (StringUtil.isNotEmpty(playerId)) {
+            PlayerEventBus.getInstance().post(new PlayerEvents.ChapterListUpdated(playerId, copy));
+        }
+    }
+
     // ==================== 事件发布 ====================
 
     /**
@@ -560,5 +620,6 @@ public class PlayerStateStore implements IPlayerStateStore {
         trackQualityList = new ArrayList<>();
         currentTrackIndex = -1;
         isFullscreen = false;
+        chapters = Collections.emptyList();
     }
 }

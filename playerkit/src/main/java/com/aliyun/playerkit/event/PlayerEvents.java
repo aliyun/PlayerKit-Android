@@ -4,6 +4,7 @@ import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.data.TrackQuality;
 import com.aliyun.playerkit.player.IMediaPlayer;
@@ -513,6 +514,49 @@ public final class PlayerEvents {
         @Override
         public String toString() {
             return "TrackQualityListUpdated{" + "trackQualityList=" + trackQualityList + ", playerId='" + playerId + '\'' + '}';
+        }
+    }
+
+    /**
+     * 章节列表更新事件
+     * <p>
+     * 当章节数据通道被写入时触发：配置期由 {@code configure()} 写入初始值，
+     * 运行期由 {@code setChapters()} 写入新值，后写覆盖先写。
+     * 章节数据为空（无章节 / 换片未下发）时同样会触发，用于驱动 UI 自然降级。
+     * </p>
+     * <p>
+     * Chapter List Updated Event
+     * <p>
+     * Triggered when the chapter data channel is written. The configured value is written
+     * during {@code configure()}, and runtime values are written by {@code setChapters()};
+     * the later write wins. An empty chapter list also triggers this event so that UI can
+     * degrade naturally.
+     * </p>
+     */
+    public static final class ChapterListUpdated extends PlayerEvent {
+        /**
+         * 章节列表（不可变，无章节时为空列表）
+         * <p>
+         * Chapter List, immutable and empty when there are no chapters
+         */
+        @NonNull
+        public final List<ChapterInfo> chapters;
+
+        /**
+         * 章节列表更新事件
+         *
+         * @param playerId 播放器ID
+         * @param chapters 章节列表，不能为 null（无章节时传空列表）
+         */
+        public ChapterListUpdated(@NonNull String playerId, @NonNull List<ChapterInfo> chapters) {
+            super(playerId);
+            this.chapters = chapters;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "ChapterListUpdated{" + "size=" + chapters.size() + ", playerId='" + playerId + '\'' + '}';
         }
     }
 

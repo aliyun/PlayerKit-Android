@@ -13,6 +13,7 @@ import com.aliyun.player.videoview.AliDisplayView;
 import com.aliyun.playerkit.core.IPlayerController;
 import com.aliyun.playerkit.core.IPlayerStateStore;
 import com.aliyun.playerkit.config.OnPlayerConfigCallback;
+import com.aliyun.playerkit.data.ChapterInfo;
 import com.aliyun.playerkit.data.PlayerState;
 import com.aliyun.playerkit.data.SceneType;
 import com.aliyun.playerkit.data.TrackQuality;
@@ -29,6 +30,9 @@ import com.aliyun.playerkit.strategy.StrategyRegistry;
 import com.aliyun.playerkit.strategy.StrategyContext;
 import com.aliyun.playerkit.strategy.StrategyManager;
 import com.aliyun.playerkit.utils.StringUtil;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * AliPlayerKit 播放控制器
@@ -248,10 +252,13 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
             strategyManager.updateContext(strategyContext);
         }
 
-        // 5. 配置视频源
+        // 5. 初始化章节数据通道：以配置值为初始值（null 时写入空列表，清除上一部影片的章节）
+        player.setChapters(model.getChapters());
+
+        // 6. 配置视频源
         player.setDataSource(model);
 
-        // 6. 调用用户自定义播放器配置回调（prepare 前）
+        // 7. 调用用户自定义播放器配置回调（prepare 前）
         OnPlayerConfigCallback onPlayerConfig = model.getOnPlayerConfig();
         if (onPlayerConfig != null) {
             onPlayerConfig.onPlayerConfig(player);
@@ -298,6 +305,9 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
         // 释放播放器资源
         if (player != null) {
             try {
+                // 清空章节数据通道，避免池化（软回收）实例被下一部影片复用时残留旧章节
+                player.setChapters(null);
+
                 // 回收播放器实例
                 String uniqueId = (model != null) ? buildUniqueId(model) : "unknown";
                 lifecycleStrategy.recycle(player, uniqueId, false);
@@ -372,6 +382,46 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
             throw new IllegalStateException("Player not ready, cannot get state store");
         }
         return player.getStateStore();
+    }
+
+    /**
+     * 写入章节数据（运行期动态更新）
+     * <p>
+     * 章节数据不再只能随 {@link #configure(AliPlayerModel)} 一次性传入，业务方在配置完成后
+     * 拿到数据写入即可生效；写入是整体替换，后写覆盖先写。
+     * </p>
+     * <p>
+     * 初始章节请通过 {@link AliPlayerModel.Builder#chapters(List)} 传入，本方法用于配置完成后的
+     * 运行期更新。播放器未就绪（{@code configure()} 之前或 {@code destroy()} 之后）时忽略本次
+     * 写入并输出警告日志：章节数据通常来自异步回调，写入晚于播放器生命周期属预期情况。
+     * </p>
+     *
+     * @param chapters 章节列表，可为 null（等同于清空章节）
+     */
+    @Override
+    public void setChapters(@Nullable List<ChapterInfo> chapters) {
+        if (!isPlayerReady()) {
+            // 与 setDisplayView() / setSurface() / 命令处理保持一致：未就绪时告警并忽略，
+            // 不向调用方抛异常，避免异步投递的写入在 destroy 之后引发崩溃
+            LogHub.w(TAG, "Player not ready, ignore chapters, size="
+                    + (chapters != null ? chapters.size() : 0));
+            return;
+        }
+        player.setChapters(chapters);
+    }
+
+    /**
+     * 获取当前章节数据
+     *
+     * @return 章节列表（不可变，无章节时为空列表）
+     */
+    @NonNull
+    @Override
+    public List<ChapterInfo> getChapters() {
+        if (!isPlayerReady()) {
+            return Collections.emptyList();
+        }
+        return player.getStateStore().getChapters();
     }
 
     /**

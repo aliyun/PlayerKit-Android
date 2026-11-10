@@ -113,6 +113,13 @@ AliPlayerKit provides a rich set of API interfaces to enable developers to direc
 | `getPlayer()` | - | IMediaPlayer | Get player instance |
 | `destroy()` | - | void | Destroy player and release all resources, should be called in `onDestroy()` |
 
+**Chapter Data (Runtime Update)**
+
+| Method | Parameters | Return | Description |
+|-----|------|-------|------|
+| `setChapters(List<ChapterInfo>)` | chapters: chapter list (nullable) | void | Write to the chapter data channel after `configure()` without re-`configure()`; pass initial chapters via `AliPlayerModel.Builder.chapters()`. The whole list is replaced, later writes win, and null/empty clears the chapters; writes are ignored with a warning while the player is not ready |
+| `getChapters()` | - | List\<ChapterInfo\> | Get the current chapter data (immutable, empty list when no chapters) |
+
 **State Management**
 
 | Method | Parameters | Return | Description |
@@ -150,7 +157,7 @@ AliPlayerKit provides a rich set of API interfaces to enable developers to direc
 | `coverUrl(String)` | Cover image URL | Set cover image URL (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
 | `videoTitle(String)` | Video title | Set video title (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
 | `thumbnailUrl(String)` | Thumbnail URL | Set the seek thumbnail URL (optional). Auto-retrieved from MediaInfo when using VID playback if not set |
-| `chapters(List<ChapterInfo>)` | Chapter list | Set video chapter data (optional), used by the video chaptering capability (effective in scenes other than `LIVE`/`MINIMAL` when data is non-empty) |
+| `chapters(List<ChapterInfo>)` | Chapter list | Set chapter data (optional, **initial value at configuration time**). Can be updated during playback via `AliPlayerController.setChapters()`; effective in scenes other than `LIVE`/`MINIMAL` when data is non-empty |
 | `autoPlay(boolean)` | Whether to auto play | Set whether to auto play |
 | `traceId(String)` | Trace ID | Set the trace identifier |
 | `startTime(long)` | Start position | Set the start position (milliseconds) |
@@ -168,7 +175,7 @@ AliPlayerKit provides a rich set of API interfaces to enable developers to direc
 | `getCoverUrl()` | String | Get the cover image address |
 | `getVideoTitle()` | String | Get the video title |
 | `getThumbnailUrl()` | String | Get the seek thumbnail address |
-| `getChapters()` | List\<ChapterInfo\> | Get the video chapter list (immutable list, returns null when not set) |
+| `getChapters()` | List\<ChapterInfo\> | Get the chapter list provided at configuration time (immutable, null when not set); use `AliPlayerController.getChapters()` for the latest chapters at runtime |
 | `isAutoPlay()` | boolean | Get whether auto play is enabled |
 | `getTraceId()` | String | Get the trace ID |
 | `getStartTime()` | long | Get the start position |
@@ -177,7 +184,9 @@ AliPlayerKit provides a rich set of API interfaces to enable developers to direc
 
 ### **1.5 ChapterInfo**
 
-`ChapterInfo` describes the time range and display information of a single video chapter (video chaptering). Pass chapters in through `AliPlayerModel.Builder.chapters()`.
+`ChapterInfo` describes the time range and display information of a single video chapter (video chaptering). Chapters are provided at configuration time via `AliPlayerModel.Builder.chapters()` and can be written at runtime via `AliPlayerController.setChapters()`.
+
+> **Data prerequisite**: chapters must be sorted by start time with continuous, non-overlapping ranges. This is an existing constraint of the chapter model; otherwise the "current chapter" may be determined incorrectly.
 
 **Constructors**
 
@@ -442,6 +451,12 @@ For details, see [Slot System](./advanced/SlotSystem-EN.md).
 | `getTrackQualityList()` | List<TrackQuality> | Get the resolution list |
 | `getCurrentTrackIndex()` | int | Get the current resolution index |
 
+**Chapters**
+
+| Method | Return | Description |
+|-----|-------|------|
+| `getChapters()` | List<ChapterInfo> | Get the current value of the chapter data channel (immutable, empty list when no chapters) |
+
 ### **5.2 PlayerState**
 
 The player state transition diagram is as follows:
@@ -574,6 +589,7 @@ Player state changes are published via events and can be subscribed to for monit
 | `PlayerEvents.SetMirrorTypeCompleted` | mirrorType | Set mirror completed |
 | `PlayerEvents.SetRotationCompleted` | rotation | Set rotation completed |
 | `PlayerEvents.TrackQualityListUpdated` | trackQualityList | Resolution list updated |
+| `PlayerEvents.ChapterListUpdated` | chapters | Chapter data channel changed (fired on configuration init, runtime update and clear) |
 | `PlayerEvents.TrackSelected` | trackIndex | Resolution selection completed |
 | `PlayerEvents.CoverUrlReady` | coverUrl | Cover image URL auto-extracted from MediaInfo is ready (VID playback) |
 | `PlayerEvents.VideoTitleReady` | title | Video title auto-extracted from MediaInfo is ready (VID playback) |

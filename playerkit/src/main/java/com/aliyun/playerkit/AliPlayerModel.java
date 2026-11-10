@@ -140,18 +140,20 @@ public class AliPlayerModel {
     private final OnPlayerConfigCallback onPlayerConfig;
 
     /**
-     * 章节信息列表（可选）
+     * 章节信息列表（可选，配置期初始值）
      * <p>
-     * 仅在 {@link SceneType#AI_VOD} 场景下使用。
-     * 提供后，BottomBarSlot 会自动在进度条上绘制章节标记点，
-     * 并在用户 Seek 时显示当前章节信息。
+     * 配置时写入章节数据通道，作为初始章节数据；播放过程中需要更新章节时，
+     * 无需重新 configure，直接调用 {@code AliPlayerController.setChapters()} 写入即可，
+     * 后写覆盖先写。章节非空且场景非 LIVE/MINIMAL 时，章节相关 UI
+     * （进度条标记点、横屏章节行与「下一章」、竖屏章节胶囊、章节面板）统一生效。
      * </p>
      * <p>
-     * Chapter info list (optional)
+     * Chapter info list (optional, initial value at configuration time)
      * <p>
-     * Only used in {@link SceneType#AI_VOD} scene.
-     * When provided, BottomBarSlot will automatically draw chapter markers on the progress bar
-     * and display chapter info during seek.
+     * Written into the chapter data channel during configuration as the initial value.
+     * To update chapters while playing, call {@code AliPlayerController.setChapters()} directly
+     * without re-configuring; the later write wins. When chapters are not empty and the scene
+     * is not LIVE/MINIMAL, all chapter UI entries take effect.
      * </p>
      */
     @Nullable
@@ -333,7 +335,14 @@ public class AliPlayerModel {
     /**
      * 获取章节信息列表
      * <p>
+     * 返回的是配置期写入的初始值快照；需要运行时最新章节数据时，
+     * 请使用 {@code AliPlayerController.getChapters()} 或状态存储的 {@code getChapters()}。
+     * </p>
+     * <p>
      * Get chapter info list
+     * <p>
+     * Returns the initial value snapshot provided at configuration time. For the latest chapters
+     * at runtime, use {@code AliPlayerController.getChapters()} or the state store's {@code getChapters()}.
      * </p>
      *
      * @return 章节信息列表（不可变），如果未设置则返回 null
@@ -643,18 +652,18 @@ public class AliPlayerModel {
         }
 
         /**
-         * 设置章节信息列表
+         * 设置章节信息列表（配置期初始值）
          * <p>
-         * 仅在 {@link SceneType#AI_VOD} 场景下有效。
-         * 提供后，播放器会自动在进度条上绘制章节标记点，
-         * 并在用户 Seek 时显示当前章节信息。
+         * 章节数据随配置写入数据通道，作为初始值；播放过程中可通过
+         * {@code AliPlayerController.setChapters()} 随时整体替换，无需重新配置。
+         * 数据前提：章节需按起始时间升序且区间连续不重叠。
          * </p>
          * <p>
-         * Set chapter info list
+         * Set chapter info list (initial value at configuration time)
          * <p>
-         * Only effective in {@link SceneType#AI_VOD} scene.
-         * When provided, the player will automatically draw chapter markers on the progress bar
-         * and display chapter info during seek.
+         * Written into the chapter data channel as the initial value. During playback, the list can be
+         * replaced at any time via {@code AliPlayerController.setChapters()} without re-configuring.
+         * Chapters are expected to be sorted by start time, with continuous (non-overlapping) ranges.
          * </p>
          *
          * @param value 章节信息列表，可以为 null

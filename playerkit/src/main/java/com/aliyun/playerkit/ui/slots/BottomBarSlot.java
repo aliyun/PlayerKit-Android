@@ -3,6 +3,7 @@ package com.aliyun.playerkit.ui.slots;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ import com.aliyun.playerkit.utils.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -181,6 +183,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
             PlayerEvents.StateChanged.class,
             PlayerEvents.Prepared.class,
             PlayerEvents.Info.class,
+            PlayerEvents.ChapterListUpdated.class,
             FullscreenEvents.FullScreenChanged.class
     );
 
@@ -357,6 +360,19 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
     }
 
     /**
+     * 横屏控制栏是否正在展示
+     * <p>
+     * 竖屏章节胶囊行与竖屏容器是兄弟节点，进入全屏时由 {@link #onToggleFullscreen(boolean)}
+     * 单独隐藏；运行期刷新章节数据时需要据同一状态维持可见性，避免竖屏 UI 叠加到横屏控制条上。
+     * </p>
+     *
+     * @return 横屏控制栏可见返回 true
+     */
+    private boolean isLandscapeLayoutActive() {
+        return mLandScapeView != null && mLandScapeView.getVisibility() == View.VISIBLE;
+    }
+
+    /**
      * 同步竖屏状态到横屏
      * <p>
      * 首次 inflate 横屏布局后调用，将播放状态、进度条、时间文本同步到横屏视图。
@@ -394,19 +410,9 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
             mChapterMarkerViewLS.setOnMarkerClickListener(mMarkerClickListener);
         }
 
-        // 横屏初始化后，如果章节数据已加载，立即应用标记
-        if (mChapterMarkerViewLS != null && isChapterAvailable() && mDuration > 0) {
-            List<Float> positions = new ArrayList<>();
-            for (ChapterInfo chapter : mChapters) {
-                float pos = (float) chapter.getStartMs() / mDuration;
-                if (pos > 0f && pos < 1f) {
-                    positions.add(pos);
-                }
-            }
-            if (!positions.isEmpty()) {
-                mChapterMarkerViewLS.setMarkerPositions(positions);
-                mChapterMarkerViewLS.setVisibility(View.VISIBLE);
-            }
+        // 横屏初始化后，如果章节数据已加载并已拿到时长，立即应用标记
+        if (isChapterAvailable() && mDuration > 0) {
+            applyChapterMarkers(mDuration);
         }
 
         // 横屏初始化后，如果章节数据已加载，立即绑定到横屏 adapter
@@ -457,44 +463,9 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         // 刷新按钮（可选：直播场景）
         updateReplayButtonVisibility();
 
-        // 章节数据初始化：统一章节能力判断（非 LIVE/MINIMAL 场景且章节数据非空）
+        // 章节数据初始化：统一从章节数据通道取值（配置期由 configure 写入，运行期由 setChapters 写入）
         // 注意：Slot 可能重复绑定数据，切换数据源时需重置旧章节状态，避免残留 UI 或旧索引错位
-        mChapters = model.getChapters();
-        if (isChapterAvailable()) {
-            mLastChapterIndex = -1;
-            if (mTvChapterLS != null) {
-                mTvChapterLS.setText("");
-            }
-            // 换源时先清除上一份数据的标记点，待 onPrepared 后按新视频时长重新应用
-            setViewVisible(false, mChapterMarkerView, mChapterMarkerViewLS);
-
-            // 注意：章节标记需要 duration 信息，延迟到收到 duration 后再应用
-
-            // 初始化章节导航适配器（竖屏）
-            if (mChapterChipAdapter == null) {
-                mChapterChipAdapter = new ChapterChipAdapter();
-                mChapterChipAdapter.setOnChipClickListener(mChipClickListener);
-            }
-            mChapterChipAdapter.setChapters(mChapters);
-            if (mRvChapterChips != null) {
-                mRvChapterChips.setAdapter(mChapterChipAdapter);
-                mRvChapterChips.setVisibility(View.VISIBLE);
-            }
-
-            // 初始化章节导航适配器（横屏）
-            if (mChapterChipAdapterLS == null) {
-                mChapterChipAdapterLS = new ChapterChipAdapter();
-                mChapterChipAdapterLS.setOnChipClickListener(mChipClickListener);
-            }
-            mChapterChipAdapterLS.setChapters(mChapters);
-
-            // 横屏章节按钮
-            setChapterButtonsVisible(true);
-            updateChapterButtonText();
-        } else {
-            mChapters = null;
-            clearChapterState();
-        }
+        applyChapters(readChaptersFromChannel());
 
     }
 
@@ -560,6 +531,8 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
             onPrepared((PlayerEvents.Prepared) event);
         } else if (event instanceof PlayerEvents.Info) {
             onInfo((PlayerEvents.Info) event);
+        } else if (event instanceof PlayerEvents.ChapterListUpdated) {
+            onChaptersUpdated();
         } else if (event instanceof FullscreenEvents.FullScreenChanged) {
             onToggleFullscreen(((FullscreenEvents.FullScreenChanged) event).isFullscreen);
         }
@@ -984,7 +957,7 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      * 当前场景是否允许通过章节控件发起跳转
      * <p>
      * RESTRICTED 防跳播：章节 UI 仅作展示，点击不发起跳转、不更新高亮、不提示已跳转；
-     * 外部/自定义 UI 发起的 Seek 命令由播放控制器统一兑底拦截。
+     * 外部/自定义 UI 发起的 Seek 命令由播放控制器统一兜底拦截。
      * </p>
      * <p>
      * Whether seeking via chapter controls is enabled in the current scene
@@ -1015,6 +988,158 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
         // 横屏章节标题残留文本
         if (mTvChapterLS != null) {
             mTvChapterLS.setText("");
+        }
+    }
+
+    /**
+     * 从章节数据通道读取章节
+     * <p>
+     * Read chapters from the chapter data channel
+     * </p>
+     *
+     * @return 章节列表（无数据时为空列表）
+     */
+    @NonNull
+    private List<ChapterInfo> readChaptersFromChannel() {
+        SlotHost host = getHost();
+        if (host == null) return Collections.emptyList();
+        try {
+            return host.getPlayerStateStore().getChapters();
+        } catch (IllegalStateException e) {
+            // 播放器尚未就绪（如 attach 早期），视为无章节
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * 处理章节数据变更
+     * <p>
+     * 事件总线为同步派发，业务可能在工作线程写入章节，统一切回主线程刷新 UI。
+     * 刷新时重新读取数据通道而非使用事件载荷：排队中的旧载荷可能晚于主线程上的新写入执行，
+     * 覆盖最新的章节数据。
+     * </p>
+     */
+    private void onChaptersUpdated() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            applyChaptersFromChannel();
+        } else {
+            post(this::applyChaptersFromChannel);
+        }
+    }
+
+    /**
+     * 从章节数据通道读取并渲染最新章节
+     */
+    private void applyChaptersFromChannel() {
+        applyChapters(readChaptersFromChannel());
+    }
+
+    /**
+     * 应用章节数据
+     * <p>
+     * 章节数据的唯一渲染入口：配置绑定与运行期写入走同一条路径。
+     * 数据为空时全部章节入口不渲染（进度条无标记点、横屏信息行回退时间显示、
+     * 竖屏无胶囊行、面板入口不存在），界面等同于普通播放器。
+     * </p>
+     * <p>
+     * Apply chapter data, the single rendering entry for both configuration binding
+     * and runtime updates.
+     * </p>
+     *
+     * @param chapters 章节列表，可为 null 或空列表（表示无章节）
+     */
+    private void applyChapters(@Nullable List<ChapterInfo> chapters) {
+        // 数据整体替换：旧索引一并失效，后续按实时播放位置重算
+        mChapters = (chapters == null || chapters.isEmpty()) ? null : chapters;
+        mLastChapterIndex = -1;
+        if (mTvChapterLS != null) {
+            mTvChapterLS.setText("");
+        }
+
+        // 无章节（或 LIVE/MINIMAL 场景）：全部章节入口不渲染
+        if (!isChapterAvailable()) {
+            clearChapterState();
+            return;
+        }
+
+        // 竖屏章节胶囊
+        if (mChapterChipAdapter == null) {
+            mChapterChipAdapter = new ChapterChipAdapter();
+            mChapterChipAdapter.setOnChipClickListener(mChipClickListener);
+        }
+        mChapterChipAdapter.setChapters(mChapters);
+        if (mRvChapterChips != null) {
+            mRvChapterChips.setAdapter(mChapterChipAdapter);
+            // 竖屏胶囊行是竖屏容器的兄弟节点，全屏时需保持隐藏，避免叠加在横屏控制条之上
+            mRvChapterChips.setVisibility(isLandscapeLayoutActive() ? View.GONE : View.VISIBLE);
+        }
+
+        // 横屏章节胶囊
+        if (mChapterChipAdapterLS == null) {
+            mChapterChipAdapterLS = new ChapterChipAdapter();
+            mChapterChipAdapterLS.setOnChipClickListener(mChipClickListener);
+        }
+        mChapterChipAdapterLS.setChapters(mChapters);
+
+        // 横屏章节按钮组
+        setChapterButtonsVisible(true);
+
+        // 进度条标记点需要时长信息：时长未就绪时先清除旧标记，待 Prepared 后再应用
+        if (mDuration > 0) {
+            applyChapterMarkers(mDuration);
+        } else {
+            setViewVisible(false, mChapterMarkerView, mChapterMarkerViewLS);
+        }
+
+        // 按实时播放位置重算当前章节（数据替换后旧索引已失效，必须强制刷新）
+        updateChapterHighlight(getCurrentPositionMs(), true);
+        // 竖屏列表定位：命中时跟随当前章节，无归属时归零
+        scrollChapterChipsToCurrent();
+    }
+
+    /**
+     * 从状态存储读取当前播放位置
+     *
+     * @return 当前播放位置（毫秒），不可用时返回 0
+     */
+    private long getCurrentPositionMs() {
+        SlotHost host = getHost();
+        if (host == null) return 0;
+        try {
+            return host.getPlayerStateStore().getCurrentPosition();
+        } catch (IllegalStateException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * 竖屏章节列表定位
+     * <p>
+     * 跟随当前章节；当前播放位置不属于任何章节时回到列表开头，
+     * 避免章节数据整体替换后残留旧偏移。
+     * </p>
+     * <p>
+     * Scroll the portrait chapter list to the current chapter, or back to the
+     * beginning when the current position does not belong to any chapter.
+     * </p>
+     */
+    private void scrollChapterChipsToCurrent() {
+        int index = mLastChapterIndex;
+        boolean valid = index >= 0 && mChapters != null && index < mChapters.size();
+
+        if (!valid) {
+            // 无归属：清除高亮并归零，避免残留旧偏移
+            if (mChapterChipAdapter != null) {
+                mChapterChipAdapter.updateCurrentIndex(-1);
+            }
+            if (mChapterChipAdapterLS != null) {
+                mChapterChipAdapterLS.updateCurrentIndex(-1);
+            }
+        }
+
+        if (mRvChapterChips != null && mRvChapterChips.getLayoutManager() instanceof LinearLayoutManager) {
+            LinearLayoutManager lm = (LinearLayoutManager) mRvChapterChips.getLayoutManager();
+            lm.scrollToPositionWithOffset(valid ? index : 0, 0);
         }
     }
 
@@ -1063,10 +1188,23 @@ public class BottomBarSlot extends BaseControlBarSlot implements View.OnClickLis
      * @param positionMs 当前播放位置（毫秒）
      */
     private void updateChapterHighlight(long positionMs) {
+        updateChapterHighlight(positionMs, false);
+    }
+
+    /**
+     * 更新章节高亮
+     * <p>
+     * Update the highlighted chapter
+     * </p>
+     *
+     * @param positionMs 当前播放位置（毫秒）
+     * @param force      是否强制刷新（章节数据整体替换后旧索引已失效，必须强制重算）
+     */
+    private void updateChapterHighlight(long positionMs, boolean force) {
         if (!isChapterAvailable()) return;
 
         int index = ChapterInfo.findIndexByPosition(mChapters, positionMs);
-        if (index == mLastChapterIndex) return; // 避免重复更新
+        if (!force && index == mLastChapterIndex) return; // 避免重复更新
         // 播放位置处于章节空隙（未命中任何章节区间）时仅清除展示态，
         // mLastChapterIndex 保留最近的有效章节索引，供「下一章」顺延计算目标
         if (index >= 0) {
