@@ -357,7 +357,7 @@ Long videos are intelligently split into multiple chapter segments based on cont
 | `BottomBarSlot` chapter markers | Visualizes the content structure split points on the progress bar; combined with the chapter chip list, taps seek to the target segment. In landscape, an extra "Chapters" entry and "Next chapter" button are provided |
 | `ChapterPanelSlot` | Slides a structured content navigation panel in from the right in fullscreen; tap to jump to the target segment |
 
-**Availability:** Effective in any scene other than `LIVE`/`MINIMAL` with non-empty chapter data. In the `RESTRICTED` scene the chapter UI is display-only: tapping chapters performs no seek (seek is disabled by the scene).
+**Availability:** Chapter capability is generic and available in every scene except `LIVE`/`MINIMAL`; see [SceneType - Chapter Capability](./advanced/SceneType-EN.md#34-chapter-capability-and-scenes) for details.
 
 **Integration Example**
 

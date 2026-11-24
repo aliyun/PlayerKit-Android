@@ -285,7 +285,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `SlotType.BOTTOM_BAR` | 底部控制栏插槽：显示播放控制、进度条等 |
 | `SlotType.SETTING_MENU` | 设置菜单插槽：用于显示设置菜单（如倍速、清晰度、镜像、旋转等） |
 | `SlotType.OPTION_PANEL` | 选项面板插槽：用于横屏场景下显示倍速/清晰度等选项的独立选择面板 |
-| `SlotType.CHAPTER_PANEL` | 章节面板插槽：全屏下从右侧滑入展示章节列表，支持点击跳转（`SceneType.AI_VOD` 场景） |
+| `SlotType.CHAPTER_PANEL` | 章节面板插槽：全屏下从右侧滑入展示章节列表，支持点击跳转。章节能力为通用能力，可用范围见 [场景类型 - 章节能力](./advanced/SceneType.md#34-章节能力与场景) |
 
 ### **2.4 SceneType（播放场景）**
 
@@ -296,7 +296,7 @@ AliPlayerKit 提供了丰富的 API 接口，方便开发者直接控制播放�
 | `SceneType.VIDEO_LIST` | 2 | 列表播放场景：视频列表中的播放器，禁用垂直手势 |
 | `SceneType.RESTRICTED` | 3 | 受限播放场景：限制时间轴操作，适用于教育培训等 |
 | `SceneType.MINIMAL` | 4 | 最小化播放场景：仅播放视图，无任何 UI |
-| `SceneType.AI_VOD` | 5 | AI 增强点播场景：在点播基础上增加章节导航与 AI 内容展示 |
+| `SceneType.AI_VOD` | 5 | AI 增强点播场景：在点播基础上增加 AI 内容展示（摘要、分段）；章节能力为通用能力，见 [场景类型 - 章节能力](./advanced/SceneType.md#34-章节能力与场景) |
 
 ### **2.5 PlayerViewType（播放器视图类型）**
 

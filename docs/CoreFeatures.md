@@ -357,7 +357,7 @@ AliPlayerKit 会在播放器 `prepared` 后自动从云端 MediaInfo 中提取�
 | `BottomBarSlot` 章节标记 | 进度条上直观展示视频内容结构的拆分点，配合章节 Chip 列表支持点击跳转；横屏下额外提供「章节」入口与「下一章」按钮 |
 | `ChapterPanelSlot` | 全屏下从右侧滑入结构化内容导航面板，支持点击快速跳转到目标片段 |
 
-**生效条件：** 非 `LIVE`/`MINIMAL` 场景且章节数据非空。`RESTRICTED` 场景下章节 UI 仅作展示，点击章节不执行跳转（Seek 已被场景禁用）。
+**生效条件：** 章节能力为通用能力，除 `LIVE`/`MINIMAL` 外均可用，详见 [场景类型 - 章节能力](./advanced/SceneType.md#34-章节能力与场景)。
 
 **接入示例**
 

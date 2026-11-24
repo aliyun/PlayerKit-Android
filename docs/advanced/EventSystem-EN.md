@@ -160,7 +160,7 @@ Control bar visibility synchronization events, plus overlay events triggered fro
 | `ShowSeekThumbnail` | Progress bar dragging started — show the seek thumbnail overlay | - |
 | `UpdateSeekThumbnail` | Update thumbnail, chapter highlight and time display while dragging | `positionMs`, `durationMs` |
 | `HideSeekThumbnail` | Progress bar dragging stopped — hide the seek thumbnail overlay | - |
-| `ShowChapterPanel` | Show the chapter panel (AI_VOD scene, triggered by the bottom bar chapter button) | - |
+| `ShowChapterPanel` | Show the chapter panel (triggered by the bottom bar chapter button when the chapter capability is available; see [SceneType - Chapter Capability](SceneType-EN.md#34-chapter-capability-and-scenes)) | - |
 
 ### **3.5 Fullscreen Events (FullscreenEvents)**
 

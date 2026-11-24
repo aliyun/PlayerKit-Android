@@ -414,7 +414,7 @@ When the chapter data is empty, all of the above entry points simply do not rend
 
 Scene and permission boundaries stay the same: `RESTRICTED` displays chapters but blocks seeking (blocked both at the interaction layer and as a fallback at the command layer), while `LIVE` / `MINIMAL` do not display them at all.
 
-> **Known limitations**: the chapter side panel is a snapshot taken when it is opened, so data changes made while it is open are not refreshed in real time; chapters must be sorted by start time in ascending order with contiguous, non-overlapping ranges.
+> **Data requirements**: chapters must be sorted by start time in ascending order with contiguous, non-overlapping ranges, otherwise the "current chapter" detection will be inaccurate; while the chapter side panel is open, data changes refresh both the list and the highlight in sync, and the panel closes automatically when the chapters are cleared.
 
 ---
 

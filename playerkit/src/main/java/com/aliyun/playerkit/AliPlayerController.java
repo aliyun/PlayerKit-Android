@@ -896,8 +896,9 @@ public class AliPlayerController implements IPlayerController, LifecycleEventObs
      * 跳转位置以毫秒为单位，应该大于等于 0，且不应超过视频总时长。
      * </p>
      * <p>
-     * 场景门卫：LIVE（无时间轴）、MINIMAL（无 UI）、RESTRICTED（防跳播）场景下禁用 Seek，
-     * 进度条拖拽、章节 Chip/标记点/面板等交互发起的跳转请求一律拦截。
+     * 场景门卫：LIVE（无时间轴）、RESTRICTED（防跳播）场景下禁用 Seek，
+     * 进度条拖拽、章节 Chip/标记点/面板等交互发起的跳转请求一律拦截；
+     * MINIMAL 场景虽无内置 UI，但允许跳转，不在拦截范围内。
      * </p>
      *
      * @param command 跳转命令，不能为 null，包含目标播放位置（单位：毫秒）

@@ -160,7 +160,7 @@ AliPlayerKit 中的事件分为两大类：
 | `ShowSeekThumbnail` | 开始拖动进度条，显示 Seek 缩略图浮层 | - |
 | `UpdateSeekThumbnail` | 拖动进度条过程中更新缩略图、章节高亮与时间显示 | `positionMs`, `durationMs` |
 | `HideSeekThumbnail` | 停止拖动进度条，隐藏 Seek 缩略图浮层 | - |
-| `ShowChapterPanel` | 显示章节面板（AI_VOD 场景，由底部栏章节按钮触发） | - |
+| `ShowChapterPanel` | 显示章节面板（章节能力可用时由底部栏章节按钮触发，见 [场景类型 - 章节能力](SceneType.md#34-章节能力与场景)） | - |
 
 ### **3.5 全屏事件 (FullscreenEvents)**
 

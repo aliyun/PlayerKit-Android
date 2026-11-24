@@ -2,26 +2,47 @@
 
 Language: [中文简体](CHANGELOG.md) | English
 
-## [Unreleased]
+## [7.19.0] - 2026-11-24
+
+### SDK Upgrade
+
+- AliyunPlayer: 7.16.0 → 7.19.0
+- AlivcArtc: 7.16.0 → 7.19.0
+- PlayerKit version bumped to 7.19.0, readable via `AliPlayerKit.getPlayerKitVersion()`
 
 ### Added
 
-- **Dynamic chapter data updates (lazy loading)**: Chapter data is no longer limited to a single delivery at configure time. Applications can call `AliPlayerController.setChapters()` once `configure()` has completed, without rebuilding the player or re-configuring it (initial chapters are still passed via `AliPlayerModel.Builder.chapters()`; writes are ignored with a warning while the player is not ready).
-  - Both data sources write to the same data: `AliPlayerModel.Builder.chapters()` provides the initial value at configure time, while runtime writes take effect immediately and later writes override earlier ones
-  - A single write updates every chapter entry point: progress bar chapter markers (portrait and landscape), the landscape "Chapter N · Title" row with the "Next" entry, the portrait chapter chip list, and the landscape chapter side panel
-  - When the chapter data is empty, all of these entry points are hidden and the UI behaves like a normal player, making "start playback first, add chapters later" a safe path
-  - Chapter data is released together with the player and reset to the new configuration value on re-configure, so chapters from the previous video never leak
-  - The portrait chapter list automatically scrolls to the current chapter when the whole data set is replaced, and returns to the beginning when the current position belongs to no chapter
-  - Scene boundaries are unchanged: `RESTRICTED` displays chapters but blocks seeking, while `LIVE` / `MINIMAL` do not display them
-- New APIs: `AliPlayerController.setChapters()` / `getChapters()`, `IPlayerStateStore.getChapters()`, and the `PlayerEvents.ChapterListUpdated` event
+- **Lazy chapter data (`ChapterInfo` dynamic updates)**: Chapter data is no longer limited to a single delivery at `configure()`; call `AliPlayerController.setChapters()` at any time after configuration and it takes effect immediately, without re-creating or re-configuring the player (initial values can still be passed via `AliPlayerModel.Builder.chapters()`)
+  - **Data semantics**: The configured value and runtime writes share the same data; each write replaces the whole list and later writes override earlier ones; `null` or an empty list clears the chapters
+  - **Write timing**: While the player is not ready (before `configure()` or after `destroy()`) the write is logged and ignored instead of throwing to the caller; writes do not need to be on the main thread, and UI refreshes are marshalled back to it
+  - **Linked entry points**: A single write refreshes the progress bar chapter markers (portrait and landscape), the landscape "Chapter N · Title" row with the "Next" entry, the portrait chapter chips and the landscape chapter side panel, and notifies custom UI through the `PlayerEvents.ChapterListUpdated` event
+  - **Empty data fallback**: With no chapters all of these entry points are not rendered (the panel closes and the landscape info row falls back to the time display), so the UI behaves like a normal player and "start playback first, add chapters later" is a safe path
+  - **Lifecycle**: Chapter data is released with `destroy()` and reset to the new configuration value on re-`configure()`, so a pooled instance never leaks chapters from the previous video
+  - **Portrait positioning**: The portrait chapter chips scroll to the current chapter after the data set is replaced, and return to the beginning when the position belongs to no chapter
+- **New APIs**: `AliPlayerController.setChapters()` / `getChapters()` (returns an empty list while the player is not ready), `IMediaPlayer.setChapters()`, `IPlayerStateStore.getChapters()`, and the `PlayerEvents.ChapterListUpdated` event (also fired when chapters are cleared, so UI can fall back)
 
 ### Changed
 
-- **AI Education scene now starts playback before loading chapters**: The player is configured and started as soon as the PlayAuth is available; chapters are written via `setChapters()` after the AI content returns, so playback is no longer blocked by the AI request
+- **Chapter capability now applies more broadly**: Previously limited to "`AI_VOD` with at least 2 chapters", it now applies to any scene except `LIVE` / `MINIMAL` as soon as chapters are non-empty, so `VOD` / `VIDEO_LIST` / `RESTRICTED` also show chapter entry points; a single chapter works as well — chips are still shown, no marker is drawn when its start time is 0, and the landscape "Next" entry stays visible but does not respond; in `RESTRICTED` chapters are display-only — tapping does not seek, does not update the highlight and does not show the "seeked" toast
+- **Behavior change: seek is blocked in the `LIVE` / `RESTRICTED` scenes**: Jumps initiated through the `PlayerCommand.Seek` event channel (progress bar dragging, chapter entries, custom Slots posting `postEvent(...)`) are all dropped with a warning log, and the playback position stays unchanged
+  - Affected: previously `RESTRICTED` only disabled interactions at the UI layer (progress bar not draggable, horizontal gesture disabled), so custom Slots could still seek by posting this event; that no longer works after the upgrade
+  - Not affected: business code calling `controller.getPlayer().seekTo()` (`IMediaPlayer`) bypasses the command channel and is not gated
+  - See [SceneType - Seek Capability and Blocking Boundaries](./advanced/SceneType-EN.md#33-seek-capability-and-blocking-boundaries) for the per-scene differences
+- **Chapter slots now read a single data channel**: `BottomBarSlot` / `ChapterPanelSlot` no longer hold their own `AliPlayerModel` snapshots; they subscribe to `ChapterListUpdated` and read from `PlayerStateStore`, keeping every chapter entry point consistent
+- **`AliPlayerModel.getChapters()` semantics clarified**: It now represents only the initial snapshot taken at `configure()` and does not change with runtime writes; use `AliPlayerController.getChapters()` or `IPlayerStateStore.getChapters()` for the latest data at runtime
+- **AI Education scene switched to lazy chapters**: Playback starts first and chapters are added once the AI content returns, so the first frame no longer waits for the AI request. See [AI Education Scene - Lazy Chapter Data Updates](./scenes/AiEducation-EN.md#84-lazy-chapter-data-updates) for the integration flow
+
+### Fixed
+
+- Stale chapter UI when switching data sources: chapter chips, landscape chapter buttons and progress bar markers were not cleared, and their click listeners could still seek on the new video
+- Entering fullscreen right after switching videos rebuilt the landscape chapter markers with the previous duration, causing misplaced markers and highlighting
+- When the position is before the first chapter or falls into a chapter gap, the landscape "Next" entry did not respond or computed the wrong target chapter; it now advances from the most recent valid chapter and reports "last chapter" when out of range
+- The chapter side panel did not refresh while open when chapter data changed, so highlighting could land on the wrong chapter and cleared entries could remain; the panel now rebuilds its snapshot on open, refreshes in sync with data changes, and closes automatically when the chapters are cleared
 
 ### Documentation
 
 - [API Reference](./ApiReference-EN.md) now documents the chapter data channel and the `ChapterListUpdated` event
+- [SceneType](./advanced/SceneType-EN.md) now documents Seek capability and blocking boundaries, plus chapter capability and scene coverage: generic across scenes, hidden in `LIVE` / `MINIMAL`, display-only in `RESTRICTED`
 - [AI Education Scene](./scenes/AiEducation-EN.md) now documents lazy chapter data updates
 
 ## [7.16.0] - 2026-08-26

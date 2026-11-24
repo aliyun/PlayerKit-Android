@@ -91,7 +91,7 @@ AliPlayerKit defines 6 playback scenes. Slot behavior automatically adapts under
 | VIDEO_LIST | List playback scene, disables vertical gestures | Feed, short video lists |
 | RESTRICTED | Restricted playback scene, restricts seeking | Education/training, exam monitoring |
 | MINIMAL | Minimal playback scene, only displays the video frame | Background videos, decorative videos |
-| AI_VOD | AI-enhanced VOD scene, adds chapter navigation and AI content display on top of VOD | AI courses, knowledge videos |
+| AI_VOD | AI-enhanced VOD scene, adds AI content display (summary, segments) on top of VOD | AI courses, knowledge videos |
 
 **Slot Visibility Rules**:
 
@@ -112,7 +112,7 @@ AliPlayerKit defines 6 playback scenes. Slot behavior automatically adapts under
 | OPTION_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 | CHAPTER_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 
-> 💡 `CHAPTER_PANEL` declares no scene-exclusion rule, so it is mounted in every non-MINIMAL scene. However it stays hidden by default and only expands when it receives `ControlBarEvents.ShowChapterPanel` with non-empty chapter data. That event is posted solely by the `BottomBarSlot` chapter button, which appears only when the chapter feature is available (any scene other than `LIVE`/`MINIMAL` with non-empty chapter data).
+> 💡 `CHAPTER_PANEL` declares no scene-exclusion rule, so it is mounted in every non-MINIMAL scene. However it stays hidden by default and only expands when it receives `ControlBarEvents.ShowChapterPanel` with non-empty chapter data. That event is posted solely by the `BottomBarSlot` chapter button, which appears only when the chapter capability is available; see [SceneType - Chapter Capability](SceneType-EN.md#34-chapter-capability-and-scenes) for availability.
 
 **Gesture Behavior Differences**:
 
@@ -780,7 +780,7 @@ The player UI consists of multiple stacked slots; the z-order directly determine
 | BOTTOM_BAR | 90 | Control layer | Bottom Bar |
 | SETTING_MENU | 100 | Menu layer | Settings Menu overlay |
 | OPTION_PANEL | 110 | Menu layer | Option panel (landscape speed/quality) |
-| CHAPTER_PANEL | 115 | Menu layer | Chapter panel (AI_VOD scene, slides in from the right in fullscreen) |
+| CHAPTER_PANEL | 115 | Menu layer | Chapter panel (available when the chapter capability is active, slides in from the right in fullscreen) |
 
 > **Z-Order Rule**: Smaller order values are at the bottom (rendered first, occluded first); larger order values are on top (rendered last, occluding others).
 

@@ -285,7 +285,7 @@ Custom slots need to implement the `ISlot` interface, which defines the slot lif
 | `SlotType.BOTTOM_BAR` | Bottom Control Bar Slot: Displays playback controls, progress bar, etc. |
 | `SlotType.SETTING_MENU` | Settings Menu Slot: Displays settings menu (such as speed, resolution, mirror, rotation, etc.) |
 | `SlotType.OPTION_PANEL` | Option Panel Slot: Independent selection panel for speed/resolution shown in landscape scenarios |
-| `SlotType.CHAPTER_PANEL` | Chapter Panel Slot: Slides in from the right in fullscreen to show the chapter list, tap to seek (`SceneType.AI_VOD` scene) |
+| `SlotType.CHAPTER_PANEL` | Chapter Panel Slot: Slides in from the right in fullscreen to show the chapter list, tap to seek. Chapter capability is generic; see [SceneType - Chapter Capability](./advanced/SceneType-EN.md#34-chapter-capability-and-scenes) for availability |
 
 ### **2.4 SceneType**
 
@@ -296,7 +296,7 @@ Custom slots need to implement the `ISlot` interface, which defines the slot lif
 | `SceneType.VIDEO_LIST` | 2 | Video list playback scene: Player in a video list, with vertical gestures disabled |
 | `SceneType.RESTRICTED` | 3 | Restricted playback scene: Restricts timeline operations, suitable for education and training |
 | `SceneType.MINIMAL` | 4 | Minimal playback scene: Only the playback view, without any UI |
-| `SceneType.AI_VOD` | 5 | AI-enhanced VOD scene: Adds chapter navigation and AI content display on top of the VOD scene |
+| `SceneType.AI_VOD` | 5 | AI-enhanced VOD scene: Adds AI content display (summary, segments) on top of the VOD scene; chapter capability is generic, see [SceneType - Chapter Capability](./advanced/SceneType-EN.md#34-chapter-capability-and-scenes) |
 
 ### **2.5 PlayerViewType**
 

@@ -91,7 +91,7 @@ AliPlayerKit 定义了 6 种播放场景，不同场景下插槽行为自动适�
 | VIDEO_LIST | 列表播放场景，禁用垂直手势 | 信息流、短视频列表 |
 | RESTRICTED | 受限播放场景，限制跳跃播放 | 教育培训、考试监控 |
 | MINIMAL | 最小化播放场景，仅显示视频画面 | 背景视频、装饰视频 |
-| AI_VOD | AI 增强点播场景，在 VOD 基础上增加章节导航与 AI 内容展示 | AI 课程、知识视频 |
+| AI_VOD | AI 增强点播场景，在 VOD 基础上增加 AI 内容展示（摘要、分段） | AI 课程、知识视频 |
 
 **插槽可见性规则**：
 
@@ -112,7 +112,7 @@ AliPlayerKit 定义了 6 种播放场景，不同场景下插槽行为自动适�
 | OPTION_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 | CHAPTER_PANEL | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ |
 
-> 💡 `CHAPTER_PANEL` 未配置场景排除规则，因此在非 MINIMAL 场景下都会被挂载，但它默认隐藏，且只有在收到 `ControlBarEvents.ShowChapterPanel` 且章节数据非空时才会展开。而该事件仅由 `BottomBarSlot` 的章节按钮触发，章节按钮只在章节能力可用（非 LIVE/MINIMAL 场景且章节数据非空）时出现。
+> 💡 `CHAPTER_PANEL` 未配置场景排除规则，因此在非 MINIMAL 场景下都会被挂载，但它默认隐藏，且只有在收到 `ControlBarEvents.ShowChapterPanel` 且章节数据非空时才会展开。而该事件仅由 `BottomBarSlot` 的章节按钮触发，章节按钮只在章节能力可用时出现，可用范围见 [场景类型 - 章节能力](SceneType.md#34-章节能力与场景)。
 
 **手势行为差异**：
 
@@ -780,7 +780,7 @@ AliPlayerKit 的插槽系统采用**显式层级控制**机制，通过 `order` 
 | BOTTOM_BAR | 90 | 控制层 | 底部控制栏 |
 | SETTING_MENU | 100 | 菜单层 | 设置菜单浮层 |
 | OPTION_PANEL | 110 | 菜单层 | 选项面板（横屏倍速/清晰度） |
-| CHAPTER_PANEL | 115 | 菜单层 | 章节面板（AI_VOD 场景，全屏下从右侧滑入） |
+| CHAPTER_PANEL | 115 | 菜单层 | 章节面板（章节能力可用时，全屏下从右侧滑入） |
 
 > **层级规则**：order 值越小越靠底层（先渲染、先被遮盖），order 值越大越靠顶层（后渲染、后遮盖其他）。
 
